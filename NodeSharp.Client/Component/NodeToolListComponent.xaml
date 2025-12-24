@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:core="http://schemas.syncfusion.com/maui"
+             xmlns:icons="clr-namespace:Syncfusion.Maui.Toolkit;assembly=Syncfusion.Maui.Toolkit"
+             x:Class="NodeSharp.Client.Component.NodeToolListComponent">
+
+    <Border Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray" StrokeShape="RoundRectangle 1">
+        <Grid Padding="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <!-- Syncfusion themed input -->
+            <Grid Grid.Row="0" Grid.ColumnSpan="0" Padding="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <!-- Text input fills -->
+                    <ColumnDefinition Width="Auto" />
+                    <!-- Button fixed -->
+                </Grid.ColumnDefinitions>
+
+                <core:SfTextInputLayout Grid.Column="0"
+                                        Hint="Search by name"
+                                        HorizontalOptions="Fill"
+                                        VerticalOptions="Center">
+
+                    <core:SfTextInputLayout.HintLabelStyle>
+                        <core:LabelStyle
+                            FontSize="16"
+                            FontAttributes="Italic"
+                            TextColor="Blue" />
+                    </core:SfTextInputLayout.HintLabelStyle>
+
+                    <Entry x:Name="SearchBox" />
+                    <core:SfTextInputLayout.TrailingView>
+                        <Label Text="&#xe713;"
+                           FontFamily="MaterialAssets"
+                           FontSize="24"
+                           TextColor="Black">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSearchClicked" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </core:SfTextInputLayout.TrailingView>
+
+
+                </core:SfTextInputLayout>
+
+                <ImageButton Grid.Column="1"
+                             Margin="8,0,0,0"
+                             VerticalOptions="Center"
+                             BackgroundColor="Transparent"
+                             WidthRequest="40"
+                             HeightRequest="40"
+                             Clicked="OnSearchClicked">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="&#xe713;"
+                                         FontFamily="MaterialAssets"
+                                         Size="40"
+                                         Color="Black" />
+                    </ImageButton.Source>
+                </ImageButton>
+
+
+                <!-- <ImageButton Grid.Column="1" -->
+                <!--              Source="search.png" -->
+                <!--              BackgroundColor="Transparent" -->
+                <!--              WidthRequest="40" -->
+                <!--              HeightRequest="40" -->
+                <!--              Clicked="OnSearchClicked" /> -->
+            </Grid>
+
+
+        </Grid>
+
+    </Border>
+</ContentView>

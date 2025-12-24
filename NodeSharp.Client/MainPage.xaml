@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:component="clr-namespace:NodeSharp.Client.Component"
+             xmlns:toolkit="clr-namespace:Syncfusion.Maui.Toolkit;assembly=Syncfusion.Maui.Toolkit"
+             xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             x:Class="NodeSharp.Client.MainPage">
+
+
+    <Grid
+        HorizontalOptions="Fill"
+        VerticalOptions="Fill">
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <!-- <Grid Grid.Row="0" Grid.ColumnSpan="2" Padding="10"> -->
+            <!--     <Grid.ColumnDefinitions> -->
+            <!--         <ColumnDefinition Width="*" /> -->
+            <!--         <ColumnDefinition Width="50" /> -->
+            <!--     </Grid.ColumnDefinitions> -->
+            <!-- -->
+            <!--     ~1~ Syncfusion themed input @1@ -->
+            <!--     <inputLayout:SfTextInputLayout Grid.Column="0" -->
+            <!--                    Hint="Search by name" -->
+            <!--                    HorizontalOptions="Fill" -->
+            <!--                    VerticalOptions="Center"> -->
+            <!--         <Entry x:Name="SearchBox" /> -->
+            <!--     </inputLayout:SfTextInputLayout> -->
+            <!-- -->
+            <!--     <ImageButton Grid.Column="1" -->
+            <!--      Source="search.png" -->
+            <!--      BackgroundColor="Transparent" -->
+            <!--      WidthRequest="40" -->
+            <!--      HeightRequest="40" -->
+            <!--      Clicked="OnSearchClicked" /> -->
+            <!-- </Grid> -->
+
+
+
+            <component:NodeToolListComponent
+                Grid.Column="0" Grid.Row="0"
+                Title="Hello MAUI Component!" />
+        </Grid>
+    </Grid>
+
+</ContentPage>
