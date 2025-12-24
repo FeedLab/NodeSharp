@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using FluentAssertions;
+using NodeSharp.NodeEngine.Node;
 
 namespace NodeSharp.NodeEngine.Tests.Nodes.Delay;
 

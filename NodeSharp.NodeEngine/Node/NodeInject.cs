@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace NodeSharp.NodeEngine;
+namespace NodeSharp.NodeEngine.Node;
 
 public class NodeInject : BaseNode
 {

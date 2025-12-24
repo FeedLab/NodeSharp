@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 
-namespace NodeSharp.NodeEngine;
+namespace NodeSharp.NodeEngine.Node;
 
 public class NodeDebug : BaseNode
 {

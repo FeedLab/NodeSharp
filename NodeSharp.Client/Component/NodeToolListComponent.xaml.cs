@@ -1,10 +1,20 @@
-﻿namespace NodeSharp.Client.Component;
+﻿using NodeSharp.Client.Services;
+using NodeSharp.Client.ViewModel;
+using NodeSharp.NodeEngine.Model;
+
+namespace NodeSharp.Client.Component;
 
 public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
 {
+    private readonly NodeToolListComponentModel viewModel;
+
     public NodeToolListComponent()
     {
+        viewModel = AppService.GetRequiredService<NodeToolListComponentModel>();
+
         InitializeComponent();
+        
+        this.BindingContext = viewModel;
     }
 
     public static readonly BindableProperty TitleProperty = BindableProperty.Create(nameof(Title), typeof(string),
@@ -30,28 +40,4 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
             app.ToggleTheme();
         }
     }
-
-    //private void OnThemeSwitchClicked(object sender, EventArgs e)
-    //{
-    //    var app = Application.Current as App;
-
-    //    // Check current theme
-    //    bool isDark = app.Resources.MergedDictionaries.OfType<DarkTheme>().Any();
-
-    //    // Toggle
-    //    app.ApplyTheme(isDark ? AppTheme.Light : AppTheme.Dark);
-
-    //    var currentTheme = Application.Current.RequestedTheme;
-
-    //    if (currentTheme == AppTheme.Dark)
-    //    {
-    //        // Dark mode is active
-    //    }
-    //    else
-    //    {
-    //        // Light mode is active
-    //    }
-
-    //}
-
 }

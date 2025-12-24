@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace NodeSharp.NodeEngine;
+namespace NodeSharp.NodeEngine.Node;
 
 public abstract class BaseNode
 {

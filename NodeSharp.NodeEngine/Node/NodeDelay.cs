@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using NodeSharp.NodeEngine.Extension;
 
-namespace NodeSharp.NodeEngine;
+namespace NodeSharp.NodeEngine.Node;
 
 public class NodeDelay : BaseNode
 {

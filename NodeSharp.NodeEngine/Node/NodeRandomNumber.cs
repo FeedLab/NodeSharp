@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace NodeSharp.NodeEngine;
+namespace NodeSharp.NodeEngine.Node;
 
 public class NodeRandomNumber : BaseNode
 {

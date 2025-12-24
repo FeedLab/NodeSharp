@@ -1,4 +1,6 @@
-﻿namespace NodeSharp.NodeEngine;
+﻿using NodeSharp.NodeEngine.Node;
+
+namespace NodeSharp.NodeEngine;
 
 public class BaseNodeList : List<BaseNode>
 {
