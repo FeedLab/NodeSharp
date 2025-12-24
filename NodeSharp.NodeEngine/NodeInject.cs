@@ -1,32 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using System.Collections.Generic;
-using System.Globalization;
 
-namespace ConsoleApp1;
+namespace NodeSharp.NodeEngine;
 
 public class NodeInject : BaseNode
 {
     public ActivateAfter ActivateAfter { get; }
     public Parameter[] Parameters { get; }
-
-    // public NodeInject(
-    //     BaseNodeList nodes,
-    //     string id,
-    //     string typeId,
-    //     string name,
-    //     bool isEnabled,
-    //     bool activateOnStart,
-    //     Output[] outputs,
-    //     Input[] inputs,
-    //     ActivateAfter activateAfter,
-    //     Parameter[] parameters)
-    //     : base(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs)
-    // {
-    //     ActivateAfter = activateAfter;
-    //     Parameters = parameters;
-    // }
 
     public NodeInject(
         BaseNodeList nodes,
@@ -87,7 +68,7 @@ public class NodeInject : BaseNode
 
         var parametersJsonString = BuildParametersJson(Parameters);
 
-        await SendToChildren(parametersJsonString);
+        await SendToConnectedChildrenAsync(parametersJsonString);
     }
 
     private static string BuildParametersJson(Parameter[] parameters)

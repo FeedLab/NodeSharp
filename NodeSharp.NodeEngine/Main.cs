@@ -1,15 +1,27 @@
 ﻿using System.Text.Json;
 
-namespace ConsoleApp1;
+namespace NodeSharp.NodeEngine;
 
 public class Main
 {
     private readonly BaseNodeList nodes = [];
+    // private string? nodeDataJson = null;
 
-    public async Task Run(string jsonSchema)
+    // public async Task LoadFromFileAsync(string fileName)
+    // {
+    //     nodeDataJson = await File.ReadAllTextAsync(fileName);
+    // }
+    
+    public async Task LoadFromFileAsync(string fileName)
     {
+        var nodeDataJson = await File.ReadAllTextAsync(fileName);
+
+        if (nodeDataJson is null)
+        {
+            throw new InvalidOperationException($"Node data JSON is null. File name is: {fileName}");
+        }
         
-        var document = JsonDocument.Parse(jsonSchema);
+        var document = JsonDocument.Parse(nodeDataJson);
         var nodesArray = document.RootElement.GetProperty("Nodes");
 
         ParseNodesFromJson(nodesArray);
@@ -23,8 +35,15 @@ public class Main
             Console.WriteLine($"  - {node.Name} ({node.TypeId}): {node.Outputs.Length} outputs, {node.Inputs.Length} inputs");
         }
 
+        // return Task.CompletedTask;
+    }
+    
+    public async Task Run()
+    {
         await nodes.Run();
     }
+    
+    public T? FindNodeFromId<T>(string id) where T : BaseNode => nodes.OfType<T>().SingleOrDefault(x => x.Id == id);
     
     void ParseNodesFromJson(JsonElement jsonElement)
     {

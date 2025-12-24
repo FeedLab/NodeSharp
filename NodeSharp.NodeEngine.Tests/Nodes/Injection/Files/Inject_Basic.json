@@ -1,0 +1,61 @@
+﻿{
+  "Nodes": [
+    {
+      "Id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "TypeId": "Inject",
+      "Name": "Node1",
+      "IsEnabled": true,
+      "ActivateOnStart": true,
+      "Outputs": [
+        {
+          "Name": "Output 1",
+          "ConnectsToNodeId": [
+          ]
+        }
+      ],
+      "Inputs": [],
+      "ActivateAfter": {
+        "Type": "Seconds",
+        "Value": 10
+      },
+      "Parameters": [
+        {
+          "Name": "RandomMin",
+          "Type": "number",
+          "Value": "1000",
+          "Source": "primitive"
+        },
+        {
+          "Name": "RandomMax",
+          "Type": "number",
+          "Value": "2000",
+          "Source": "primitive"
+        },
+        {
+          "Name": "Count",
+          "Type": "number",
+          "Value": "100",
+          "Source": "primitive"
+        },
+        {
+          "Name": "Description",
+          "Type": "string",
+          "Value": "Monday",
+          "Source": "primitive"
+        },
+        {
+          "Name": "ComputerName",
+          "Type": "string",
+          "Value": "COMPUTERNAME",
+          "Source": "environment"
+        },
+        {
+          "Name": "Processors",
+          "Type": "number",
+          "Value": "NUMBER_OF_PROCESSORS",
+          "Source": "environment"
+        }
+      ]
+    }
+  ]
+}

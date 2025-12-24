@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp1;
+﻿namespace NodeSharp.NodeEngine;
 
 public class BaseNodeList : List<BaseNode>
 {
@@ -12,9 +12,17 @@ public class BaseNodeList : List<BaseNode>
 
     public async Task Run()
     {
-        foreach (var node in this.Where(node => node is { ActivateOnStart: true, IsEnabled: true }))
+        foreach (var candidate in this)
         {
-            await node.Run();
+            if (!ShouldRunOnStart(candidate))
+            {
+                continue;
+            }
+
+            await candidate.Run().ConfigureAwait(false);
         }
     }
+
+    private static bool ShouldRunOnStart(BaseNode candidate) =>
+        candidate is { ActivateOnStart: true, IsEnabled: true };
 }

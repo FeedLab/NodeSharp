@@ -1,6 +1,6 @@
-﻿namespace ConsoleApp1.Extension;
+﻿using System.Text.Json.Nodes;
 
-using System.Text.Json.Nodes;
+namespace NodeSharp.NodeEngine.Extension;
 
 public static class JsonNodeExtensions
 {

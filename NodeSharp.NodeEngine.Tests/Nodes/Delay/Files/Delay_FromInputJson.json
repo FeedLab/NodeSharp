@@ -1,0 +1,72 @@
+﻿{
+  "Nodes": [
+    {
+      "Id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "TypeId": "Inject",
+      "Name": "Node1",
+      "IsEnabled": true,
+      "ActivateOnStart": true,
+      "Outputs": [
+        {
+          "Name": "Output 1",
+          "ConnectsToNodeId": [
+            "04d42414-6992-4201-8d29-da4b1facfbb6"
+          ]
+        }
+      ],
+      "Inputs": [],
+      "ActivateAfter": {
+        "Type": "Seconds",
+        "Value": 10
+      },
+      "Parameters": [
+        {
+          "Name": "Processors",
+          "Type": "number",
+          "Value": "NUMBER_OF_PROCESSORS",
+          "Source": "environment"
+        }
+      ]
+    },
+    {
+      "Id": "04d42414-6992-4201-8d29-da4b1facfbb6",
+      "TypeId": "Delay",
+      "Name": "Node5",
+      "IsEnabled": true,
+      "ActivateOnStart": false,
+      "Outputs": [
+        "fdec97b0-c81a-4062-a9c8-76e87c4d6691"
+      ],
+      "Inputs": [
+        {
+          "Name": "Input 1",
+          "ConnectsToParentNodeId": [
+            "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+          ]
+        }
+      ],
+      "Delay": {
+        "PathToDelayNode": "Delay",
+        "Source": "FromInput",
+        "Type": "Seconds",
+        "Value": 2
+      }
+    },
+    {
+      "Id": "fdec97b0-c81a-4062-a9c8-76e87c4d6691",
+      "TypeId": "Debug",
+      "Name": "Node4",
+      "IsEnabled": true,
+      "ActivateOnStart": false,
+      "Outputs": [],
+      "Inputs": [
+        {
+          "Name": "Input 1",
+          "ConnectsToParentNodeId": [
+            "04d42414-6992-4201-8d29-da4b1facfbb6"
+          ]
+        }
+      ]
+    }
+  ]
+}

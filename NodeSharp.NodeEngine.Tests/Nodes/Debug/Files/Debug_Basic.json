@@ -1,0 +1,48 @@
+﻿{
+  "Nodes": [
+    {
+      "Id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "TypeId": "Inject",
+      "Name": "Node1",
+      "IsEnabled": true,
+      "ActivateOnStart": true,
+      "Outputs": [
+        {
+          "Name": "Output 1",
+          "ConnectsToNodeId": [
+            "f6e5d4c3-b2a1-4f5e-6d7c-8b9a0e1f2d3c"
+          ]
+        }
+      ],
+      "Inputs": [],
+      "ActivateAfter": {
+        "Type": "Seconds",
+        "Value": 10
+      },
+      "Parameters": [
+        {
+          "Name": "Processors",
+          "Type": "number",
+          "Value": "NUMBER_OF_PROCESSORS",
+          "Source": "environment"
+        }
+      ]
+    },
+    {
+      "Id": "f6e5d4c3-b2a1-4f5e-6d7c-8b9a0e1f2d3c",
+      "TypeId": "Debug",
+      "Name": "Node2",
+      "IsEnabled": true,
+      "ActivateOnStart": false,
+      "Outputs": [],
+      "Inputs": [
+        {
+          "Name": "Input 1",
+          "ConnectsToParentNodeId": [
+            "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+          ]
+        }
+      ]
+    }
+  ]
+}

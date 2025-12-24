@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using ConsoleApp1.Extension;
+using NodeSharp.NodeEngine.Extension;
 
-namespace ConsoleApp1;
+namespace NodeSharp.NodeEngine;
 
 public class NodeDelay : BaseNode
 {
@@ -56,7 +55,7 @@ public class NodeDelay : BaseNode
             : valueProp.GetInt32();
     }
 
-    protected override async Task RunFromInput(BaseNode parentNode, string parametersJsonString)
+    public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
     {
         await base.RunFromInput(parentNode, parametersJsonString);
 
@@ -97,35 +96,6 @@ public class NodeDelay : BaseNode
                 "minutes" => delayValue * 60 * 1000,
                 _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Type}")
             };
-            
-            // if (parsed is JsonArray parameters)
-            // {
-            //     var nodeDelay = parsed.GetByPath(FromInputPath);
-            //     if (nodeDelay is null)
-            //     {
-            //         throw new InvalidOperationException($"NodeDelay '{Name}' could not find parameter '{FromInputPath}'");
-            //     }
-            //     
-            //     int GetNumber(string name)
-            //     {
-            //         var param = parameters
-            //                         .OfType<JsonObject>()
-            //                         .FirstOrDefault(p => p.ContainsKey(name))
-            //                     ?? throw new InvalidOperationException($"Missing parameter '{name}'");
-            //
-            //         return param[name]!.GetValue<int>();
-            //     }
-            //
-            //     var delayValue = GetNumber("Delay");
-            //
-            //     delayMilliseconds = Type.ToLowerInvariant() switch
-            //     {
-            //         "milliseconds" => delayValue,
-            //         "seconds" => delayValue * 1000,
-            //         "minutes" => delayValue * 60 * 1000,
-            //         _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Type}")
-            //     };
-            // }
         }
         else
         {
@@ -135,93 +105,8 @@ public class NodeDelay : BaseNode
         Debug.WriteLine($"NodeDelay '{Name}' delaying for {delayMilliseconds}ms");
         await Task.Delay(delayMilliseconds);
 
-        await SendToChildren(parametersJsonString);
-    }
-
-    private void ValidateNodeId()
-    {
-        Debug.WriteLine($"Validating NodeId: {Id}");
-
-        if (!Guid.TryParse(Id, out _))
-        {
-            Debug.WriteLine($"NodeId '{Id}' is not a valid GUID - throwing exception");
-            throw new InvalidOperationException($"NodeId '{Id}' is not a valid GUID.");
-        }
-
-        Debug.WriteLine($"NodeId is valid");
-    }
-
-    private void ValidateInputConnections(BaseNodeList baseNodeList)
-    {
-        Debug.WriteLine($"Validating {Inputs.Length} input connections");
-        var errors = new StringBuilder();
-
-        foreach (var input in Inputs)
-        {
-            Debug.WriteLine($"Validating input: {input.Name}");
-
-            foreach (var nodeId in input.ConnectsToParentNodeId)
-            {
-                Debug.WriteLine($"Checking parent node connection: {nodeId}");
-
-                if (!Guid.TryParse(nodeId, out _))
-                {
-                    Debug.WriteLine($"Invalid GUID: {nodeId}");
-                    errors.Append($"Input ConnectsToParentNodeId '{nodeId}' is not a valid GUID. ");
-                }
-                else if (baseNodeList.All(n => n.Id != nodeId))
-                {
-                    Debug.WriteLine($"Parent node not found: {nodeId}");
-                    errors.Append($"Input '{input.Name}' connects to non-existing parent node '{nodeId}'. ");
-                }
-                else
-                {
-                    Debug.WriteLine($"Parent node connection valid: {nodeId}");
-                }
-            }
-        }
-
-        if (errors.Length > 0)
-        {
-            Debug.WriteLine($"Validation errors found: {errors}");
-            throw new InvalidOperationException(errors.ToString().Trim());
-        }
-    }
-
-    private void ValidateOutputConnections(BaseNodeList baseNodeList)
-    {
-        Debug.WriteLine($"Validating {Outputs.Length} output connections");
-        var errors = new StringBuilder();
-
-        foreach (var output in Outputs)
-        {
-            Debug.WriteLine($"Validating output: {output.Name}");
-
-            foreach (var nodeId in output.ConnectsToNodeId)
-            {
-                Debug.WriteLine($"Checking node connection: {nodeId}");
-
-                if (!Guid.TryParse(nodeId, out _))
-                {
-                    Debug.WriteLine($"Invalid GUID: {nodeId}");
-                    errors.Append($"Output ConnectsToNodeId '{nodeId}' is not a valid GUID. ");
-                }
-                else if (baseNodeList.All(n => n.Id != nodeId))
-                {
-                    Debug.WriteLine($"Node not found: {nodeId}");
-                    errors.Append($"Output '{output.Name}' connects to non-existing node '{nodeId}'. ");
-                }
-                else
-                {
-                    Debug.WriteLine($"Node connection valid: {nodeId}");
-                }
-            }
-        }
-
-        if (errors.Length > 0)
-        {
-            Debug.WriteLine($"Validation errors found: {errors}");
-            throw new InvalidOperationException(errors.ToString().Trim());
-        }
+        await SendToConnectedChildrenAsync(parametersJsonString);
+        
+        return await Task.FromResult(parametersJsonString);
     }
 }

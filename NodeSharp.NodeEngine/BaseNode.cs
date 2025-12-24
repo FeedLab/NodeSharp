@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using System.Text.Json.Nodes;
 
-namespace ConsoleApp1;
+namespace NodeSharp.NodeEngine;
 
 public abstract class BaseNode
 {
@@ -42,127 +41,111 @@ public abstract class BaseNode
             return Task.CompletedTask;
         }
 
-        Debug.WriteLine($"Node {Name}:{TypeId} is activated on start");
-
+        Debug.WriteLine($"Node {FormatNode()} is activated on start");
         return Task.CompletedTask;
     }
 
-    protected virtual Task RunFromInput(BaseNode parent, string parametersJsonString)
+    public virtual Task<string> RunFromInput(BaseNode parent, string parametersJsonString)
     {
-        Debug.WriteLine($"Node {Name}:{TypeId} has been activate by parent node {parent.Name}:{parent.TypeId}");
-
-        return Task.CompletedTask;
+        Debug.WriteLine($"Node {FormatNode()} has been activated by parent node {parent.FormatNode()}");
+        return Task.FromResult(parametersJsonString);
     }
 
-    protected Task SendToChildren(string parametersJsonString)
+    // ... existing code ...
+
+    protected Task SendToConnectedChildrenAsync(string parametersJsonString)
     {
+        var tasks = new List<Task>();
+
         foreach (var output in Outputs)
         {
             foreach (var nodeId in output.ConnectsToNodeId)
             {
-                var baseNode = Nodes.Find(f => f.Id == nodeId);
-
-                if (baseNode is null)
+                var targetNode = Nodes.Find(f => f.Id == nodeId);
+                if (targetNode is null)
                 {
                     throw new InvalidOperationException($"Node not found: {nodeId}");
                 }
 
-                Task.Run(() => baseNode.RunFromInput(this, parametersJsonString));
+                tasks.Add(targetNode.RunFromInput(this, parametersJsonString));
             }
         }
-        
-        return Task.CompletedTask;
+
+        return Task.WhenAll(tasks);
     }
-    
+
     public void ValidateInputAndOutput()
     {
         Debug.WriteLine($"Validating NodeInject: {Name} (Id: {Id})");
-
         ValidateNodeId();
+
         ValidateInputConnections(Nodes);
         ValidateOutputConnections(Nodes);
 
         Debug.WriteLine($"NodeInject {Name} validation completed successfully");
     }
-    
+
     private void ValidateNodeId()
     {
         Debug.WriteLine($"Validating NodeId: {Id}");
-
         if (!Guid.TryParse(Id, out _))
         {
             Debug.WriteLine($"NodeId '{Id}' is not a valid GUID - throwing exception");
             throw new InvalidOperationException($"NodeId '{Id}' is not a valid GUID.");
         }
 
-        Debug.WriteLine($"NodeId is valid");
+        Debug.WriteLine("NodeId is valid");
     }
 
     private void ValidateOutputConnections(BaseNodeList baseNodeList)
     {
         Debug.WriteLine($"Validating {Outputs.Length} output connections");
-        var errors = new StringBuilder();
 
-        foreach (var output in Outputs)
-        {
-            Debug.WriteLine($"Validating output: {output.Name}");
-
-            foreach (var nodeId in output.ConnectsToNodeId)
-            {
-                Debug.WriteLine($"Checking node connection: {nodeId}");
-
-                if (!Guid.TryParse(nodeId, out _))
-                {
-                    Debug.WriteLine($"Invalid GUID: {nodeId}");
-                    errors.Append($"Output ConnectsToNodeId '{nodeId}' is not a valid GUID. ");
-                }
-                else if (baseNodeList.All(n => n.Id != nodeId))
-                {
-                    Debug.WriteLine($"Node not found: {nodeId}");
-                    errors.Append($"Output '{output.Name}' connects to non-existing node '{nodeId}'. ");
-                }
-                else
-                {
-                    Debug.WriteLine($"Node connection valid: {nodeId}");
-                }
-            }
-        }
-
-        if (errors.Length > 0)
-        {
-            Debug.WriteLine($"Validation errors found: {errors}");
-            throw new InvalidOperationException(errors.ToString().Trim());
-        }
+        ValidateConnections(
+            baseNodeList,
+            connections: Outputs.SelectMany(o => o.ConnectsToNodeId.Select(nodeId => (PortName: o.Name, NodeId: nodeId))),
+            idLabel: "Output ConnectsToNodeId",
+            missingNodeMessage: (portName, nodeId) => $"Output '{portName}' connects to non-existing node '{nodeId}'. ");
     }
-    
+
     private void ValidateInputConnections(BaseNodeList baseNodeList)
     {
         Debug.WriteLine($"Validating {Inputs.Length} input connections");
+
+        ValidateConnections(
+            baseNodeList,
+            connections: Inputs.SelectMany(i => i.ConnectsToParentNodeId.Select(nodeId => (PortName: i.Name, NodeId: nodeId))),
+            idLabel: "Input ConnectsToParentNodeId",
+            missingNodeMessage: (portName, nodeId) => $"Input '{portName}' connects to non-existing parent node '{nodeId}'. ");
+    }
+
+    private void ValidateConnections(
+        BaseNodeList baseNodeList,
+        IEnumerable<(string PortName, string NodeId)> connections,
+        string idLabel,
+        Func<string, string, string> missingNodeMessage)
+    {
         var errors = new StringBuilder();
 
-        foreach (var input in Inputs)
+        foreach (var (portName, nodeId) in connections)
         {
-            Debug.WriteLine($"Validating input: {input.Name}");
+            Debug.WriteLine($"Checking connection for '{portName}': {nodeId}");
 
-            foreach (var nodeId in input.ConnectsToParentNodeId)
+            if (!Guid.TryParse(nodeId, out _))
             {
-                Debug.WriteLine($"Checking parent node connection: {nodeId}");
-
-                if (!Guid.TryParse(nodeId, out _))
-                {
-                    Debug.WriteLine($"Invalid GUID: {nodeId}");
-                    errors.Append($"Input ConnectsToParentNodeId '{nodeId}' is not a valid GUID. ");
-                }
-                else if (baseNodeList.All(n => n.Id != nodeId))
-                {
-                    Debug.WriteLine($"Parent node not found: {nodeId}");
-                    errors.Append($"Input '{input.Name}' connects to non-existing parent node '{nodeId}'. ");
-                }
-                else
-                {
-                    Debug.WriteLine($"Parent node connection valid: {nodeId}");
-                }
+                Debug.WriteLine($"Invalid GUID: {nodeId}");
+                errors.Append($"{idLabel} '{nodeId}' is not a valid GUID. ");
+                continue;
             }
+
+            if (baseNodeList.All(n => n.Id != nodeId))
+            {
+                Debug.WriteLine($"Node not found: {nodeId}");
+                errors.Append(missingNodeMessage(portName, nodeId));
+                continue;
+            }
+
+            Debug.WriteLine($"Node connection valid: {nodeId}");
         }
 
         if (errors.Length > 0)
@@ -171,7 +154,6 @@ public abstract class BaseNode
             throw new InvalidOperationException(errors.ToString().Trim());
         }
     }
-    
 
-
+    private string FormatNode() => $"{Name}:{TypeId}";
 }
