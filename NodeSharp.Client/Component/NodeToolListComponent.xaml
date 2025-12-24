@@ -2,8 +2,9 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:core="http://schemas.syncfusion.com/maui"
              xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:toolkit="clr-namespace:Syncfusion.Maui.Toolkit;assembly=Syncfusion.Maui.Toolkit"
              xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
              x:Class="NodeSharp.Client.Component.NodeToolListComponent">
 
@@ -56,59 +57,60 @@
                 </core:SfTextInputLayout>
             </Grid>
 
-            <syncfusion:SfListView
+                <syncfusion:SfListView
                 x:Name="ListViewNodesInfo"
                 Grid.Row="1"
                 ItemsSource="{Binding Nodes}"
                 SelectionMode="Single"
+                DragStartMode="OnHold"
                 SelectionBackground="LightBlue"
                 ItemSize="100">
-                <syncfusion:SfListView.ItemTemplate>
-                    <DataTemplate x:DataType="viewModel:NodeInformationModel">
-                        <Border Margin="4, 3, 4, 3" Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray" StrokeShape="RoundRectangle 5">
-                            <Border.Shadow>
-                                <Shadow Radius="10" Opacity="0.5" Brush="Black" Offset="10,10" />
-                            </Border.Shadow>
+                    <syncfusion:SfListView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModel:NodeInformationModel">
+                            <Border Margin="4, 3, 4, 3" Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray" StrokeShape="RoundRectangle 5">
+                                <Border.Shadow>
+                                    <Shadow Radius="10" Opacity="0.5" Brush="Black" Offset="10,10" />
+                                </Border.Shadow>
 
-                            <Grid Padding="4">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="0.4*" />
-                                    <RowDefinition Height="0.6*" />
-                                </Grid.RowDefinitions>
+                                <Grid Padding="4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="0.4*" />
+                                        <RowDefinition Height="0.6*" />
+                                    </Grid.RowDefinitions>
 
-                                <Grid Grid.Row="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
 
-                                    <Label Grid.Column="0" Text="{Binding Symbol}"
+                                        <Label Grid.Column="0" Text="{Binding Symbol}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center"
                                            FontFamily="MaterialAssets"
                                            FontSize="24"
                                            TextColor="Black">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="OnSearchClicked" />
-                                        </Label.GestureRecognizers>
-                                    </Label>
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnSearchClicked" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
 
-                                    <Label Grid.Column="1" Text="{Binding TypeId}" 
+                                        <Label Grid.Column="1" Text="{Binding TypeId}" 
                                            HorizontalOptions="Center"
                                            FontAttributes="None" TextColor="Coral" FontSize="21" />
-                                </Grid>
+                                    </Grid>
 
-                                <Label Grid.Row="1" Text="{Binding Information}" 
+                                    <Label Grid.Row="1" Text="{Binding Information}" 
                                        LineBreakMode="TailTruncation"
                                        MaxLines="4"
                                    HorizontalOptions="Center"                                   
                                    FontAttributes="None" TextColor="Teal" FontSize="11" />
 
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </syncfusion:SfListView.ItemTemplate>
-            </syncfusion:SfListView>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </syncfusion:SfListView.ItemTemplate>
+                </syncfusion:SfListView>
         </Grid>
     </Border>
 </ContentView>

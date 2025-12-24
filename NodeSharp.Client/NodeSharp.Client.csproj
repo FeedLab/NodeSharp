@@ -86,4 +86,10 @@
       <ProjectReference Include="..\NodeSharp.NodeEngine\NodeSharp.NodeEngine.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Syncfusion.Maui.Core">
+        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.core\32.1.20\lib\net10.0-android36.0\Syncfusion.Maui.Core.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
