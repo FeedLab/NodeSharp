@@ -42,6 +42,7 @@
                     <core:SfTextInputLayout.TrailingView>
                         <Label Text="&#xe713;"
                            FontFamily="MaterialAssets"
+                           
                            FontSize="24"
                            TextColor="Black">
                             <Label.GestureRecognizers>
@@ -52,33 +53,7 @@
 
 
                 </core:SfTextInputLayout>
-
-                <ImageButton Grid.Column="1"
-                             Margin="8,0,0,0"
-                             VerticalOptions="Center"
-                             BackgroundColor="Transparent"
-                             WidthRequest="40"
-                             HeightRequest="40"
-                             Clicked="OnSearchClicked">
-                    <ImageButton.Source>
-                        <FontImageSource Glyph="&#xe713;"
-                                         FontFamily="MaterialAssets"
-                                         Size="40"
-                                         Color="Black" />
-                    </ImageButton.Source>
-                </ImageButton>
-
-
-                <!-- <ImageButton Grid.Column="1" -->
-                <!--              Source="search.png" -->
-                <!--              BackgroundColor="Transparent" -->
-                <!--              WidthRequest="40" -->
-                <!--              HeightRequest="40" -->
-                <!--              Clicked="OnSearchClicked" /> -->
             </Grid>
-
-
         </Grid>
-
     </Border>
 </ContentView>

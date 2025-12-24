@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeSharp.Client", "NodeSharp.Client\NodeSharp.Client.csproj", "{A5F0EA5C-3712-45EC-A5DB-23CF43C8E64B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeSharp.NodeEngine", "NodeSharp.NodeEngine\NodeSharp.NodeEngine.csproj", "{0101E373-7A9A-4C51-A406-E4C563CED378}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{A5F0EA5C-3712-45EC-A5DB-23CF43C8E64B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5F0EA5C-3712-45EC-A5DB-23CF43C8E64B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5F0EA5C-3712-45EC-A5DB-23CF43C8E64B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0101E373-7A9A-4C51-A406-E4C563CED378}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0101E373-7A9A-4C51-A406-E4C563CED378}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0101E373-7A9A-4C51-A406-E4C563CED378}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0101E373-7A9A-4C51-A406-E4C563CED378}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
