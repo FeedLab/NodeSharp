@@ -69,7 +69,7 @@
                 ItemSize="100">
                 <syncfusion:SfListView.ItemTemplate>
                     <DataTemplate x:DataType="viewModel:NodeInformationModel">
-                        <Border Margin="4, 3, 4, 3" Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray"
+                        <Border Margin="6, 3, 6, 3" Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray"
                                 StrokeShape="RoundRectangle 5">
                             <Border.Shadow>
                                 <Shadow Radius="10" Opacity="0.5" Brush="Black" Offset="10,10" />

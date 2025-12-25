@@ -5,18 +5,28 @@
              xmlns:component="clr-namespace:NodeSharp.Client.Component"
              xmlns:client="clr-namespace:NodeSharp.Client"
              xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
-             x:Class="NodeSharp.Client.Component.DiagramViewComponent">
+             x:Class="NodeSharp.Client.Component.DiagramViewComponent"
+             Background="White"
+             IsClippedToBounds="True"
+             >
 
-    <AbsoluteLayout x:Name="Canvas" BindableLayout.ItemsSource="{Binding Nodes}">
-        <BindableLayout.ItemTemplate>
-            <DataTemplate>
-                <component:DraggableBoxComponent
-                    X="{Binding X, Mode=TwoWay}"
-                    Y="{Binding Y, Mode=TwoWay}"
-                    BoxColor="{Binding BoxColor}"
-                    AbsoluteLayout.LayoutBounds="50, 100, AutoSize, AutoSize"
-                    x:DataType="viewModel:BoxNode" />
-            </DataTemplate>
-        </BindableLayout.ItemTemplate>
-    </AbsoluteLayout>
+    <Grid Background="Transparent" IsClippedToBounds="True">
+        <AbsoluteLayout x:Name="CanvasSurface" WidthRequest="3000"
+                        HeightRequest="2000"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start"
+                        Background="Transparent"
+                        IsClippedToBounds="True"
+                        BindableLayout.ItemsSource="{Binding Nodes}" >
+            <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                    <component:DraggableBoxComponent
+                        X="{Binding X, Mode=TwoWay}"
+                        Y="{Binding Y, Mode=TwoWay}"
+                        BoxColor="{Binding BoxColor}"
+                        x:DataType="viewModel:BoxNode" />
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </AbsoluteLayout>
+    </Grid>
 </ContentView>

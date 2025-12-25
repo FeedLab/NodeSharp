@@ -20,25 +20,35 @@
         </Style>
     </ContentView.Resources>
 
-    <Border Style="{StaticResource DraggableBoxStyle}" Padding="4"
-            BackgroundColor="{Binding BoxColor, Source={x:Reference Root}}" >
+    <Grid>
+        <Border
+            Style="{StaticResource 
+    DraggableBoxStyle}"
+            Padding="4"
+            BackgroundColor="{Binding BoxColor, Source={x:Reference Root}}"
+            AbsoluteLayout.LayoutFlags="PositionProportional">
 
-        <Grid Margin="4">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            
-            <Label Grid.Row="0" Text="{Binding Node.Name}" 
-                   LineBreakMode="NoWrap"
-                   HorizontalOptions="Center"                                   
-                   FontAttributes="None" TextColor="DarkRed" FontSize="12" />
+            <Border.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+            </Border.GestureRecognizers>
 
-            <Label Grid.Row="1" Text="{Binding Node.TypeId}" 
-                   LineBreakMode="NoWrap"
-                   HorizontalOptions="Center"                                   
-                   FontAttributes="None" TextColor="DarkGreen" FontSize="14" />
+            <Grid Margin="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-        </Grid>
-    </Border>
+                <Label Grid.Row="0" Text="{Binding Node.Name}"
+                       LineBreakMode="NoWrap"
+                       HorizontalOptions="Center"
+                       FontAttributes="None" TextColor="DarkRed" FontSize="12" />
+
+                <Label Grid.Row="1" Text="{Binding Node.TypeId}"
+                       LineBreakMode="NoWrap"
+                       HorizontalOptions="Center"
+                       FontAttributes="None" TextColor="DarkGreen" FontSize="14" />
+
+            </Grid>
+        </Border>
+    </Grid>
 </ContentView>

@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using NodeSharp.Client.Component;
 using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Node;
@@ -38,8 +40,13 @@ public class DiagramViewModel(Main main)
     }
 }
 
-public class BoxNode
+public class BoxNode : INotifyPropertyChanged
 {
+    private double _x;
+    private double _y;
+    private double _width;
+    private double _height;
+
     public BoxNode()
     {
         BoxColor = Colors.ForestGreen;
@@ -49,13 +56,69 @@ public class BoxNode
 
     public string Id { get; set; }
     public string Name { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Width { get; set; }
-    public double Height { get; set; }
+
+    public double X
+    {
+        get => _x;
+        set
+        {
+            if (_x != value)
+            {
+                _x = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public double Y
+    {
+        get => _y;
+        set
+        {
+            if (_y != value)
+            {
+                _y = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public double Width
+    {
+        get => _width;
+        set
+        {
+            if (_width != value)
+            {
+                _width = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public double Height
+    {
+        get => _height;
+        set
+        {
+            if (_height != value)
+            {
+                _height = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public bool IsEnabled { get; set; }
     public Color BoxColor { get; set; }
 
     public Rect Bounds => new Rect(X, Y, Width, Height);
     public BaseNode Node { get; set; }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace NodeSharp.Client.Component;
 
@@ -50,32 +51,63 @@ public partial class DraggableBoxComponent : ContentView
     {
         InitializeComponent();
 
-        var panGesture = new PanGestureRecognizer();
-        panGesture.PanUpdated += OnPanUpdated;
-        GestureRecognizers.Add(panGesture);
+        // Update AbsoluteLayout bounds when X or Y properties change
+        PropertyChanged += (s, e) =>
+        {
+            if ((e.PropertyName == nameof(X) || e.PropertyName == nameof(Y)) && Parent is AbsoluteLayout)
+            {
+                Dispatcher.Dispatch(() =>
+                {
+                    AbsoluteLayout.SetLayoutBounds(this, new Rect(X, Y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
+                });
+            }
+        };
+
+        // Set initial position when parent is assigned
+        this.ParentChanged += (s, e) =>
+        {
+            if (Parent is AbsoluteLayout)
+            {
+                AbsoluteLayout.SetLayoutBounds(this, new Rect(X, Y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
+            }
+        };
     }
 
     void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (Parent is not AbsoluteLayout)
+        if (Parent is not AbsoluteLayout layout)
             return;
 
         switch (e.StatusType)
         {
             case GestureStatus.Started:
-                var bounds = AbsoluteLayout.GetLayoutBounds(this);
-                startX = bounds.X;
-                startY = bounds.Y;
+                var currentBounds = AbsoluteLayout.GetLayoutBounds(this);
+                startX = X;
+                startY = Y;
+
+                System.Diagnostics.Debug.WriteLine($"Drag started: X={X}, Y={Y}, LayoutBounds=({currentBounds.X}, {currentBounds.Y})");
+
+                WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeDragging = true });
                 break;
 
             case GestureStatus.Running:
-                AbsoluteLayout.SetLayoutBounds(
-                    this,
-                    new Rect(
-                        startX + e.TotalX,
-                        startY + e.TotalY,
-                        Width,
-                        Height));
+                double newX = startX + e.TotalX;
+                double newY = startY + e.TotalY;
+
+                // Get actual dimensions
+                double maxX = layout.Width - Width;
+                double maxY = layout.Height - Height;
+
+                // Clamp to canvas boundaries
+                newX = Math.Max(0, Math.Min(newX, maxX));
+                newY = Math.Max(0, Math.Min(newY, maxY));
+
+                X = newX;
+                Y = newY;
+                break;
+
+            case GestureStatus.Completed:
+                WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeDragging = false });
                 break;
         }
     }
