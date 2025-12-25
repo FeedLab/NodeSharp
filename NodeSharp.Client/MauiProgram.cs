@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Logging;
 using NodeSharp.Client.ViewModel;
+using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Model;
 using Syncfusion.Maui.Core.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
@@ -30,12 +31,16 @@ public static class MauiProgram
                 fonts.AddFont("Roboto-Medium.ttf", "Roboto-Medium");
                 fonts.AddFont("Roboto-Regular.ttf", "Roboto-Regular");
                 fonts.AddFont("TimesNewRoman.ttf", "TimesNewRoman");
+                fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
+                fonts.AddFont("MaterialSymbolsOutlined-Regular.ttf", "MaterialSymbols");
             });
         
         builder.Services.AddSingleton<Storage>();
         builder.Services.AddSingleton<NodeToolListComponentModel>();
+        builder.Services.AddScoped<DiagramViewModel>();
         builder.Services.AddScoped<NodeInformationModel>();
         builder.Services.AddScoped<MainPageModel>();
+        builder.Services.AddScoped<Main>();
 
 #if DEBUG
         builder.Logging.AddDebug();

@@ -19,23 +19,7 @@ public partial class MainPage : ContentPage
         
         viewModel.Init();
         
-        AddBox(50, 50, Colors.Red);
-        AddBox(200, 50, Colors.Green);
-        AddBox(350, 50, Colors.Blue);
-    }
-    
-    void AddBox(double x, double y, Color color)
-    {
-        var box = new DraggableBoxComponent
-        {
-            BoxColor = color,
-            WidthRequest = 100,
-            HeightRequest = 100
-        };
-
-        AbsoluteLayout.SetLayoutBounds(box, new Rect(x, y, 100, 100));
-        AbsoluteLayout.SetLayoutFlags(box, AbsoluteLayoutFlags.None);
-
-        Canvas.Children.Add(box);
+        var diagramViewModelModel = AppService.GetRequiredService<DiagramViewModel>();
+     
     }
 }

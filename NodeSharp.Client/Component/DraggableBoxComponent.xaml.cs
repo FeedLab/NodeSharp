@@ -10,12 +10,35 @@ public partial class DraggableBoxComponent : ContentView
 {
     double startX, startY;
 
+    public static readonly BindableProperty XProperty =
+        BindableProperty.Create(nameof(X), typeof(double), typeof(DraggableBoxComponent), 0.0);
+
+    public static readonly BindableProperty YProperty =
+        BindableProperty.Create(nameof(Y), typeof(double), typeof(DraggableBoxComponent), 0.0);
+
+    public static readonly BindableProperty TextProperty =
+        BindableProperty.Create(nameof(Text), typeof(string), typeof(DraggableBoxComponent), "");
+
     public static readonly BindableProperty BoxColorProperty =
-        BindableProperty.Create(
-            nameof(BoxColor),
-            typeof(Color),
-            typeof(DraggableBoxComponent),
-            Colors.Gray);
+        BindableProperty.Create(nameof(BoxColor), typeof(Color), typeof(DraggableBoxComponent), Colors.Gray);
+
+    public double X
+    {
+        get => (double)GetValue(XProperty);
+        set => SetValue(XProperty, value);
+    }
+
+    public double Y
+    {
+        get => (double)GetValue(YProperty);
+        set => SetValue(YProperty, value);
+    }
+
+    public string Text
+    {
+        get => (string)GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
+    }
 
     public Color BoxColor
     {

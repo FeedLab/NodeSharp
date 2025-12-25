@@ -7,10 +7,12 @@ namespace NodeSharp.Client.Component;
 public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
 {
     private readonly NodeToolListComponentModel viewModel;
+    private readonly DiagramViewModel diagramViewModel;
 
     public NodeToolListComponent()
     {
         viewModel = AppService.GetRequiredService<NodeToolListComponentModel>();
+        diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
 
         InitializeComponent();
         
@@ -40,4 +42,21 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
             app.ToggleTheme();
         }
     }
+    
+    
+    private void OnSaveTapped(object sender, EventArgs e) { /* Save logic */ }
+    private void OnSaveAsTapped(object sender, EventArgs e) { /* Save As logic */ }
+
+    private async void OnLoadTapped(object sender, EventArgs e)
+    {
+        await diagramViewModel.Init();
+    }
+    private void OnNewTapped(object sender, EventArgs e) { /* New logic */ }
+
+    private void OnQuitTapped(object sender, EventArgs e)
+    {
+        Application.Current?.Quit();
+    }
+
+
 }

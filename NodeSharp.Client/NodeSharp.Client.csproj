@@ -92,4 +92,10 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Nodes.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

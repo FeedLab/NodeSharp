@@ -6,6 +6,8 @@ namespace NodeSharp.NodeEngine;
 public class Main
 {
     private readonly BaseNodeList nodes = [];
+
+    public BaseNodeList Nodes => nodes;
     // private string? nodeDataJson = null;
 
     // public async Task LoadFromFileAsync(string fileName)

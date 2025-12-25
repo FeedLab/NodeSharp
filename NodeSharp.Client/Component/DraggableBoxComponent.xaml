@@ -7,8 +7,8 @@
 
     <ContentView.Resources>
         <Style x:Key="DraggableBoxStyle" TargetType="Border">
-            <Setter Property="WidthRequest" Value="100" />
-            <Setter Property="HeightRequest" Value="100" />
+            <!-- <Setter Property="WidthRequest" Value="100" /> -->
+            <!-- <Setter Property="HeightRequest" Value="100" /> -->
             <Setter Property="StrokeShape" Value="RoundRectangle 8" />
             <Setter Property="StrokeThickness" Value="1" />
             <Setter Property="Stroke" Value="Gray" />
@@ -20,6 +20,25 @@
         </Style>
     </ContentView.Resources>
 
-    <Border Style="{StaticResource DraggableBoxStyle}"
-            BackgroundColor="{Binding BoxColor, Source={x:Reference Root}}" />
+    <Border Style="{StaticResource DraggableBoxStyle}" Padding="4"
+            BackgroundColor="{Binding BoxColor, Source={x:Reference Root}}" >
+
+        <Grid Margin="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <Label Grid.Row="0" Text="{Binding Node.Name}" 
+                   LineBreakMode="NoWrap"
+                   HorizontalOptions="Center"                                   
+                   FontAttributes="None" TextColor="DarkRed" FontSize="12" />
+
+            <Label Grid.Row="1" Text="{Binding Node.TypeId}" 
+                   LineBreakMode="NoWrap"
+                   HorizontalOptions="Center"                                   
+                   FontAttributes="None" TextColor="DarkGreen" FontSize="14" />
+
+        </Grid>
+    </Border>
 </ContentView>

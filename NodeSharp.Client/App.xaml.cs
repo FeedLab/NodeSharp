@@ -10,36 +10,38 @@ public partial class App : Application
         
         InitializeComponent();
 
+    //    ApplyTheme(AppTheme.Light);
+        
         //(Application.Current as App)?.ToggleTheme();
 
         // Apply initial theme
-        if (Current != null)
-        {
-            ApplyTheme(Current.RequestedTheme);
-        }
-        else
-        {
-            ApplyTheme(AppTheme.Light);
-        }
+        // if (Current != null)
+        // {
+        //     ApplyTheme(Current.RequestedTheme);
+        // }
+        // else
+        // {
+        //     ApplyTheme(AppTheme.Light);
+        // }
 
         // Subscribe to theme change event
         //Current.RequestedThemeChanged += (s, e) => { ApplyTheme(e.RequestedTheme); };
 
-        if (Current != null)
-        {
-            Current.RequestedThemeChanged += (s, e) =>
-            {
-                var themeDictionary = Resources.MergedDictionaries
-                    .OfType<SyncfusionThemeResourceDictionary>()
-                    .FirstOrDefault();
-
-                var visualTheme = e.RequestedTheme == AppTheme.Dark
-                    ? SfVisuals.MaterialDark
-                    : SfVisuals.MaterialLight;
-
-                Resources.MergedDictionaries.Add(new SyncfusionThemeResourceDictionary() { VisualTheme = visualTheme });
-            };
-        }
+        // if (Current != null)
+        // {
+        //     Current.RequestedThemeChanged += (s, e) =>
+        //     {
+        //         var themeDictionary = Resources.MergedDictionaries
+        //             .OfType<SyncfusionThemeResourceDictionary>()
+        //             .FirstOrDefault();
+        //
+        //         var visualTheme = e.RequestedTheme == AppTheme.Dark
+        //             ? SfVisuals.MaterialDark
+        //             : SfVisuals.MaterialLight;
+        //
+        //         Resources.MergedDictionaries.Add(new SyncfusionThemeResourceDictionary() { VisualTheme = visualTheme });
+        //     };
+        // }
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

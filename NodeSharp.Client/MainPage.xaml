@@ -44,18 +44,7 @@
                 Title="Hello MAUI Component!" />
         </Grid>
 
-        <AbsoluteLayout x:Name="Canvas" Grid.Column="1" BackgroundColor="#1E1E1E" HorizontalOptions="Fill" VerticalOptions="Fill">
-
-            <component:DraggableBoxComponent BoxColor="Red"
-                                             AbsoluteLayout.LayoutBounds="50,50,100,100" />
-
-            <component:DraggableBoxComponent BoxColor="Green"
-                                             AbsoluteLayout.LayoutBounds="200,50,100,100" />
-
-            <component:DraggableBoxComponent BoxColor="Blue"
-                                             AbsoluteLayout.LayoutBounds="350,50,100,100" />
-
-        </AbsoluteLayout>
+        <component:DiagramViewComponent Grid.Column="1" > </component:DiagramViewComponent>
     </Grid>
 
 </ContentPage>
