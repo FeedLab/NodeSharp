@@ -1,4 +1,6 @@
-﻿using NodeSharp.Client.Services;
+﻿using System.Text;
+using CommunityToolkit.Maui.Storage;
+using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Model;
@@ -18,7 +20,7 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
         main = AppService.GetRequiredService<Main>();
 
         InitializeComponent();
-        
+
         this.BindingContext = viewModel;
     }
 
@@ -51,7 +53,10 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     {
         try
         {
-            await main.SaveToFileAsync();
+            if (!string.IsNullOrEmpty(main.FileNameSaved))
+            {
+                await main.SaveToFileAsync();
+            }
         }
         catch (Exception exception)
         {
@@ -63,7 +68,27 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     {
         try
         {
-            await main.SaveToFileAsync("Test.json");
+            var ms = new MemoryStream();
+            await main.SaveToFileAsync(ms);
+            
+            var fileSaverResult = await FileSaver.Default.SaveAsync(
+                "Nodes.json", 
+                ms,
+                CancellationToken.None);
+
+            if (fileSaverResult.IsSuccessful)
+            {
+                // User picked a location, file saved successfully
+                main.FileNameSaved = fileSaverResult.FilePath;
+                Console.WriteLine($"File saved at: {main.FileNameSaved}");
+            }
+            else
+            {
+                // Handle error or cancellation
+                Console.WriteLine($"Error: {fileSaverResult.Exception?.Message}");
+            }
+
+            // await main.SaveToFileAsync("Test.json");
         }
         catch (Exception exception)
         {
@@ -82,12 +107,14 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
             throw; // TODO handle exception
         }
     }
-    private void OnNewTapped(object sender, EventArgs e) { /* New logic */ }
+
+    private void OnNewTapped(object sender, EventArgs e)
+    {
+        /* New logic */
+    }
 
     private void OnQuitTapped(object sender, EventArgs e)
     {
         Application.Current?.Quit();
     }
-
-
 }

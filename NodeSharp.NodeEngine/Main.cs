@@ -8,9 +8,15 @@ namespace NodeSharp.NodeEngine;
 public class Main
 {
     private readonly BaseNodeList nodes = [];
-    private string fileNameSaved;
+    private string? fileNameSaved;
 
     public BaseNodeList Nodes => nodes;
+
+    public string? FileNameSaved
+    {
+        get => fileNameSaved;
+        set => fileNameSaved = value;
+    }
 
     public async Task SaveToFileAsync()
     {
@@ -19,23 +25,31 @@ public class Main
             throw new InvalidOperationException("No file name exists. Call LoadFromFileAsync first.");
         }
 
-        await SaveToFileAsync(fileNameSaved);
+        if (File.Exists(fileNameSaved))
+        {
+            File.Delete(fileNameSaved);
+        }
+
+        using var stream = File.Create(fileNameSaved);
+
+        await SaveToFileAsync(stream);
     }
 
-    public async Task SaveToFileAsync(string fileName)
+    public async Task SaveToFileAsync(Stream stream)
     {
-        ArgumentException.ThrowIfNullOrEmpty(fileName);
-
-        if (File.Exists(fileName))
+        // ArgumentException.ThrowIfNullOrEmpty(fileName);
+        //
+        // if (File.Exists(fileName))
+        // {
+        //     File.Delete(fileName);
+        // }
+        //
+        // // using var stream = File.Create(fileName);
+        // using var stream = new MemoryStream();
+        var options = new JsonSerializerOptions
         {
-            File.Delete(fileName);
-        }
-        
-        using var stream = File.Create(fileName);
-        var options = new JsonSerializerOptions 
-        { 
             WriteIndented = true,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles 
+            ReferenceHandler = ReferenceHandler.IgnoreCycles
         };
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = options.WriteIndented });
 
@@ -47,12 +61,14 @@ public class Main
         {
             JsonSerializer.Serialize(writer, node, node.GetType(), options);
         }
+
         writer.WriteEndArray();
 
         writer.WriteEndObject();
 
         await writer.FlushAsync();
     }
+
     public async Task LoadFromFileAsync(string fileName)
     {
         ArgumentException.ThrowIfNullOrEmpty(fileName);
