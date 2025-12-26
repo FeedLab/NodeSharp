@@ -13,10 +13,12 @@ public class NodeDebug : BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
+        int xPosition, 
+        int yPosition,
         Output[] outputs,
         Input[] inputs,
         JsonElement nodeElement)
-        : base(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs)
+        : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs)
     {
         OutputJsonMessage = "";
     }

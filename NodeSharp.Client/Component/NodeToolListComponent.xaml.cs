@@ -53,6 +53,14 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     {
         try
         {
+            var nodes = diagramViewModel.Nodes;
+
+            foreach (var nodeBox in nodes)
+            {
+                nodeBox.Node.X = nodeBox.X;
+                nodeBox.Node.Y = nodeBox.Y;
+            }
+            
             if (!string.IsNullOrEmpty(main.FileNameSaved))
             {
                 await main.SaveToFileAsync();
@@ -68,6 +76,14 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     {
         try
         {
+            var nodes = diagramViewModel.Nodes;
+
+            foreach (var nodeBox in nodes)
+            {
+                nodeBox.Node.X = nodeBox.X;
+                nodeBox.Node.Y = nodeBox.Y;
+            }
+            
             var ms = new MemoryStream();
             await main.SaveToFileAsync(ms);
             
@@ -100,17 +116,41 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     {
         try
         {
-            await diagramViewModel.Init();
+            var result = await FilePicker.Default.PickAsync();
+
+            if (result != null)
+            {
+                // Full path (Windows/macOS only; on mobile you get a stream)
+                var filePath = result.FullPath;
+                Console.WriteLine($"Picked file: {filePath}");
+
+                // Open as stream
+                // using var stream = await result.OpenReadAsync();
+                // using var reader = new StreamReader(stream);
+                // string content = await reader.ReadToEndAsync();
+
+                // Console.WriteLine($"File content: {content}");
+                
+                await diagramViewModel.Init(filePath);
+            }
+            else
+            {
+                Console.WriteLine("User canceled file picking.");
+            }
+            
         }
         catch (Exception exception)
         {
             throw; // TODO handle exception
         }
     }
+    
+
+
 
     private void OnNewTapped(object sender, EventArgs e)
     {
-        /* New logic */
+        diagramViewModel.Clear();
     }
 
     private void OnQuitTapped(object sender, EventArgs e)

@@ -14,6 +14,8 @@ public abstract class BaseNode
     public string Name { get; }
     public bool IsEnabled { get; }
     public bool ActivateOnStart { get; }
+    public int X { get; set; }
+    public int Y { get; set; }
     public Output[] Outputs { get; }
     public Input[] Inputs { get; }
 
@@ -24,6 +26,8 @@ public abstract class BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
+        int xPosition, 
+        int yPosition,
         Output[] outputs,
         Input[] inputs)
     {
@@ -33,6 +37,8 @@ public abstract class BaseNode
         Name = name;
         IsEnabled = isEnabled;
         ActivateOnStart = activateOnStart;
+        X = xPosition;
+        Y = yPosition;
         Outputs = outputs;
         Inputs = inputs;
     }

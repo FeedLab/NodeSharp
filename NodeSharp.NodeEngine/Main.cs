@@ -37,15 +37,6 @@ public class Main
 
     public async Task SaveToFileAsync(Stream stream)
     {
-        // ArgumentException.ThrowIfNullOrEmpty(fileName);
-        //
-        // if (File.Exists(fileName))
-        // {
-        //     File.Delete(fileName);
-        // }
-        //
-        // // using var stream = File.Create(fileName);
-        // using var stream = new MemoryStream();
         var options = new JsonSerializerOptions
         {
             WriteIndented = true,
@@ -87,6 +78,8 @@ public class Main
             throw new InvalidOperationException($"Node data JSON is null. File name is: {fileName}");
         }
 
+        Clear();
+        
         var document = JsonDocument.Parse(nodeDataJson);
         var nodesArray = document.RootElement.GetProperty("Nodes");
 
@@ -119,6 +112,13 @@ public class Main
             var id = nodeElement.GetProperty("Id").GetString()!;
             var typeId = nodeElement.GetProperty("TypeId").GetString()!;
             var name = nodeElement.GetProperty("Name").GetString()!;
+            var xPosition = nodeElement.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number 
+                ? xProp.GetInt32() 
+                : 100;
+            
+            var yPosition = nodeElement.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number 
+                ? yProp.GetInt32() 
+                : 100;
 
             var isEnabled = ReadBool(nodeElement, preferredPropertyName: "IsEnabled", fallbackPropertyName: "Enabled");
             var activateOnStart = nodeElement.TryGetProperty("ActivateOnStart", out var activateOnStartProp) &&
@@ -129,13 +129,13 @@ public class Main
 
             BaseNode node = typeId switch
             {
-                "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs,
+                "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs,
                     nodeElement),
-                "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs,
+                "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs,
                     nodeElement),
-                "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart, outputs,
+                "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs,
                     inputs, nodeElement),
-                "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs,
+                "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs,
                     nodeElement),
                 _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
             };

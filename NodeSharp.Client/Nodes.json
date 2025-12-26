@@ -94,9 +94,11 @@
           ]
         }
       ],
-      "Source": "Fixed",
-      "Min": 222,
-      "Max": 333
+      "RandomData": {
+        "Source": "Fixed",
+        "Min": 222,
+        "Max": 333
+      }
     },
     {
       "Id": "91744f2d-4b3e-4dc8-a890-df2e8a364907",
@@ -115,9 +117,11 @@
           ]
         }
       ],
-      "Source": "FromInput",
-      "Min": 0,
-      "Max": 0
+      "RandomData": {
+        "Source": "FromInput",
+        "Min": 0,
+        "Max": 0
+      }
     },
     {
       "Id": "fdec97b0-c81a-4062-a9c8-76e87c4d6691",

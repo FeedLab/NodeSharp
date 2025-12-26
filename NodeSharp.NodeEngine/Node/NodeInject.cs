@@ -16,6 +16,8 @@ public class NodeInject : BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
+        int xPosition, 
+        int yPosition,
         Output[] outputs,
         Input[] inputs,
         JsonElement nodeElement)
@@ -26,6 +28,8 @@ public class NodeInject : BaseNode
             name,
             isEnabled,
             activateOnStart,
+            xPosition,
+            yPosition,
             outputs,
             inputs
         )

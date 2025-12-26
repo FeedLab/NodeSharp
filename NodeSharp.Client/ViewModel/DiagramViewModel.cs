@@ -11,12 +11,12 @@ public class DiagramViewModel(Main main)
 {
     private const string BaseFilePath = ".";
     public ObservableCollection<BoxNode> Nodes { get; } = new();
-
-    public async Task Init()
+    
+    public async Task Init(string filePath)
     {
-        var fileToLoad = $"{BaseFilePath}\\Nodes.json";
+        // var fileToLoad = $"{BaseFilePath}\\Nodes.json";
 
-        await main.LoadFromFileAsync(fileToLoad);
+        await main.LoadFromFileAsync(filePath);
 
         Nodes.Clear();
 
@@ -29,8 +29,8 @@ public class DiagramViewModel(Main main)
                 Name = node.Name,
                 BoxColor = Colors.BlanchedAlmond,
                 IsEnabled = node.IsEnabled,
-                X = 100,
-                Y = 100,
+                X = node.X,
+                Y = node.Y,
                 Width = 130,
                 Height = 50
             };
@@ -47,12 +47,17 @@ public class DiagramViewModel(Main main)
             Nodes.Add(node);
         }
     }
+
+    public void Clear()
+    {
+        Nodes.Clear();
+    }
 }
 
 public class BoxNode : INotifyPropertyChanged
 {
-    private double _x;
-    private double _y;
+    private int _x;
+    private int _y;
     private double _width;
     private double _height;
 
@@ -66,7 +71,7 @@ public class BoxNode : INotifyPropertyChanged
     public string Id { get; set; }
     public string Name { get; set; }
 
-    public double X
+    public int X
     {
         get => _x;
         set
@@ -79,7 +84,7 @@ public class BoxNode : INotifyPropertyChanged
         }
     }
 
-    public double Y
+    public int Y
     {
         get => _y;
         set
@@ -121,7 +126,7 @@ public class BoxNode : INotifyPropertyChanged
     public bool IsEnabled { get; set; }
     public Color BoxColor { get; set; }
 
-    public Rect Bounds => new Rect(X, Y, Width, Height);
+    // public Rect Bounds => new Rect(X, Y, Width, Height);
     public BaseNode Node { get; set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
