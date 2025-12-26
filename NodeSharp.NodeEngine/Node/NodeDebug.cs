@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace NodeSharp.NodeEngine.Node;
 
@@ -30,5 +31,6 @@ public class NodeDebug : BaseNode
         return Task.FromResult(parametersJsonString);
     }
 
+    [JsonIgnore]
     public string OutputJsonMessage { get; set; }
 }
