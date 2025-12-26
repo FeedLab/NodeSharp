@@ -156,8 +156,4 @@ public class NodeRandomNumber : BaseNode
 
         Debug.WriteLine($"NodeId is valid");
     }
-
-    
-
-
 }
