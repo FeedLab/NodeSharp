@@ -125,13 +125,13 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
                 Console.WriteLine($"Picked file: {filePath}");
 
                 // Open as stream
-                // using var stream = await result.OpenReadAsync();
-                // using var reader = new StreamReader(stream);
-                // string content = await reader.ReadToEndAsync();
+                using var stream = await result.OpenReadAsync();
+                using var reader = new StreamReader(stream);
+                string content = await reader.ReadToEndAsync();
 
-                // Console.WriteLine($"File content: {content}");
+                Console.WriteLine($"File content: {content}");
                 
-                await diagramViewModel.Init(filePath);
+                // await diagramViewModel.Init(reader);
             }
             else
             {

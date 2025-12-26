@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using NodeSharp.Client.Component;
 using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Node;
@@ -12,13 +13,9 @@ public class DiagramViewModel(Main main)
     private const string BaseFilePath = ".";
     public ObservableCollection<BoxNode> Nodes { get; } = new();
     
-    public async Task Init(string filePath)
+    public async Task Init(StreamReader reader, string filePath)
     {
-        // var fileToLoad = $"{BaseFilePath}\\Nodes.json";
-
-        await main.LoadFromFileAsync(filePath);
-
-        Nodes.Clear();
+        await main.LoadFromFileAsync(reader, filePath);
 
         foreach (var node in main.Nodes)
         {
@@ -52,6 +49,7 @@ public class DiagramViewModel(Main main)
     {
         Nodes.Clear();
     }
+
 }
 
 public class BoxNode : INotifyPropertyChanged

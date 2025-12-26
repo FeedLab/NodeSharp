@@ -60,42 +60,33 @@ public class Main
         await writer.FlushAsync();
     }
 
-    public async Task LoadFromFileAsync(string fileName)
+    public async Task LoadFromFileAsync(StreamReader reader, string filePath)
     {
-        ArgumentException.ThrowIfNullOrEmpty(fileName);
+        fileNameSaved = filePath;
 
-        if (!File.Exists(fileName))
-        {
-            throw new FileNotFoundException($"File not found: {fileName}");
-        }
+            var nodeDataJson = await reader.ReadToEndAsync();
 
-        fileNameSaved = fileName;
+            if (nodeDataJson is null)
+            {
+                throw new InvalidOperationException($"Node data JSON is null. File name is: {filePath}");
+            }
 
-        var nodeDataJson = await File.ReadAllTextAsync(fileName);
+            Clear();
 
-        if (nodeDataJson is null)
-        {
-            throw new InvalidOperationException($"Node data JSON is null. File name is: {fileName}");
-        }
+            var document = JsonDocument.Parse(nodeDataJson);
+            var nodesArray = document.RootElement.GetProperty("Nodes");
 
-        Clear();
-        
-        var document = JsonDocument.Parse(nodeDataJson);
-        var nodesArray = document.RootElement.GetProperty("Nodes");
+            ParseNodesFromJson(nodesArray);
 
-        ParseNodesFromJson(nodesArray);
+            nodes.ValidateInputAndOutputNodes();
 
-        nodes.ValidateInputAndOutputNodes();
+            Console.WriteLine($"Loaded {nodes.Count} nodes:");
 
-        Console.WriteLine($"Loaded {nodes.Count} nodes:");
-
-        foreach (var node in nodes)
-        {
-            Console.WriteLine(
-                $"  - {node.Name} ({node.TypeId}): {node.Outputs.Length} outputs, {node.Inputs.Length} inputs");
-        }
-
-        // return Task.CompletedTask;
+            foreach (var node in nodes)
+            {
+                Console.WriteLine(
+                    $"  - {node.Name} ({node.TypeId}): {node.Outputs.Length} outputs, {node.Inputs.Length} inputs");
+            }
     }
 
     public async Task Run()
@@ -112,15 +103,18 @@ public class Main
             var id = nodeElement.GetProperty("Id").GetString()!;
             var typeId = nodeElement.GetProperty("TypeId").GetString()!;
             var name = nodeElement.GetProperty("Name").GetString()!;
-            var xPosition = nodeElement.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number 
-                ? xProp.GetInt32() 
-                : 100;
-            
-            var yPosition = nodeElement.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number 
-                ? yProp.GetInt32() 
+            var xPosition = nodeElement.TryGetProperty("X", out var xProp) &&
+                            xProp.ValueKind == JsonValueKind.Number
+                ? xProp.GetInt32()
                 : 100;
 
-            var isEnabled = ReadBool(nodeElement, preferredPropertyName: "IsEnabled", fallbackPropertyName: "Enabled");
+            var yPosition = nodeElement.TryGetProperty("Y", out var yProp) &&
+                            yProp.ValueKind == JsonValueKind.Number
+                ? yProp.GetInt32()
+                : 100;
+
+            var isEnabled = ReadBool(nodeElement, preferredPropertyName: "IsEnabled",
+                fallbackPropertyName: "Enabled");
             var activateOnStart = nodeElement.TryGetProperty("ActivateOnStart", out var activateOnStartProp) &&
                                   activateOnStartProp.ValueKind == JsonValueKind.True;
 
@@ -129,13 +123,17 @@ public class Main
 
             BaseNode node = typeId switch
             {
-                "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs,
+                "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition,
+                    yPosition, outputs, inputs,
                     nodeElement),
-                "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs,
+                "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
+                    outputs, inputs,
                     nodeElement),
-                "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs,
+                "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart,
+                    xPosition, yPosition, outputs,
                     inputs, nodeElement),
-                "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs,
+                "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
+                    outputs, inputs,
                     nodeElement),
                 _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
             };

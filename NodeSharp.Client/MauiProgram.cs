@@ -41,6 +41,7 @@ public static class MauiProgram
         builder.Services.AddScoped<NodeInformationModel>();
         builder.Services.AddScoped<MainPageModel>();
         builder.Services.AddScoped<Main>();
+        builder.Services.AddScoped<ToolBarViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

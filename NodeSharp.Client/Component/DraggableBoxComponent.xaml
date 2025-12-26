@@ -20,8 +20,9 @@
         </Style>
     </ContentView.Resources>
 
-    <Grid>
+    <Grid BackgroundColor="Blue">
         <Border
+            Margin="12"
             Style="{StaticResource 
     DraggableBoxStyle}"
             Padding="4"

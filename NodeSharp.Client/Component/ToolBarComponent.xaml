@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:toolTip="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
+             x:Class="NodeSharp.Client.Component.ToolBarComponent">
+    <ContentView.Resources>
+        <Style TargetType="buttons:SfButton" x:Key="IconButtonStyle">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="EnableRippleEffect" Value="True" />
+            <Setter Property="ShowIcon" Value="True" />
+            <Setter Property="ImageSize" Value="26" />
+            <Setter Property="ImageAlignment" Value="Default" />
+            <Setter Property="TextColor" Value="Black" />
+            <Setter Property="Stroke" Value="DarkRed" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+
+
+        <!-- Icon resources -->
+        <FontImageSource x:Key="SaveIcon" FontFamily="FontSolid" Glyph="&#xf0c7;" Color="DarkBlue" Size="26" />
+        <FontImageSource x:Key="SaveAsIcon" FontFamily="FontSolid" Glyph="&#xf56f;" Color="DarkBlue" Size="26" />
+        <FontImageSource x:Key="LoadIcon" FontFamily="FontSolid" Glyph="&#xf07c;" Color="DarkBlue" Size="26" />
+        <FontImageSource x:Key="NewIcon" FontFamily="FontSolid" Glyph="&#xf15b;" Color="DarkBlue" Size="26" />
+        <FontImageSource x:Key="QuitIcon" FontFamily="FontSolid" Glyph="&#xf2f5;" Color="DarkBlue" Size="26" />
+    </ContentView.Resources>
+
+    <Grid ColumnDefinitions="*,*,*,*,*" Padding="4"
+          HorizontalOptions="Fill" VerticalOptions="Center">
+
+        <buttons:SfButton
+            Grid.Column="0"
+            Style="{StaticResource IconButtonStyle}"
+            Command="{Binding SaveCommand}"
+            IsEnabled="{Binding IsSaveEnabled}"
+            ImageSource="{StaticResource SaveIcon}"
+            ToolTipProperties.Text="Save" />
+
+        <buttons:SfButton
+            Grid.Column="1"
+            Style="{StaticResource IconButtonStyle}"
+            Command="{Binding SaveAsCommand}"
+            IsEnabled="{Binding IsSaveAsEnabled}"
+            ImageSource="{StaticResource SaveAsIcon}"
+            ToolTipProperties.Text="SaveAs" />
+
+        <buttons:SfButton
+            Grid.Column="2"
+            Style="{StaticResource IconButtonStyle}"
+            Command="{Binding LoadCommand}"
+            IsEnabled="{Binding IsLoadEnabled}"
+            ImageSource="{StaticResource LoadIcon}"
+            ToolTipProperties.Text="Open" />
+
+        <buttons:SfButton
+            Grid.Column="3"
+            Style="{StaticResource IconButtonStyle}"
+            Command="{Binding NewCommand}"
+            IsEnabled="{Binding IsNewEnabled}"
+            ImageSource="{StaticResource NewIcon}"
+            ToolTipProperties.Text="New" />
+
+        <buttons:SfButton
+            Grid.Column="4"
+            Style="{StaticResource IconButtonStyle}"
+            Command="{Binding QuitCommand}"
+            IsEnabled="{Binding IsQuitEnabled}"
+            ImageSource="{StaticResource QuitIcon}"
+            ToolTipProperties.Text="Quit" />
+
+
+        <!--     ~1~ Save As @1@ -->
+        <!--     <Label Grid.Column="1" -->
+        <!--            Text="&#xf56f;" -->
+        <!--            FontFamily="FontSolid" -->
+        <!--            FontSize="32" -->
+        <!--            TextColor="Black" -->
+        <!--            HorizontalOptions="Center" -->
+        <!--            VerticalOptions="Center" -->
+        <!--            BackgroundColor="Transparent" -->
+        <!--            ToolTipProperties.Text="Save As"> -->
+        <!--         <Label.GestureRecognizers> -->
+        <!--             <TapGestureRecognizer Tapped="OnSaveAsTapped" /> -->
+        <!--         </Label.GestureRecognizers> -->
+        <!--     </Label> -->
+        <!-- -->
+        <!--     ~1~ Load @1@ -->
+        <!--     <Label Grid.Column="2" -->
+        <!--            Text="&#xf07c;" -->
+        <!--            FontFamily="FontSolid" -->
+        <!--            FontSize="32" -->
+        <!--            TextColor="Black" -->
+        <!--            HorizontalOptions="Center" -->
+        <!--            VerticalOptions="Center" -->
+        <!--            BackgroundColor="Transparent" -->
+        <!--            ToolTipProperties.Text="Load"> -->
+        <!--         <Label.GestureRecognizers> -->
+        <!--             <TapGestureRecognizer Tapped="OnLoadTapped" /> -->
+        <!--         </Label.GestureRecognizers> -->
+        <!--     </Label> -->
+        <!-- -->
+        <!--     ~1~ New @1@ -->
+        <!--     <Label Grid.Column="3" -->
+        <!--            Text="&#xf15b;" -->
+        <!--            FontFamily="FontSolid" -->
+        <!--            FontSize="32" -->
+        <!--            TextColor="Black" -->
+        <!--            HorizontalOptions="Center" -->
+        <!--            VerticalOptions="Center" -->
+        <!--            BackgroundColor="Transparent" -->
+        <!--            ToolTipProperties.Text="New"> -->
+        <!--         <Label.GestureRecognizers> -->
+        <!--             <TapGestureRecognizer Tapped="OnNewTapped" /> -->
+        <!--         </Label.GestureRecognizers> -->
+        <!--     </Label> -->
+        <!-- -->
+        <!--     ~1~ Quit @1@ -->
+        <!--     <Label Grid.Column="4" -->
+        <!--            Text="&#xf2f5;" -->
+        <!--            FontFamily="FontSolid" -->
+        <!--            FontSize="32" -->
+        <!--            TextColor="Black" -->
+        <!--            HorizontalOptions="Center" -->
+        <!--            VerticalOptions="Center" -->
+        <!--            BackgroundColor="Transparent" -->
+        <!--            ToolTipProperties.Text="Quit"> -->
+        <!--         <Label.GestureRecognizers> -->
+        <!--             <TapGestureRecognizer Tapped="OnQuitTapped" /> -->
+        <!--         </Label.GestureRecognizers> -->
+        <!--     </Label> -->
+    </Grid>
+
+</ContentView>

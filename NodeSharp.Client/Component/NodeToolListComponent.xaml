@@ -7,6 +7,7 @@
              xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
              xmlns:toolkit="clr-namespace:Syncfusion.Maui.Toolkit;assembly=Syncfusion.Maui.Toolkit"
              xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
+             xmlns:component="using:NodeSharp.Client.Component"
              x:Class="NodeSharp.Client.Component.NodeToolListComponent">
 
     <Border Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray" StrokeShape="RoundRectangle 1">
@@ -115,86 +116,7 @@
                 </syncfusion:SfListView.ItemTemplate>
             </syncfusion:SfListView>
 
-            <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*,*" Padding="10"
-                  HorizontalOptions="Fill" VerticalOptions="End">
-
-                <!-- Save -->
-                <Label Grid.Column="0"
-                       Text="&#xf0c7;"
-                       TextColor="Black"
-                       FontFamily="FontSolid"
-                       FontSize="32"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       BackgroundColor="Transparent"
-                       ToolTipProperties.Text="Save">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnSaveTapped" />
-                    </Label.GestureRecognizers>
-                </Label>
-
-                <!-- Save As -->
-                <Label Grid.Column="1"
-                       Text="&#xf56f;"
-                       FontFamily="FontSolid"
-                       FontSize="32"
-                       TextColor="Black"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       BackgroundColor="Transparent"
-                       ToolTipProperties.Text="Save As">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnSaveAsTapped" />
-                    </Label.GestureRecognizers>
-                </Label>
-
-                <!-- Load -->
-                <Label Grid.Column="2"
-                       Text="&#xf07c;"
-                       FontFamily="FontSolid"
-                       FontSize="32"
-                       TextColor="Black"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       BackgroundColor="Transparent"
-                       ToolTipProperties.Text="Load">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnLoadTapped" />
-                    </Label.GestureRecognizers>
-                </Label>
-
-                <!-- New -->
-                <Label Grid.Column="3"
-                       Text="&#xf15b;"
-                       FontFamily="FontSolid"
-                       FontSize="32"
-                       TextColor="Black"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       BackgroundColor="Transparent"
-                       ToolTipProperties.Text="New">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnNewTapped" />
-                    </Label.GestureRecognizers>
-                </Label>
-
-                <!-- Quit -->
-                <Label Grid.Column="4"
-                       Text="&#xf2f5;"
-                       FontFamily="FontSolid"
-                       FontSize="32"
-                       TextColor="Black"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       BackgroundColor="Transparent"
-                       ToolTipProperties.Text="Quit">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnQuitTapped" />
-                    </Label.GestureRecognizers>
-                </Label>
-            </Grid>
-
-
+            <component:ToolBarComponent Grid.Row="2" HorizontalOptions="Fill" VerticalOptions="End"/>
         </Grid>
     </Border>
 </ContentView>
