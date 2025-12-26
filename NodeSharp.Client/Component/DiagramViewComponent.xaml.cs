@@ -46,6 +46,14 @@ public partial class DiagramViewComponent : ContentView
         panGrid.PanUpdated += OnPanUpdated;
         this.GestureRecognizers.Add(panGrid);
         
+        // var pinch = new PinchGestureRecognizer();
+        // pinch.PinchUpdated += OnCanvasPinch;
+        // CanvasSurface.GestureRecognizers.Add(pinch);
+        //
+        // var pinchGrid = new PinchGestureRecognizer();
+        // pinchGrid.PinchUpdated += OnCanvasPinch;
+        // this.GestureRecognizers.Add(pinchGrid);
+        
         WeakReferenceMessenger.Default.Register<NodeDraggingStatus>(this, (sender, args) =>
         {
             MainThread.InvokeOnMainThreadAsync(() =>
@@ -85,7 +93,33 @@ public partial class DiagramViewComponent : ContentView
         System.Diagnostics.Debug.WriteLine($"Pan event: {e.StatusType}, IsNodeDragging: {DraggingStatus.IsNodeDragging}");
 
         if (DraggingStatus.IsNodeDragging)
+        {
+            Element? current = sender as Element;
+            while (current != null && current is not DraggableBoxComponent)
+            {
+                current = current.Parent;
+            }
+
+            if (current is DraggableBoxComponent element)
+            {
+                if (e.StatusType == GestureStatus.Started)
+                {
+                    // 1. Set ZIndex (as a backup)
+                    element.ZIndex = 1000;
+
+                    // 2. Move the data item to the end of the collection to force it to the top of the visual stack
+                    if (element.BindingContext is BoxNode boxNode)
+                    {
+                        viewModel.MoveNodeToFront(boxNode);
+                    }
+                }
+                else if (e.StatusType == GestureStatus.Completed || e.StatusType == GestureStatus.Canceled)
+                {
+                    element.ZIndex = 1;
+                }
+            }
             return;
+        }
 
         switch (e.StatusType)
         {

@@ -11,32 +11,41 @@ public class DiagramViewModel(Main main)
 {
     private const string BaseFilePath = ".";
     public ObservableCollection<BoxNode> Nodes { get; } = new();
-    
+
     public async Task Init()
     {
         var fileToLoad = $"{BaseFilePath}\\Nodes.json";
 
-       await main.LoadFromFileAsync(fileToLoad);
+        await main.LoadFromFileAsync(fileToLoad);
 
-       Nodes.Clear();
-       
-       foreach (var node in main.Nodes)
-       {
-           var boxNode = new BoxNode
-           {
-               Node = node,
-               Id = node.Id,
-               Name = node.Name,
-               BoxColor = Colors.BlanchedAlmond,
-               IsEnabled = node.IsEnabled,
-               X = 100,
-               Y = 100,
-               Width = 130,
-               Height = 50
-           };
+        Nodes.Clear();
 
-           Nodes.Add(boxNode);
-       }
+        foreach (var node in main.Nodes)
+        {
+            var boxNode = new BoxNode
+            {
+                Node = node,
+                Id = node.Id,
+                Name = node.Name,
+                BoxColor = Colors.BlanchedAlmond,
+                IsEnabled = node.IsEnabled,
+                X = 100,
+                Y = 100,
+                Width = 130,
+                Height = 50
+            };
+
+            Nodes.Add(boxNode);
+        }
+    }
+
+    public void MoveNodeToFront(BoxNode node)
+    {
+        if (Nodes.Contains(node) && Nodes.Last() != node)
+        {
+            Nodes.Remove(node);
+            Nodes.Add(node);
+        }
     }
 }
 

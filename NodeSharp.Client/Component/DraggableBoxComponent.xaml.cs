@@ -78,37 +78,41 @@ public partial class DraggableBoxComponent : ContentView
         if (Parent is not AbsoluteLayout layout)
             return;
 
-        switch (e.StatusType)
+        if (sender is VisualElement element)
         {
-            case GestureStatus.Started:
-                var currentBounds = AbsoluteLayout.GetLayoutBounds(this);
-                startX = X;
-                startY = Y;
+            switch (e.StatusType)
+            {
+                case GestureStatus.Started:
+                    var currentBounds = AbsoluteLayout.GetLayoutBounds(this);
+                    startX = X;
+                    startY = Y;
 
-                System.Diagnostics.Debug.WriteLine($"Drag started: X={X}, Y={Y}, LayoutBounds=({currentBounds.X}, {currentBounds.Y})");
+                    System.Diagnostics.Debug.WriteLine(
+                        $"Drag started: X={X}, Y={Y}, LayoutBounds=({currentBounds.X}, {currentBounds.Y})");
 
-                WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeDragging = true });
-                break;
+                    WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeDragging = true });
+                    break;
 
-            case GestureStatus.Running:
-                double newX = startX + e.TotalX;
-                double newY = startY + e.TotalY;
+                case GestureStatus.Running:
+                    double newX = startX + e.TotalX;
+                    double newY = startY + e.TotalY;
 
-                // Get actual dimensions
-                double maxX = layout.Width - Width;
-                double maxY = layout.Height - Height;
+                    // Get actual dimensions
+                    double maxX = layout.Width - Width;
+                    double maxY = layout.Height - Height;
 
-                // Clamp to canvas boundaries
-                newX = Math.Max(0, Math.Min(newX, maxX));
-                newY = Math.Max(0, Math.Min(newY, maxY));
+                    // Clamp to canvas boundaries
+                    newX = Math.Max(0, Math.Min(newX, maxX));
+                    newY = Math.Max(0, Math.Min(newY, maxY));
 
-                X = newX;
-                Y = newY;
-                break;
+                    X = newX;
+                    Y = newY;
+                    break;
 
-            case GestureStatus.Completed:
-                WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeDragging = false });
-                break;
+                case GestureStatus.Completed:
+                    WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeDragging = false });
+                    break;
+            }
         }
     }
 }

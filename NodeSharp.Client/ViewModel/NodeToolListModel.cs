@@ -5,9 +5,9 @@ using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.Client.ViewModel;
 
-public class NodeToolListComponentModel(ILogger<NodeToolListComponentModel> logger, Storage storage)
+public class NodeToolListModel(ILogger<NodeToolListModel> logger, Storage storage)
 {
-    private readonly ILogger<NodeToolListComponentModel> logger = logger;
+    private readonly ILogger<NodeToolListModel> logger = logger;
     private readonly ObservableCollection<NodeInformationModel> nodes = [];
 
     public ObservableCollection<NodeInformationModel> Nodes => nodes;

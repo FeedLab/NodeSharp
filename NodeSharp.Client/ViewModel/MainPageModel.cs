@@ -5,20 +5,20 @@ namespace NodeSharp.Client.ViewModel;
 
 public class MainPageModel
 {
-    private readonly NodeToolListComponentModel nodeToolListComponentModel;
+    private readonly NodeToolListModel nodeToolListModel;
     private readonly Main main;
     private readonly DiagramViewModel diagramViewModelModel;
 
-    public MainPageModel(ILogger<MainPageModel> logger,  NodeToolListComponentModel nodeToolListComponentModel, Main main, DiagramViewModel diagramViewModelModel)
+    public MainPageModel(ILogger<MainPageModel> logger,  NodeToolListModel nodeToolListModel, Main main, DiagramViewModel diagramViewModelModel)
     {
         this.main = main;
         this.diagramViewModelModel = diagramViewModelModel;
-        this.nodeToolListComponentModel = nodeToolListComponentModel;
+        this.nodeToolListModel = nodeToolListModel;
     }
 
     public void Init()
     {
-        nodeToolListComponentModel.Init();
+        nodeToolListModel.Init();
         
         // Task.Run(async () =>
         // {

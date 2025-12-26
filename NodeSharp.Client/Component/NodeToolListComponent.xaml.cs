@@ -1,18 +1,21 @@
 ﻿using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
+using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.Client.Component;
 
 public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
 {
-    private readonly NodeToolListComponentModel viewModel;
+    private readonly NodeToolListModel viewModel;
     private readonly DiagramViewModel diagramViewModel;
+    private readonly Main main;
 
     public NodeToolListComponent()
     {
-        viewModel = AppService.GetRequiredService<NodeToolListComponentModel>();
+        viewModel = AppService.GetRequiredService<NodeToolListModel>();
         diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
+        main = AppService.GetRequiredService<Main>();
 
         InitializeComponent();
         
@@ -42,14 +45,42 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
             app.ToggleTheme();
         }
     }
-    
-    
-    private void OnSaveTapped(object sender, EventArgs e) { /* Save logic */ }
-    private void OnSaveAsTapped(object sender, EventArgs e) { /* Save As logic */ }
+
+
+    private async void OnSaveTapped(object sender, EventArgs e)
+    {
+        try
+        {
+            await main.SaveToFileAsync();
+        }
+        catch (Exception exception)
+        {
+            throw; // TODO handle exception
+        }
+    }
+
+    private async void OnSaveAsTapped(object sender, EventArgs e)
+    {
+        try
+        {
+            await main.SaveToFileAsync("Test.json");
+        }
+        catch (Exception exception)
+        {
+            throw; // TODO handle exception
+        }
+    }
 
     private async void OnLoadTapped(object sender, EventArgs e)
     {
-        await diagramViewModel.Init();
+        try
+        {
+            await diagramViewModel.Init();
+        }
+        catch (Exception exception)
+        {
+            throw; // TODO handle exception
+        }
     }
     private void OnNewTapped(object sender, EventArgs e) { /* New logic */ }
 

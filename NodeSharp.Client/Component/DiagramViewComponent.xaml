@@ -15,9 +15,17 @@
                         HeightRequest="2000"
                         HorizontalOptions="Start"
                         VerticalOptions="Start"
-                        Background="Transparent"
                         IsClippedToBounds="True"
                         BindableLayout.ItemsSource="{Binding Nodes}" >
+            <AbsoluteLayout.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FFFFFF" Offset="0.0" />
+                    <GradientStop Color="#F0F0F5" Offset="0.3" />
+                    <GradientStop Color="#FFFFFF" Offset="0.5" />
+                    <GradientStop Color="#E8E8F0" Offset="0.7" />
+                    <GradientStop Color="#DCDCE6" Offset="1.0" />
+                </LinearGradientBrush>
+            </AbsoluteLayout.Background>
             <BindableLayout.ItemTemplate>
                 <DataTemplate>
                     <component:DraggableBoxComponent
