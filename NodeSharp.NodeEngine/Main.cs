@@ -1,4 +1,6 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using NodeSharp.NodeEngine.Node;
 
 namespace NodeSharp.NodeEngine;
@@ -6,24 +8,69 @@ namespace NodeSharp.NodeEngine;
 public class Main
 {
     private readonly BaseNodeList nodes = [];
+    private string fileNameSaved;
 
     public BaseNodeList Nodes => nodes;
-    // private string? nodeDataJson = null;
 
-    // public async Task LoadFromFileAsync(string fileName)
-    // {
-    //     nodeDataJson = await File.ReadAllTextAsync(fileName);
-    // }
-    
+    public async Task SaveToFileAsync()
+    {
+        if (fileNameSaved is null)
+        {
+            throw new InvalidOperationException("No file name exists. Call LoadFromFileAsync first.");
+        }
+
+        await SaveToFileAsync(fileNameSaved);
+    }
+
+    public async Task SaveToFileAsync(string fileName)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(fileName);
+
+        if (File.Exists(fileName))
+        {
+            File.Delete(fileName);
+        }
+        
+        using var stream = File.Create(fileName);
+        var options = new JsonSerializerOptions 
+        { 
+            WriteIndented = true,
+            ReferenceHandler = ReferenceHandler.IgnoreCycles 
+        };
+        using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = options.WriteIndented });
+
+        writer.WriteStartObject();
+        writer.WritePropertyName("Nodes");
+
+        writer.WriteStartArray();
+        foreach (var node in nodes)
+        {
+            JsonSerializer.Serialize(writer, node, node.GetType(), options);
+        }
+        writer.WriteEndArray();
+
+        writer.WriteEndObject();
+
+        await writer.FlushAsync();
+    }
     public async Task LoadFromFileAsync(string fileName)
     {
+        ArgumentException.ThrowIfNullOrEmpty(fileName);
+
+        if (!File.Exists(fileName))
+        {
+            throw new FileNotFoundException($"File not found: {fileName}");
+        }
+
+        fileNameSaved = fileName;
+
         var nodeDataJson = await File.ReadAllTextAsync(fileName);
 
         if (nodeDataJson is null)
         {
             throw new InvalidOperationException($"Node data JSON is null. File name is: {fileName}");
         }
-        
+
         var document = JsonDocument.Parse(nodeDataJson);
         var nodesArray = document.RootElement.GetProperty("Nodes");
 
@@ -35,19 +82,20 @@ public class Main
 
         foreach (var node in nodes)
         {
-            Console.WriteLine($"  - {node.Name} ({node.TypeId}): {node.Outputs.Length} outputs, {node.Inputs.Length} inputs");
+            Console.WriteLine(
+                $"  - {node.Name} ({node.TypeId}): {node.Outputs.Length} outputs, {node.Inputs.Length} inputs");
         }
 
         // return Task.CompletedTask;
     }
-    
+
     public async Task Run()
     {
         await nodes.Run();
     }
-    
+
     public T? FindNodeFromId<T>(string id) where T : BaseNode => nodes.OfType<T>().SingleOrDefault(x => x.Id == id);
-    
+
     void ParseNodesFromJson(JsonElement jsonElement)
     {
         foreach (var nodeElement in jsonElement.EnumerateArray())
@@ -65,16 +113,20 @@ public class Main
 
             BaseNode node = typeId switch
             {
-                "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs, nodeElement),
-                "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs, nodeElement),
-                "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs, nodeElement),
-                "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs, nodeElement),
+                "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs,
+                    nodeElement),
+                "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs,
+                    nodeElement),
+                "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart, outputs,
+                    inputs, nodeElement),
+                "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, outputs, inputs,
+                    nodeElement),
                 _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
             };
 
             nodes.Add(node);
         }
-        
+
         static bool ReadBool(JsonElement element, string preferredPropertyName, string fallbackPropertyName)
         {
             if (element.TryGetProperty(preferredPropertyName, out var preferred))
@@ -85,7 +137,7 @@ public class Main
             return element.GetProperty(fallbackPropertyName).GetBoolean();
         }
     }
-    
+
     static Output[] ParseOutputs(JsonElement outputsElement)
     {
         // Supports:
@@ -111,7 +163,8 @@ public class Main
                     ))
                     .ToArray(),
 
-            _ => throw new InvalidOperationException("Invalid 'Outputs' JSON shape. Expected array of objects or array of strings.")
+            _ => throw new InvalidOperationException(
+                "Invalid 'Outputs' JSON shape. Expected array of objects or array of strings.")
         };
     }
 
@@ -123,6 +176,11 @@ public class Main
                 i.GetProperty("ConnectsToParentNodeId").EnumerateArray().Select(x => x.GetString()!).ToArray()
             ))
             .ToArray();
+    }
+
+    public void Clear()
+    {
+        Nodes.Clear();
     }
 }
 
