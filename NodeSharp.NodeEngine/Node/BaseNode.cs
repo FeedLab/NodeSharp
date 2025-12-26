@@ -1,10 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace NodeSharp.NodeEngine.Node;
 
 public abstract class BaseNode
 {
+    [JsonIgnore]
     public BaseNodeList Nodes { get; }
     public string Id { get; }
     public string TypeId { get; }
