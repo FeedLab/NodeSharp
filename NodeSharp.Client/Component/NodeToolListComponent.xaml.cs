@@ -11,13 +11,13 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
 {
     private readonly NodeToolListModel viewModel;
     private readonly DiagramViewModel diagramViewModel;
-    private readonly Main main;
+    private readonly NodeIo nodeIo;
 
     public NodeToolListComponent()
     {
         viewModel = AppService.GetRequiredService<NodeToolListModel>();
         diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
-        main = AppService.GetRequiredService<Main>();
+        nodeIo = AppService.GetRequiredService<NodeIo>();
 
         InitializeComponent();
 
@@ -53,17 +53,17 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     {
         try
         {
-            var nodes = diagramViewModel.Nodes;
+            var nodes = diagramViewModel.BoxNodes;
 
             foreach (var nodeBox in nodes)
             {
-                nodeBox.Node.X = nodeBox.X;
-                nodeBox.Node.Y = nodeBox.Y;
+                nodeBox.Node.X = (int)nodeBox.X;
+                nodeBox.Node.Y = (int)nodeBox.Y;
             }
             
-            if (!string.IsNullOrEmpty(main.FileNameSaved))
+            if (!string.IsNullOrEmpty(nodeIo.FileNameSaved))
             {
-                await main.SaveToFileAsync();
+                await nodeIo.SaveToFileAsync();
             }
         }
         catch (Exception exception)
@@ -76,16 +76,16 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     {
         try
         {
-            var nodes = diagramViewModel.Nodes;
+            var nodes = diagramViewModel.BoxNodes;
 
             foreach (var nodeBox in nodes)
             {
-                nodeBox.Node.X = nodeBox.X;
-                nodeBox.Node.Y = nodeBox.Y;
+                nodeBox.Node.X = (int)nodeBox.X;
+                nodeBox.Node.Y = (int)nodeBox.Y;
             }
             
             var ms = new MemoryStream();
-            await main.SaveToFileAsync(ms);
+            await nodeIo.SaveToFileAsync(ms);
             
             var fileSaverResult = await FileSaver.Default.SaveAsync(
                 "Nodes.json", 
@@ -95,8 +95,8 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
             if (fileSaverResult.IsSuccessful)
             {
                 // User picked a location, file saved successfully
-                main.FileNameSaved = fileSaverResult.FilePath;
-                Console.WriteLine($"File saved at: {main.FileNameSaved}");
+                nodeIo.FileNameSaved = fileSaverResult.FilePath;
+                Console.WriteLine($"File saved at: {nodeIo.FileNameSaved}");
             }
             else
             {

@@ -4,6 +4,11 @@ namespace NodeSharp.NodeEngine;
 
 public class BaseNodeList : List<BaseNode>
 {
+    public Dictionary<string, BaseNode> ToDictionary()
+    {
+        return this.ToDictionary(n => n.Id);
+    }
+    
     public void ValidateInputAndOutputNodes()
     {
         foreach (var node in this)

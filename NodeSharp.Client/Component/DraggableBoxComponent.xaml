@@ -26,7 +26,7 @@
         </Grid.GestureRecognizers>
         <Border
             InputTransparent="False"
-            Margin="12"
+            Margin="0"
             Style="{StaticResource 
     DraggableBoxStyle}"
             Padding="4"

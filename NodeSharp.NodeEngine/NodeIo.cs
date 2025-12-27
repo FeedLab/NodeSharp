@@ -5,7 +5,7 @@ using NodeSharp.NodeEngine.Node;
 
 namespace NodeSharp.NodeEngine;
 
-public class Main
+public class NodeIo
 {
     private readonly BaseNodeList nodes = [];
     private string? fileNameSaved;

@@ -38,12 +38,13 @@ public static class MauiProgram
         
         builder.Services.AddSingleton<Storage>();
         builder.Services.AddSingleton<NodeToolListModel>();
-        builder.Services.AddScoped<DiagramViewModel>();
+        builder.Services.AddSingleton<DiagramViewModel>();
         builder.Services.AddScoped<NodeInformationModel>();
         builder.Services.AddScoped<MainPageModel>();
-        builder.Services.AddScoped<Main>();
+        builder.Services.AddSingleton<NodeIo>();
         builder.Services.AddScoped<ToolBarViewModel>();
         builder.Services.AddSingleton<CurvedLineDrawable>();
+        builder.Services.AddSingleton<LineConnectionManager>();
 
 #if DEBUG
         builder.Logging.AddDebug();

@@ -6,12 +6,12 @@ namespace NodeSharp.Client.ViewModel;
 public class MainPageModel
 {
     private readonly NodeToolListModel nodeToolListModel;
-    private readonly Main main;
+    private readonly NodeIo nodeIo;
     private readonly DiagramViewModel diagramViewModelModel;
 
-    public MainPageModel(ILogger<MainPageModel> logger,  NodeToolListModel nodeToolListModel, Main main, DiagramViewModel diagramViewModelModel)
+    public MainPageModel(ILogger<MainPageModel> logger,  NodeToolListModel nodeToolListModel, NodeIo nodeIo, DiagramViewModel diagramViewModelModel)
     {
-        this.main = main;
+        this.nodeIo = nodeIo;
         this.diagramViewModelModel = diagramViewModelModel;
         this.nodeToolListModel = nodeToolListModel;
     }

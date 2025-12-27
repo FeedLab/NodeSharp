@@ -1,60 +1,62 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using NodeSharp.Client.Component;
 
 namespace NodeSharp.Client.ViewModel;
 
-public partial class ToolBarViewModel(DiagramViewModel diagramViewModel) : ObservableObject
+public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineConnectionManager lineConnectionManager)
+    : ObservableObject
 {
-    [ObservableProperty]
-    private bool isSaveEnabled = true;
-    [ObservableProperty]
-    private bool isSaveAsEnabled = true;
-    [ObservableProperty]
-    private bool isLoadEnabled = true;
-    [ObservableProperty]
-    private bool isNewEnabled = true;
-    [ObservableProperty]
-    private bool isQuitEnabled = true;
+    [ObservableProperty] private bool isSaveEnabled = true;
+    [ObservableProperty] private bool isSaveAsEnabled = true;
+    [ObservableProperty] private bool isLoadEnabled = true;
+    [ObservableProperty] private bool isNewEnabled = true;
+    [ObservableProperty] private bool isQuitEnabled = true;
 
     [RelayCommand(CanExecute = nameof(CanDoSave))]
     private Task Save()
     {
         Console.WriteLine("Save executed!");
-        
+
         return Task.CompletedTask;
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanDoSaveAs))]
     private Task SaveAs()
     {
         Console.WriteLine("SaveAs executed!");
-        
+
         return Task.CompletedTask;
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanDoLoad))]
-    private async void Load()
+    private async Task Load()
     {
         Console.WriteLine("Load executed!");
 
         await PickFileAsync();
+
+        lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanDoNew))]
     private Task New()
     {
         Console.WriteLine("New executed!");
-        
+
         diagramViewModel.Clear();
-        
+
         return Task.CompletedTask;
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanDoQuit))]
     private Task Quit()
     {
         Console.WriteLine("Quit executed!");
-        
+
         Application.Current?.Quit();
 
         return Task.CompletedTask;
@@ -62,30 +64,30 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel) : Obser
 
     private bool CanDoSave()
     {
-        return IsSaveEnabled; 
+        return IsSaveEnabled;
     }
-    
+
     private bool CanDoSaveAs()
     {
-        return IsSaveAsEnabled; 
+        return IsSaveAsEnabled;
     }
-    
+
     private bool CanDoLoad()
     {
-        return IsLoadEnabled; 
+        return IsLoadEnabled;
     }
-    
+
     private bool CanDoNew()
     {
-        return IsNewEnabled; 
+        return IsNewEnabled;
     }
-    
+
     private bool CanDoQuit()
     {
-        return IsQuitEnabled; 
+        return IsQuitEnabled;
     }
-    
-    public async Task PickFileAsync()
+
+    private async Task PickFileAsync()
     {
         var result = await FilePicker.Default.PickAsync();
 
@@ -109,5 +111,9 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel) : Obser
             Console.WriteLine("User canceled file picking.");
         }
     }
+}
 
+public class ConnectionPointStatus
+{
+    public bool Dummy { get; set; }
 }

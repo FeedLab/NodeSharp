@@ -1,136 +1,39 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using NodeSharp.Client.Component;
 using NodeSharp.NodeEngine;
-using NodeSharp.NodeEngine.Node;
 
 namespace NodeSharp.Client.ViewModel;
 
-public class DiagramViewModel(Main main)
+public class DiagramViewModel(NodeIo nodeIo)
 {
     private const string BaseFilePath = ".";
-    public ObservableCollection<BoxNode> Nodes { get; } = new();
+    public ObservableCollection<BoxNode> BoxNodes { get; } = new();
     
     public async Task Init(StreamReader reader, string filePath)
     {
-        await main.LoadFromFileAsync(reader, filePath);
+        await nodeIo.LoadFromFileAsync(reader, filePath);
 
-        foreach (var node in main.Nodes)
+        foreach (var node in nodeIo.Nodes)
         {
-            var boxNode = new BoxNode
-            {
-                Node = node,
-                Id = node.Id,
-                Name = node.Name,
-                BoxColor = Colors.BlanchedAlmond,
-                IsEnabled = node.IsEnabled,
-                X = node.X,
-                Y = node.Y,
-                Width = 130,
-                Height = 50
-            };
+            var boxNode = new BoxNode(node, this);
 
-            Nodes.Add(boxNode);
+            BoxNodes.Add(boxNode);
         }
     }
 
     public void MoveNodeToFront(BoxNode node)
     {
-        if (Nodes.Contains(node) && Nodes.Last() != node)
+        if (BoxNodes.Contains(node) && BoxNodes.Last() != node)
         {
-            Nodes.Remove(node);
-            Nodes.Add(node);
+            BoxNodes.Remove(node);
+            BoxNodes.Add(node);
         }
     }
 
     public void Clear()
     {
-        Nodes.Clear();
+        BoxNodes.Clear();
     }
 
-}
-
-public class BoxNode : INotifyPropertyChanged
-{
-    private int _x;
-    private int _y;
-    private double _width;
-    private double _height;
-
-    public BoxNode()
-    {
-        BoxColor = Colors.ForestGreen;
-        Id = Guid.NewGuid().ToString();
-        Name = Id;
-    }
-
-    public string Id { get; set; }
-    public string Name { get; set; }
-
-    public int X
-    {
-        get => _x;
-        set
-        {
-            if (_x != value)
-            {
-                _x = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public int Y
-    {
-        get => _y;
-        set
-        {
-            if (_y != value)
-            {
-                _y = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public double Width
-    {
-        get => _width;
-        set
-        {
-            if (_width != value)
-            {
-                _width = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public double Height
-    {
-        get => _height;
-        set
-        {
-            if (_height != value)
-            {
-                _height = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public bool IsEnabled { get; set; }
-    public Color BoxColor { get; set; }
-
-    // public Rect Bounds => new Rect(X, Y, Width, Height);
-    public BaseNode Node { get; set; }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 }

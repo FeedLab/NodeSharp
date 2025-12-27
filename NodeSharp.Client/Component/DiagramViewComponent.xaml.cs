@@ -13,6 +13,8 @@ namespace NodeSharp.Client.Component;
 public partial class DiagramViewComponent : ContentView
 {
     private readonly DiagramViewModel viewModel;
+    private readonly CurvedLineDrawable curvedLineDrawable;
+    private readonly LineConnectionManager lineConnectionManager;
 
     private NodeDraggingStatus DraggingStatus { get; set; } = new();
 
@@ -24,10 +26,12 @@ public partial class DiagramViewComponent : ContentView
     double viewportWidth, viewportHeight;
     double canvasWidth = 3000;   // virtual size
     double canvasHeight = 2000;
-    
+
     public DiagramViewComponent()
     {
         viewModel = AppService.GetRequiredService<DiagramViewModel>();
+        curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
+        lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
         
         InitializeComponent();
 
@@ -53,6 +57,16 @@ public partial class DiagramViewComponent : ContentView
             MainThread.InvokeOnMainThreadAsync(() =>
             {
                 DraggingStatus.IsNodeInDraggingMode = args.IsNodeInDraggingMode;
+                return Task.CompletedTask;
+            }); 
+        });
+        
+        WeakReferenceMessenger.Default.Register<ConnectionPointStatus>(this, (sender, args) =>
+        {
+            MainThread.InvokeOnMainThreadAsync(() =>
+            {
+
+                ConnectionCanvas.Invalidate();
                 return Task.CompletedTask;
             }); 
         });

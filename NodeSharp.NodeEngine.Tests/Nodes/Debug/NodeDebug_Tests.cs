@@ -5,7 +5,7 @@ namespace NodeSharp.NodeEngine.Tests.Nodes.Debug;
 
 public class NodeDebugTests
 {
-    private readonly Main test = new();
+    private readonly NodeIo test = new();
     private const string BaseFilePath = @"Nodes\Debug\Files";
 
 

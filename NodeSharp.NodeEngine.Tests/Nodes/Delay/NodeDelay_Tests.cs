@@ -6,7 +6,7 @@ namespace NodeSharp.NodeEngine.Tests.Nodes.Delay;
 
 public class NodeDelay_Tests
 {
-    private readonly Main test;
+    private readonly NodeIo test;
     private const string BaseFilePath = "Nodes\\Delay\\Files";
     
 //     public NodeDelay_Tests()

@@ -22,7 +22,7 @@
                         VerticalOptions="Start"
                         IsClippedToBounds="True"
                         BackgroundColor="Transparent"
-                        BindableLayout.ItemsSource="{Binding Nodes}">
+                        BindableLayout.ItemsSource="{Binding BoxNodes}">
             <BindableLayout.ItemTemplate>
                 <DataTemplate>
                     <component:DraggableBoxComponent

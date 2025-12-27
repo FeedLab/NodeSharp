@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
+using NodeSharp.Client.Services;
+using NodeSharp.Client.ViewModel;
 
 namespace NodeSharp.Client.Component;
 
 public partial class DraggableBoxComponent : ContentView
 {
     double startX, startY;
+    private readonly DiagramViewModel diagramViewModel;
 
     public static readonly BindableProperty XProperty =
         BindableProperty.Create(nameof(X), typeof(double), typeof(DraggableBoxComponent), 0.0);
@@ -51,6 +55,9 @@ public partial class DraggableBoxComponent : ContentView
     {
         InitializeComponent();
 
+        diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
+
+        
         // Update AbsoluteLayout bounds when X or Y properties change
         PropertyChanged += (s, e) =>
         {
@@ -58,7 +65,8 @@ public partial class DraggableBoxComponent : ContentView
             {
                 Dispatcher.Dispatch(() =>
                 {
-                    AbsoluteLayout.SetLayoutBounds(this, new Rect(X, Y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
+                    AbsoluteLayout.SetLayoutBounds(this,
+                        new Rect(X, Y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
                 });
             }
         };
@@ -69,6 +77,30 @@ public partial class DraggableBoxComponent : ContentView
             if (Parent is AbsoluteLayout)
             {
                 AbsoluteLayout.SetLayoutBounds(this, new Rect(X, Y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
+            }
+        };
+
+        this.SizeChanged += (sender, args) =>
+        {
+            var view = (VisualElement)sender!;
+            Debug.WriteLine(
+                $"SizeChanged fired by {view.GetType().Name} (Id={view.AutomationId ?? "n/a"}): Width={view.Width}, Height={view.Height}");
+
+            // if (view is null)
+            // {
+            //     return;
+            // }
+
+            var boxNode = (BoxNode)BindingContext;
+
+            if (boxNode is not null)
+            {
+                boxNode.Width = view.Width;
+                boxNode.Height = view.Height;
+            }
+            else
+            {
+                throw new InvalidOperationException("BindingContext is not a BoxNode.");
             }
         };
     }
@@ -107,9 +139,11 @@ public partial class DraggableBoxComponent : ContentView
 
                     X = newX;
                     Y = newY;
-                    
+
+                    WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
+
                     // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
-                    
+
                     break;
 
                 case GestureStatus.Completed:
