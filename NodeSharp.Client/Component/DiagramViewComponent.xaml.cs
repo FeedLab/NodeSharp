@@ -36,29 +36,23 @@ public partial class DiagramViewComponent : ContentView
         CanvasSurface.AnchorY = 0;
 
         this.BindingContext = viewModel;
-        
-        var pan = new PanGestureRecognizer();
-        pan.PanUpdated += OnPanUpdated;
-        CanvasSurface.GestureRecognizers.Add(pan);
 
-        // Also add to Grid to capture events outside canvas
-        var panGrid = new PanGestureRecognizer();
-        panGrid.PanUpdated += OnPanUpdated;
-        this.GestureRecognizers.Add(panGrid);
+        // Add pan gesture to CanvasSurface for canvas panning (empty space)
+        var panCanvas = new PanGestureRecognizer();
+        panCanvas.PanUpdated += OnCanvasPan;
+        CanvasSurface.GestureRecognizers.Add(panCanvas);
+
+        // Also add to ConnectionCanvas for when it's visible
+        var panGraphics = new PanGestureRecognizer();
+        panGraphics.PanUpdated += OnCanvasPan;
+        ConnectionCanvas.GestureRecognizers.Add(panGraphics);
         
-        // var pinch = new PinchGestureRecognizer();
-        // pinch.PinchUpdated += OnCanvasPinch;
-        // CanvasSurface.GestureRecognizers.Add(pinch);
-        //
-        // var pinchGrid = new PinchGestureRecognizer();
-        // pinchGrid.PinchUpdated += OnCanvasPinch;
-        // this.GestureRecognizers.Add(pinchGrid);
         
         WeakReferenceMessenger.Default.Register<NodeDraggingStatus>(this, (sender, args) =>
         {
             MainThread.InvokeOnMainThreadAsync(() =>
             {
-                DraggingStatus.IsNodeDragging = args.IsNodeDragging;
+                DraggingStatus.IsNodeInDraggingMode = args.IsNodeInDraggingMode;
                 return Task.CompletedTask;
             }); 
         });
@@ -88,35 +82,14 @@ public partial class DiagramViewComponent : ContentView
         panY = scaledCanvasHeight > viewportHeight ? Math.Clamp(panY, minY, 0) : 0;
     }
 
-    void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+    void OnCanvasPan(object sender, PanUpdatedEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine($"Pan event: {e.StatusType}, IsNodeDragging: {DraggingStatus.IsNodeDragging}");
-
-        if (DraggingStatus.IsNodeDragging)
+        // If a node is being dragged, don't pan the canvas
+        if (DraggingStatus.IsNodeInDraggingMode)
         {
-            Element? current = sender as Element;
-            while (current != null && current is not DraggableBoxComponent)
+            if (e.StatusType == GestureStatus.Running)
             {
-                current = current.Parent;
-            }
-
-            if (current is DraggableBoxComponent element)
-            {
-                if (e.StatusType == GestureStatus.Started)
-                {
-                    // 1. Set ZIndex (as a backup)
-                    element.ZIndex = 1000;
-
-                    // 2. Move the data item to the end of the collection to force it to the top of the visual stack
-                    if (element.BindingContext is BoxNode boxNode)
-                    {
-                        viewModel.MoveNodeToFront(boxNode);
-                    }
-                }
-                else if (e.StatusType == GestureStatus.Completed || e.StatusType == GestureStatus.Canceled)
-                {
-                    element.ZIndex = 1;
-                }
+                ConnectionCanvas.Invalidate();
             }
             return;
         }
@@ -139,6 +112,8 @@ public partial class DiagramViewComponent : ContentView
 
                 CanvasSurface.TranslationX = panX;
                 CanvasSurface.TranslationY = panY;
+                ConnectionCanvas.TranslationX = panX;
+                ConnectionCanvas.TranslationY = panY;
                 break;
 
             case GestureStatus.Completed:
@@ -169,13 +144,11 @@ public partial class DiagramViewComponent : ContentView
         CanvasSurface.Scale = scale;
         CanvasSurface.TranslationX = panX;
         CanvasSurface.TranslationY = panY;
+        ConnectionCanvas.TranslationX = panX;
+        ConnectionCanvas.TranslationY = panY;
     }
 
     
     
 }
 
-public class NodeDraggingStatus
-{
-    public bool IsNodeDragging { get; set; }
-}

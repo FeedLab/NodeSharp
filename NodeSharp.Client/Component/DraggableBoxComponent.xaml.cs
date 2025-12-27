@@ -90,7 +90,7 @@ public partial class DraggableBoxComponent : ContentView
                     System.Diagnostics.Debug.WriteLine(
                         $"Drag started: X={X}, Y={Y}, LayoutBounds=({currentBounds.X}, {currentBounds.Y})");
 
-                    WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeDragging = true });
+                    WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeInDraggingMode = true });
                     break;
 
                 case GestureStatus.Running:
@@ -107,12 +107,27 @@ public partial class DraggableBoxComponent : ContentView
 
                     X = newX;
                     Y = newY;
+                    
+                    // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
+                    
                     break;
 
                 case GestureStatus.Completed:
-                    WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeDragging = false });
+                    WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeInDraggingMode = false });
                     break;
             }
         }
     }
+}
+
+public class NodeDraggingStatus
+{
+    public bool IsNodeInDraggingMode { get; set; }
+}
+
+public class HasNodePositionChanged(bool isDirty, VisualElement element, DraggableBoxComponent draggableBox)
+{
+    public bool IsDirty { get; } = isDirty;
+    public VisualElement? Element { get; } = element;
+    public DraggableBoxComponent DraggableBox { get; } = draggableBox;
 }

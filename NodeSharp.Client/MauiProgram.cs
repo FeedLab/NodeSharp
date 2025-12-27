@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Logging;
+using NodeSharp.Client.Component;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Model;
@@ -42,6 +43,7 @@ public static class MauiProgram
         builder.Services.AddScoped<MainPageModel>();
         builder.Services.AddScoped<Main>();
         builder.Services.AddScoped<ToolBarViewModel>();
+        builder.Services.AddSingleton<CurvedLineDrawable>();
 
 #if DEBUG
         builder.Logging.AddDebug();

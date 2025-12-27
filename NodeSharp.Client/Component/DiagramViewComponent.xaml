@@ -7,25 +7,22 @@
              xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
              x:Class="NodeSharp.Client.Component.DiagramViewComponent"
              Background="White"
-             IsClippedToBounds="True"
-             >
+             IsClippedToBounds="True">
 
     <Grid Background="Transparent" IsClippedToBounds="True">
+        <GraphicsView x:Name="ConnectionCanvas" WidthRequest="3000" HeightRequest="2000" HorizontalOptions="Start"
+                      VerticalOptions="Start">
+            <GraphicsView.Drawable>
+                <component:CurvedLineDrawable />
+            </GraphicsView.Drawable>
+        </GraphicsView>
         <AbsoluteLayout x:Name="CanvasSurface" WidthRequest="3000"
                         HeightRequest="2000"
                         HorizontalOptions="Start"
                         VerticalOptions="Start"
                         IsClippedToBounds="True"
-                        BindableLayout.ItemsSource="{Binding Nodes}" >
-            <AbsoluteLayout.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FFFFFF" Offset="0.0" />
-                    <GradientStop Color="#F0F0F5" Offset="0.3" />
-                    <GradientStop Color="#FFFFFF" Offset="0.5" />
-                    <GradientStop Color="#E8E8F0" Offset="0.7" />
-                    <GradientStop Color="#DCDCE6" Offset="1.0" />
-                </LinearGradientBrush>
-            </AbsoluteLayout.Background>
+                        BackgroundColor="Transparent"
+                        BindableLayout.ItemsSource="{Binding Nodes}">
             <BindableLayout.ItemTemplate>
                 <DataTemplate>
                     <component:DraggableBoxComponent

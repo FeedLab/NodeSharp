@@ -20,8 +20,12 @@
         </Style>
     </ContentView.Resources>
 
-    <Grid BackgroundColor="Blue">
+    <Grid InputTransparent="True">
+        <Grid.GestureRecognizers>
+            <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+        </Grid.GestureRecognizers>
         <Border
+            InputTransparent="False"
             Margin="12"
             Style="{StaticResource 
     DraggableBoxStyle}"
@@ -29,9 +33,7 @@
             BackgroundColor="{Binding BoxColor, Source={x:Reference Root}}"
             AbsoluteLayout.LayoutFlags="PositionProportional">
 
-            <Border.GestureRecognizers>
-                <PanGestureRecognizer PanUpdated="OnPanUpdated" />
-            </Border.GestureRecognizers>
+
 
             <Grid Margin="4">
                 <Grid.RowDefinitions>
