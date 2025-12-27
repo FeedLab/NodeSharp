@@ -59,8 +59,9 @@ public partial class DraggableBoxComponent : ContentView
 
         
         // Update AbsoluteLayout bounds when X or Y properties change
-        PropertyChanged += (s, e) =>
+        PropertyChanged += (sender, e) =>
         {
+            var view = (VisualElement)sender!;
             if ((e.PropertyName == nameof(X) || e.PropertyName == nameof(Y)) && Parent is AbsoluteLayout)
             {
                 Dispatcher.Dispatch(() =>
@@ -139,6 +140,12 @@ public partial class DraggableBoxComponent : ContentView
 
                     X = newX;
                     Y = newY;
+
+                    if (element.BindingContext is BoxNode boxNode)
+                    {
+                        boxNode.Node.X = (int)newX;
+                        boxNode.Node.Y = (int)newY;
+                    }
 
                     WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
 

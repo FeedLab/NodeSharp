@@ -1,11 +1,13 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.Client.Component;
+using NodeSharp.NodeEngine;
 
 namespace NodeSharp.Client.ViewModel;
 
-public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineConnectionManager lineConnectionManager)
+public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineConnectionManager lineConnectionManager, NodeIo nodeIo)
     : ObservableObject
 {
     [ObservableProperty] private bool isSaveEnabled = true;
@@ -23,11 +25,29 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
     }
 
     [RelayCommand(CanExecute = nameof(CanDoSaveAs))]
-    private Task SaveAs()
+    private async Task SaveAs()
     {
         Console.WriteLine("SaveAs executed!");
 
-        return Task.CompletedTask;
+        var ms = new MemoryStream();
+        await nodeIo.SaveToFileAsync(ms);
+            
+        var fileSaverResult = await FileSaver.Default.SaveAsync(
+            "Nodes.json", 
+            ms,
+            CancellationToken.None);
+
+        if (fileSaverResult.IsSuccessful)
+        {
+            // User picked a location, file saved successfully
+            nodeIo.FileNameSaved = fileSaverResult.FilePath;
+            Console.WriteLine($"File saved at: {nodeIo.FileNameSaved}");
+        }
+        else
+        {
+            // Handle error or cancellation
+            Console.WriteLine($"Error: {fileSaverResult.Exception?.Message}");
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanDoLoad))]

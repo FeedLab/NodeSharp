@@ -16,7 +16,7 @@ public class DiagramViewModel(NodeIo nodeIo)
 
         foreach (var node in nodeIo.Nodes)
         {
-            var boxNode = new BoxNode(node, this);
+            var boxNode = new BoxNode(node);
 
             BoxNodes.Add(boxNode);
         }

@@ -18,8 +18,6 @@ public class CurvedLineDrawable : IDrawable
 
         var recalculateLines = lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
         
-        // var boxNodes = diagramViewModel.BoxNodes;
-        
         var allConnections = recalculateLines.SelectMany(node => node.Connections) .ToList();
 
         foreach (var (start, end) in allConnections)

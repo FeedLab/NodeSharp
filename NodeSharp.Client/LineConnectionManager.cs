@@ -14,22 +14,22 @@ public class LineConnectionManager(NodeIo nodeIo)
 
         var recalculateLines = boxNodes.ToList();
         
-        foreach (var boxNode in recalculateLines)
+        foreach (var boxNodeFrom in recalculateLines)
         {
-            boxNode.Connections.Clear();
+            boxNodeFrom.Connections.Clear();
 
-            var fromNode = boxNode.Node;
-            var fromPt = new Point(fromNode.X, fromNode.Y);
+            var fromPt = boxNodeFrom.PtCenter;
 
-            foreach (var output in fromNode.Outputs)
+            foreach (var output in boxNodeFrom.Node.Outputs)
             {
                 foreach (var nodeToId in output.ConnectsToNodeId)
                 {
                     var toNode = nodeDictionary[nodeToId];
+                    var boxNodeTo = new BoxNode(toNode);
 
-                    var toPt = new Point(toNode.X, toNode.Y);
+                    var toPt = boxNodeTo.PtCenter;
 
-                    boxNode.Connections.Add((fromPt, toPt));
+                    boxNodeFrom.Connections.Add((fromPt, toPt));
                 }
             }
         }
