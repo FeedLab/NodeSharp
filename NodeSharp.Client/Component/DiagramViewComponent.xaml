@@ -33,5 +33,5 @@
                 </DataTemplate>
             </BindableLayout.ItemTemplate>
         </AbsoluteLayout>
-    </Grid>
+    </Grid> 
 </ContentView>
