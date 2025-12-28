@@ -2,6 +2,7 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
              x:Class="NodeSharp.Client.Component.DraggableBoxComponent"
              x:Name="Root">
 
@@ -25,32 +26,64 @@
             <PanGestureRecognizer PanUpdated="OnPanUpdated" />
         </Grid.GestureRecognizers>
         <Border
+            x:Name="MainBorder"
             InputTransparent="False"
             Margin="0"
-            Style="{StaticResource 
+            Padding="0"
+            Style="{StaticResource
     DraggableBoxStyle}"
-            Padding="4"
             BackgroundColor="{Binding BoxColor, Source={x:Reference Root}}"
             AbsoluteLayout.LayoutFlags="PositionProportional">
+            
 
 
-
-            <Grid Margin="4">
+            <Grid Margin="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Text="{Binding Node.Name}"
-                       LineBreakMode="NoWrap"
-                       HorizontalOptions="Center"
-                       FontAttributes="None" TextColor="DarkRed" FontSize="12" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="1" Text="{Binding Node.TypeId}"
-                       LineBreakMode="NoWrap"
-                       HorizontalOptions="Center"
-                       FontAttributes="None" TextColor="DarkGreen" FontSize="14" />
+                <Grid x:Name="LeftAnchorArea" BackgroundColor="Transparent" Grid.Column="0" Grid.Row="0">
+                    <AbsoluteLayout />
+                </Grid>
+                <Grid x:Name="RightAnchorArea" BackgroundColor="Transparent" Grid.Column="2" Grid.Row="0">
+                    <AbsoluteLayout />
+                </Grid>
 
+                <Grid Margin="4" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+
+                    <Label Grid.Row="0" Text="{Binding Node.Name}"
+                           LineBreakMode="NoWrap"
+                           HorizontalOptions="Center"
+                           FontAttributes="None" TextColor="DarkRed" FontSize="12" >
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsHovered, Source={x:Reference Root}}" Value="True">
+                                <Setter Property="Scale" Value="1.05" />
+                                <Setter Property="Shadow">
+                                    <Setter.Value>
+                                        <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+
+                    <Label Grid.Row="1" Text="{Binding Node.TypeId}"
+                           LineBreakMode="NoWrap"
+                           HorizontalOptions="Center"
+                           FontAttributes="None" TextColor="DarkGreen" FontSize="14" />
+
+                </Grid>
             </Grid>
         </Border>
     </Grid>

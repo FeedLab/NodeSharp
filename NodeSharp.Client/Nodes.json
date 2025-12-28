@@ -15,6 +15,12 @@
             "91744f2d-4b3e-4dc8-a890-df2e8a364907",
             "04d42414-6992-4201-8d29-da4b1facfbb6"
           ]
+        },
+        {
+          "Name": "Output 2",
+          "ConnectsToNodeId": [
+            "fdec97b0-c81a-4062-a9c8-76e87c4d6691"
+          ]
         }
       ],
       "Inputs": [],

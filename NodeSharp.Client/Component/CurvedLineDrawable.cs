@@ -1,13 +1,11 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-using NodeSharp.Client.Services;
+﻿using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 
 namespace NodeSharp.Client.Component;
 
 public class CurvedLineDrawable : IDrawable
 {
-    // private readonly LineConnectionManager lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
-
+   
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
         var diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
@@ -16,11 +14,9 @@ public class CurvedLineDrawable : IDrawable
         canvas.StrokeColor = Colors.DarkRed;
         canvas.StrokeSize = 2;
 
-        var recalculateLines = lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+        var lines = lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
         
-        var allConnections = recalculateLines.SelectMany(node => node.Connections) .ToList();
-
-        foreach (var (start, end) in allConnections)
+        foreach (var (start, end) in lines)
         {
             var path = new PathF();
             path.MoveTo((float)start.X, (float)start.Y);

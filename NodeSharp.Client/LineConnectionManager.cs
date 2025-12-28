@@ -6,17 +6,21 @@ namespace NodeSharp.Client;
 
 public class LineConnectionManager(NodeIo nodeIo)
 {
-    public IList<(Point Start, Point End)> Connections { get; set; } = [];
+    private IList<(Point Start, Point End)> Connections { get; set; } = [];
 
-    public IEnumerable<BoxNode> RecalculateLines(IEnumerable<BoxNode> boxNodes)
+    public IList<(Point Start, Point End)>  RecalculateLines(IEnumerable<BoxNode> boxNodes)
     {
-        var nodeDictionary = nodeIo.Nodes.ToDictionary();
-
-        var recalculateLines = boxNodes.ToList();
+        Connections.Clear();
         
+        var recalculateLines = boxNodes.ToList();
+        var boxNodeDictionary = recalculateLines.ToDictionary(bn => bn.NodeId);
+
         foreach (var boxNodeFrom in recalculateLines)
         {
             boxNodeFrom.Connections.Clear();
+            boxNodeFrom.InputNodes.Clear();
+
+            CalculateInputNodePositions(boxNodeFrom);
 
             var fromPt = boxNodeFrom.PtCenter;
 
@@ -24,41 +28,72 @@ public class LineConnectionManager(NodeIo nodeIo)
             {
                 foreach (var nodeToId in output.ConnectsToNodeId)
                 {
-                    var toNode = nodeDictionary[nodeToId];
-                    var boxNodeTo = new BoxNode(toNode);
+                    CalculateOutputNodePositions(boxNodeFrom);
 
-                    var toPt = boxNodeTo.PtCenter;
-
-                    boxNodeFrom.Connections.Add((fromPt, toPt));
+                    if (boxNodeDictionary.TryGetValue(nodeToId, out var boxNodeTo))
+                    {
+                        var toPt = boxNodeTo.PtCenter;
+                        boxNodeFrom.Connections.Add((fromPt, toPt));
+                    }
                 }
             }
         }
-        
-        return recalculateLines;
-    }
 
-    public void RecalculateLinesx()
-    {
-        Connections.Clear();
-
-        var nodes = nodeIo.Nodes.ToDictionary();
-
-        foreach (var node in nodes.Values)
+        foreach (var anchorPoint in recalculateLines.SelectMany(s => s.OutputNodes))
         {
-            //   var nodeHeight = node.wi + 50;
-            var from = new Point(node.X, node.Y);
+            var cpFrom = new Point(anchorPoint.AbsoluteX, anchorPoint.AbsoluteY);
 
-            foreach (var output in node.Outputs)
+            foreach (var targetNodeId in anchorPoint.Ids)
             {
-                foreach (var nodeId in output.ConnectsToNodeId)
+                if (boxNodeDictionary.TryGetValue(targetNodeId, out var boxNodeTo))
                 {
-                    var toNode = nodes[nodeId];
+                    var target = boxNodeTo.InputNodes[0];
+                    var cpTo = new Point(target.AbsoluteX, target.AbsoluteY);
 
-                    var to = new Point(toNode.X, toNode.Y);
-
-                    Connections.Add((from, to));
+                    Connections.Add((cpFrom, cpTo));
                 }
             }
+        }
+
+        return Connections;
+    }
+
+    private static void CalculateOutputNodePositions(BoxNode boxNode)
+    {
+        const double verticalMargin = 8.0;
+
+        boxNode.OutputNodes.Clear();
+
+        var outputs = boxNode.Node.Outputs;
+        var availableHeight = boxNode.Height - verticalMargin;
+        var verticalStep = availableHeight / (outputs.Length + 1);
+
+        var index = 1;
+        foreach (var output in outputs)
+        {
+            var connectedIds = output.ConnectsToNodeId.ToList();
+            var yPosition = verticalStep * index;
+
+            var anchorPoint = new AnchorPoint(connectedIds, 0, yPosition, boxNode, InOrOutConnection.Out);
+            boxNode.OutputNodes.Add(anchorPoint);
+
+            index++;
+        }
+    }
+
+    private static void CalculateInputNodePositions(BoxNode boxNode)
+    {
+        const double fromVerticalMargin = 8.0;
+
+        var inputs = boxNode.Node.Inputs;
+        var verticalStep = (boxNode.Height - fromVerticalMargin) / (inputs.Length + 1);
+
+        for (var i = 0; i < inputs.Length; i++)
+        {
+            var fromSquareYPos = verticalStep * (i + 1);
+            var ptInputSquare = new AnchorPoint(boxNode.Node.Id, 0, fromSquareYPos, boxNode, InOrOutConnection.In);
+
+            boxNode.InputNodes.Add(ptInputSquare);
         }
     }
 }

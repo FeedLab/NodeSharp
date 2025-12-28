@@ -158,6 +158,10 @@ public partial class DiagramViewComponent : ContentView
         CanvasSurface.Scale = scale;
         CanvasSurface.TranslationX = panX;
         CanvasSurface.TranslationY = panY;
+
+        ConnectionCanvas.AnchorX = 0;
+        ConnectionCanvas.AnchorY = 0;
+        ConnectionCanvas.Scale = scale;
         ConnectionCanvas.TranslationX = panX;
         ConnectionCanvas.TranslationY = panY;
     }

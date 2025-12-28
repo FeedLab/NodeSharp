@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Maui.Layouts;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 
@@ -26,6 +27,9 @@ public partial class DraggableBoxComponent : ContentView
 
     public static readonly BindableProperty BoxColorProperty =
         BindableProperty.Create(nameof(BoxColor), typeof(Color), typeof(DraggableBoxComponent), Colors.Gray);
+
+    public static readonly BindableProperty IsHoveredProperty =
+        BindableProperty.Create(nameof(IsHovered), typeof(bool), typeof(DraggableBoxComponent), false);
 
     public double X
     {
@@ -51,13 +55,19 @@ public partial class DraggableBoxComponent : ContentView
         set => SetValue(BoxColorProperty, value);
     }
 
+    public bool IsHovered
+    {
+        get => (bool)GetValue(IsHoveredProperty);
+        set => SetValue(IsHoveredProperty, value);
+    }
+
     public DraggableBoxComponent()
     {
         InitializeComponent();
 
         diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
 
-        
+
         // Update AbsoluteLayout bounds when X or Y properties change
         PropertyChanged += (sender, e) =>
         {
@@ -104,6 +114,14 @@ public partial class DraggableBoxComponent : ContentView
                 throw new InvalidOperationException("BindingContext is not a BoxNode.");
             }
         };
+
+        this.BindingContextChanged += OnBindingContextChanged;
+
+        // Add pointer hover events
+        var pointerGesture = new PointerGestureRecognizer();
+        pointerGesture.PointerEntered += (s, e) => IsHovered = true;
+        pointerGesture.PointerExited += (s, e) => IsHovered = false;
+        this.GestureRecognizers.Add(pointerGesture);
     }
 
     void OnPanUpdated(object sender, PanUpdatedEventArgs e)
@@ -157,6 +175,76 @@ public partial class DraggableBoxComponent : ContentView
                     WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeInDraggingMode = false });
                     break;
             }
+        }
+    }
+
+    private void OnBindingContextChanged(object sender, EventArgs e)
+    {
+        if (BindingContext is BoxNode boxNode)
+        {
+            UpdateInputAnchors(boxNode);
+            UpdateOutputAnchors(boxNode);
+
+            boxNode.PropertyChanged += (s, args) =>
+            {
+                if (args.PropertyName == nameof(BoxNode.Height))
+                {
+                    UpdateInputAnchors(boxNode);
+                    UpdateOutputAnchors(boxNode);
+                }
+            };
+        }
+    }
+
+    private void UpdateInputAnchors(BoxNode boxNode)
+    {
+        var leftAnchorArea = this.FindByName<Grid>("LeftAnchorArea");
+        if (leftAnchorArea == null) return;
+
+        var absoluteLayout = leftAnchorArea.Children.OfType<AbsoluteLayout>().FirstOrDefault();
+        if (absoluteLayout == null) return;
+
+        absoluteLayout.Children.Clear();
+
+        foreach (var anchor in boxNode.InputNodes)
+        {
+            var boxView = new BoxView
+            {
+                WidthRequest = 6,
+                HeightRequest = 6,
+                Color = Colors.Black
+            };
+            AbsoluteLayout.SetLayoutBounds(boxView, anchor.LayoutBounds);
+            AbsoluteLayout.SetLayoutFlags(boxView, AbsoluteLayoutFlags.None);
+            absoluteLayout.Children.Add(boxView);
+
+            Debug.WriteLine($"Added anchor at {anchor.LayoutBounds}");
+        }
+    }
+
+    private void UpdateOutputAnchors(BoxNode boxNode)
+    {
+        var rightAnchorArea = this.FindByName<Grid>("RightAnchorArea");
+        if (rightAnchorArea == null) return;
+
+        var absoluteLayout = rightAnchorArea.Children.OfType<AbsoluteLayout>().FirstOrDefault();
+        if (absoluteLayout == null) return;
+
+        absoluteLayout.Children.Clear();
+
+        foreach (var anchor in boxNode.OutputNodes)
+        {
+            var boxView = new BoxView
+            {
+                WidthRequest = 6,
+                HeightRequest = 6,
+                Color = Colors.Black
+            };
+            AbsoluteLayout.SetLayoutBounds(boxView, anchor.LayoutBounds);
+            AbsoluteLayout.SetLayoutFlags(boxView, AbsoluteLayoutFlags.None);
+            absoluteLayout.Children.Add(boxView);
+
+            Debug.WriteLine($"Added anchor at {anchor.LayoutBounds}");
         }
     }
 }
