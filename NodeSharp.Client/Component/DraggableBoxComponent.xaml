@@ -3,6 +3,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
+             xmlns:component="using:NodeSharp.Client.Component"
              x:Class="NodeSharp.Client.Component.DraggableBoxComponent"
              x:Name="Root">
 
@@ -30,8 +31,7 @@
             InputTransparent="False"
             Margin="0"
             Padding="0"
-            Style="{StaticResource
-    DraggableBoxStyle}"
+            Style="{StaticResource DraggableBoxStyle}"
             BackgroundColor="{Binding BoxColor, Source={x:Reference Root}}"
             AbsoluteLayout.LayoutFlags="PositionProportional">
             
@@ -49,10 +49,11 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid x:Name="LeftAnchorArea" BackgroundColor="Transparent" Grid.Column="0" Grid.Row="0">
-                    <AbsoluteLayout />
+                  <component:BoxAnchorLeftComponent BindableLayout.ItemsSource="{Binding .}"/>
                 </Grid>
                 <Grid x:Name="RightAnchorArea" BackgroundColor="Transparent" Grid.Column="2" Grid.Row="0">
-                    <AbsoluteLayout />
+                    <component:BoxAnchorRightComponent BindableLayout.ItemsSource="{Binding .}"/>
+
                 </Grid>
 
                 <Grid Margin="4" Grid.Column="1">
@@ -66,16 +67,16 @@
                            LineBreakMode="NoWrap"
                            HorizontalOptions="Center"
                            FontAttributes="None" TextColor="DarkRed" FontSize="12" >
-                        <Label.Triggers>
-                            <DataTrigger TargetType="Label" Binding="{Binding IsHovered, Source={x:Reference Root}}" Value="True">
-                                <Setter Property="Scale" Value="1.05" />
-                                <Setter Property="Shadow">
-                                    <Setter.Value>
-                                        <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" />
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Label.Triggers>
+                        <!-- <Label.Triggers> -->
+                        <!--     <DataTrigger TargetType="Label" Binding="{Binding IsHovered, Source={x:Reference Root}}" Value="True"> -->
+                        <!--         <Setter Property="Scale" Value="1.05" /> -->
+                        <!--         <Setter Property="Shadow"> -->
+                        <!--             <Setter.Value> -->
+                        <!--                 <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" /> -->
+                        <!--             </Setter.Value> -->
+                        <!--         </Setter> -->
+                        <!--     </DataTrigger> -->
+                        <!-- </Label.Triggers> -->
                     </Label>
 
                     <Label Grid.Row="1" Text="{Binding Node.TypeId}"

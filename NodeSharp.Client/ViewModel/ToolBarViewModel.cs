@@ -17,11 +17,29 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
     [ObservableProperty] private bool isQuitEnabled = true;
 
     [RelayCommand(CanExecute = nameof(CanDoSave))]
-    private Task Save()
+    private async Task Save()
     {
         Console.WriteLine("Save executed!");
 
-        return Task.CompletedTask;
+        try
+        {
+            var nodes = diagramViewModel.BoxNodes;
+
+            foreach (var nodeBox in nodes)
+            {
+                nodeBox.Node.X = (int)nodeBox.X;
+                nodeBox.Node.Y = (int)nodeBox.Y;
+            }
+            
+            if (!string.IsNullOrEmpty(nodeIo.FileNameSaved))
+            {
+                await nodeIo.SaveToFileAsync();
+            }
+        }
+        catch (Exception exception)
+        {
+            throw; // TODO handle exception
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanDoSaveAs))]
@@ -55,6 +73,9 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
     {
         Console.WriteLine("Load executed!");
 
+        diagramViewModel.Clear();
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
+        
         await PickFileAsync();
 
         lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
@@ -68,6 +89,7 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
         Console.WriteLine("New executed!");
 
         diagramViewModel.Clear();
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
 
         return Task.CompletedTask;
     }
@@ -84,11 +106,14 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
 
     private bool CanDoSave()
     {
+        IsSaveEnabled = diagramViewModel.BoxNodes.Count != 0;
         return IsSaveEnabled;
     }
 
     private bool CanDoSaveAs()
     {
+        IsSaveAsEnabled = diagramViewModel.BoxNodes.Count != 0;
+        
         return IsSaveAsEnabled;
     }
 

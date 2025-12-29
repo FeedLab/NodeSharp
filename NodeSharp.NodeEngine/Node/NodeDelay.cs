@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using NodeSharp.NodeEngine.Extension;
+using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
 
@@ -10,6 +11,33 @@ public class NodeDelay : BaseNode
 {
     [JsonInclude]
     private DelayPayload Delay { get; set; }
+
+    public NodeDelay(
+        BaseNodeList nodes,
+        string id,
+        string typeId,
+        string name,
+        bool isEnabled,
+        bool activateOnStart,
+        int xPosition,
+        int yPosition,
+        Storage storage,
+        DelayPayload delay
+            )
+        : base(
+            nodes,
+            id,
+            typeId,
+            name,
+            isEnabled,
+            activateOnStart,
+            xPosition,
+            yPosition,
+            storage
+        )
+    {
+        Delay = delay;
+    }
 
     public NodeDelay(
         BaseNodeList nodes,
@@ -122,6 +150,14 @@ public class DelayPayload
         Value = !element.TryGetProperty("Value", out var valueProp) || valueProp.ValueKind != JsonValueKind.Number
             ? throw new InvalidOperationException("Delay.Value value not found or invalid")
             : valueProp.GetInt32();
+    }
+
+    public DelayPayload(string pathToDelayNode = "payload", string source = "Fixed", string type = "seconds", int value = 5)
+    {
+        PathToDelayNode = pathToDelayNode;
+        Source = source;
+        Type = type;
+        Value = value;
     }
 
     public string PathToDelayNode { get; }

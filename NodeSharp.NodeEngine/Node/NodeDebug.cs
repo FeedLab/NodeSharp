@@ -1,11 +1,27 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
 
 public class NodeDebug : BaseNode
 {
+    public NodeDebug(
+        BaseNodeList nodes,
+        string id,
+        string typeId,
+        string name,
+        bool isEnabled,
+        bool activateOnStart,
+        int xPosition, 
+        int yPosition,
+        Storage storage)
+        : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage)
+    {
+        OutputJsonMessage = "";
+    }
+    
     public NodeDebug(
         BaseNodeList nodes,
         string id,

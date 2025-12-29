@@ -2,13 +2,13 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
 
 public class NodeRandomNumber : BaseNode
 {
-    [JsonInclude]
-    private RandomDataPayload RandomData { get; set; }
+    [JsonInclude] private RandomDataPayload RandomData { get; set; }
 
     public NodeRandomNumber(
         BaseNodeList nodes,
@@ -17,7 +17,34 @@ public class NodeRandomNumber : BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
-        int xPosition, 
+        int xPosition,
+        int yPosition,
+        Storage storage,
+        RandomDataPayload randomData)
+        : base(
+            nodes,
+            id,
+            typeId,
+            name,
+            isEnabled,
+            activateOnStart,
+            xPosition,
+            yPosition,
+            storage
+        )
+    {
+        RandomData = randomData;
+    }
+
+
+    public NodeRandomNumber(
+        BaseNodeList nodes,
+        string id,
+        string typeId,
+        string name,
+        bool isEnabled,
+        bool activateOnStart,
+        int xPosition,
         int yPosition,
         Output[] outputs,
         Input[] inputs,
@@ -28,14 +55,15 @@ public class NodeRandomNumber : BaseNode
             typeId,
             name,
             isEnabled,
-            activateOnStart, 
-            xPosition, 
+            activateOnStart,
+            xPosition,
             yPosition,
             outputs,
             inputs
-)
+        )
     {
-        if (!nodeElement.TryGetProperty("RandomData", out var randomProp) || randomProp.ValueKind != JsonValueKind.Object)
+        if (!nodeElement.TryGetProperty("RandomData", out var randomProp) ||
+            randomProp.ValueKind != JsonValueKind.Object)
         {
             throw new InvalidOperationException("RandomData object not found or invalid");
         }
@@ -94,7 +122,7 @@ public class NodeRandomNumber : BaseNode
         }
 
         await SendToConnectedChildrenAsync(updatedJsonString);
-        
+
         return await Task.FromResult(updatedJsonString);
     }
 
@@ -149,21 +177,28 @@ public class NodeRandomNumber : BaseNode
 public class RandomDataPayload
 {
     public string Source { get; }
-    
+
     public int Min { get; }
-    
+
     public int Max { get; }
-    
+
     public RandomDataPayload(JsonElement element)
     {
-        Source = !element.TryGetProperty("Source", out var sourceProp) || sourceProp.ValueKind != JsonValueKind.String 
+        Source = !element.TryGetProperty("Source", out var sourceProp) || sourceProp.ValueKind != JsonValueKind.String
             ? throw new InvalidOperationException("Source value not found or invalid")
             : sourceProp.GetString() ?? "Fixed";
         Min = !element.TryGetProperty("Min", out var minProp) || minProp.ValueKind != JsonValueKind.Number
-            ? throw new InvalidOperationException("Min value not found or invalid") 
+            ? throw new InvalidOperationException("Min value not found or invalid")
             : minProp.GetInt32();
         Max = !element.TryGetProperty("Max", out var maxProp) || maxProp.ValueKind != JsonValueKind.Number
             ? throw new InvalidOperationException("Max value not found or invalid")
             : maxProp.GetInt32();
+    }
+
+    public RandomDataPayload(string source = "Fixed", int min = 0, int max = 100)
+    {
+        Source = source;
+        Min = min;
+        Max = max;
     }
 }

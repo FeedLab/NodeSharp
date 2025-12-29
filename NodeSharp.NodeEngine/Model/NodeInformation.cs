@@ -2,7 +2,7 @@
 
 namespace NodeSharp.NodeEngine.Model;
 
-public class NodeInformation(string? typeId, bool activateOnStart, bool isEnabled, string information, string symbol)
+public class NodeInformation(string? typeId, bool activateOnStart, bool isEnabled, string information, string symbol, int numberOfInputs, int numberOfOutputs)
 {
     public string? TypeId { get; set; } = typeId;
     public bool ActivateOnStart { get; set; } = activateOnStart;
@@ -10,6 +10,10 @@ public class NodeInformation(string? typeId, bool activateOnStart, bool isEnable
     public string? Information { get; set; } = information;
     public string? Symbol { get; set; } = symbol;
 
+    public int NumberOfInputs { get; set; } = numberOfInputs;
+    
+    public int NumberOfOutputs { get; set; } = numberOfOutputs;
+    
     public bool HasInformationText => !string.IsNullOrWhiteSpace(Information);
 
     public override string ToString()

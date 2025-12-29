@@ -98,4 +98,17 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <MauiXaml Update="Component\BoxAnchorRightComponent.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Component\BoxAnchorRightComponent.xaml.cs">
+        <DependentUpon>BoxAnchorRightComponent.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
 </Project>

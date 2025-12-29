@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
+             x:Class="NodeSharp.Client.Component.BoxAnchorRightComponent">
+    
+            <AbsoluteLayout x:Name="CanvasRightAnchorArea" AutomationId="CanvasRightAnchorArea" 
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill"
+                            IsClippedToBounds="False"
+                            BackgroundColor="BurlyWood"
+                            BindableLayout.ItemsSource="{Binding OutputNodes}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="viewModel:AnchorPoint">
+                        <BoxView Color="Black" 
+                                 WidthRequest="6" 
+                                 HeightRequest="6"
+                                 AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
+                                 AbsoluteLayout.LayoutFlags="None" />
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </AbsoluteLayout>
+    </ContentView>

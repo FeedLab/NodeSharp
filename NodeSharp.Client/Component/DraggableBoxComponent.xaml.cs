@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
+using NodeSharp.Client.Extension;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 
@@ -15,6 +16,7 @@ public partial class DraggableBoxComponent : ContentView
 {
     double startX, startY;
     private readonly DiagramViewModel diagramViewModel;
+    private readonly LineConnectionManager lineConnectionManager;
 
     public static readonly BindableProperty XProperty =
         BindableProperty.Create(nameof(X), typeof(double), typeof(DraggableBoxComponent), 0.0);
@@ -66,7 +68,8 @@ public partial class DraggableBoxComponent : ContentView
         InitializeComponent();
 
         diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
-
+        lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
+        
 
         // Update AbsoluteLayout bounds when X or Y properties change
         PropertyChanged += (sender, e) =>
@@ -91,6 +94,13 @@ public partial class DraggableBoxComponent : ContentView
             }
         };
 
+        this.MeasureInvalidated += (sender, e) =>
+        {
+            var view = (VisualElement)sender!;
+            Debug.WriteLine(
+                $"SizeMeasureInvalidated fired by {view.GetType().Name} (Id={view.AutomationId ?? "n/a"}): Width={view.Width}, Height={view.Height}");
+        };
+
         this.SizeChanged += (sender, args) =>
         {
             var view = (VisualElement)sender!;
@@ -104,8 +114,13 @@ public partial class DraggableBoxComponent : ContentView
 
             var boxNode = (BoxNode)BindingContext;
 
-            if (boxNode is not null)
+            if (boxNode is not null && sender is DraggableBoxComponent element)
             {
+                var bounds = AbsoluteLayout.GetLayoutBounds(element);
+                
+                var canvasSurface = this.Parent;
+                var position = view.GetAbsolutePosition("CanvasSurface");
+                
                 boxNode.Width = view.Width;
                 boxNode.Height = view.Height;
             }
@@ -184,7 +199,7 @@ public partial class DraggableBoxComponent : ContentView
         {
             UpdateInputAnchors(boxNode);
             UpdateOutputAnchors(boxNode);
-
+        
             boxNode.PropertyChanged += (s, args) =>
             {
                 if (args.PropertyName == nameof(BoxNode.Height))
@@ -201,24 +216,48 @@ public partial class DraggableBoxComponent : ContentView
         var leftAnchorArea = this.FindByName<Grid>("LeftAnchorArea");
         if (leftAnchorArea == null) return;
 
-        var absoluteLayout = leftAnchorArea.Children.OfType<AbsoluteLayout>().FirstOrDefault();
+        // Ensure the grid can receive input
+        leftAnchorArea.InputTransparent = false;
+
+        var component = leftAnchorArea.Children.OfType<BoxAnchorLeftComponent>().FirstOrDefault();
+        if (component == null) return;
+
+        var absoluteLayout = component.FindByName<AbsoluteLayout>("CanvasLeftAnchorArea");
         if (absoluteLayout == null) return;
 
+        absoluteLayout.InputTransparent = false;
         absoluteLayout.Children.Clear();
 
         foreach (var anchor in boxNode.InputNodes)
         {
             var boxView = new BoxView
             {
-                WidthRequest = 6,
+                WidthRequest = 6,  // Make it larger for easier interaction
                 HeightRequest = 6,
-                Color = Colors.Black
+                Color = Colors.Black,
+                InputTransparent = false  // Explicitly enable input
             };
+
+            var pointerGesture = new PointerGestureRecognizer();
+            pointerGesture.PointerEntered += (s, e) =>
+            {
+                boxView.Color = Colors.Blue;
+                boxView.WidthRequest = 8;
+                boxView.HeightRequest = 8;
+                Debug.WriteLine("✓ Input anchor ENTERED");
+            };
+            pointerGesture.PointerExited += (s, e) =>
+            {
+                boxView.Color = Colors.Black;
+                boxView.WidthRequest = 6;
+                boxView.HeightRequest = 6;
+                Debug.WriteLine("✓ Input anchor EXITED");
+            };
+            boxView.GestureRecognizers.Add(pointerGesture);
+
             AbsoluteLayout.SetLayoutBounds(boxView, anchor.LayoutBounds);
             AbsoluteLayout.SetLayoutFlags(boxView, AbsoluteLayoutFlags.None);
             absoluteLayout.Children.Add(boxView);
-
-            Debug.WriteLine($"Added anchor at {anchor.LayoutBounds}");
         }
     }
 
@@ -227,9 +266,15 @@ public partial class DraggableBoxComponent : ContentView
         var rightAnchorArea = this.FindByName<Grid>("RightAnchorArea");
         if (rightAnchorArea == null) return;
 
-        var absoluteLayout = rightAnchorArea.Children.OfType<AbsoluteLayout>().FirstOrDefault();
+        rightAnchorArea.InputTransparent = false;
+
+        var component = rightAnchorArea.Children.OfType<BoxAnchorRightComponent>().FirstOrDefault();
+        if (component == null) return;
+
+        var absoluteLayout = component.FindByName<AbsoluteLayout>("CanvasRightAnchorArea");
         if (absoluteLayout == null) return;
 
+        absoluteLayout.InputTransparent = false;
         absoluteLayout.Children.Clear();
 
         foreach (var anchor in boxNode.OutputNodes)
@@ -238,13 +283,30 @@ public partial class DraggableBoxComponent : ContentView
             {
                 WidthRequest = 6,
                 HeightRequest = 6,
-                Color = Colors.Black
+                Color = Colors.Black,
+                InputTransparent = false
             };
+
+            var pointerGesture = new PointerGestureRecognizer();
+            pointerGesture.PointerEntered += (s, e) =>
+            {
+                boxView.Color = Colors.Red;
+                boxView.WidthRequest = 8;
+                boxView.HeightRequest = 8;
+                Debug.WriteLine("✓ Output anchor ENTERED");
+            };
+            pointerGesture.PointerExited += (s, e) =>
+            {
+                boxView.Color = Colors.Black;
+                boxView.WidthRequest = 6;
+                boxView.HeightRequest = 6;
+                Debug.WriteLine("✓ Output anchor EXITED");
+            };
+            boxView.GestureRecognizers.Add(pointerGesture);
+
             AbsoluteLayout.SetLayoutBounds(boxView, anchor.LayoutBounds);
             AbsoluteLayout.SetLayoutFlags(boxView, AbsoluteLayoutFlags.None);
             absoluteLayout.Children.Add(boxView);
-
-            Debug.WriteLine($"Added anchor at {anchor.LayoutBounds}");
         }
     }
 }

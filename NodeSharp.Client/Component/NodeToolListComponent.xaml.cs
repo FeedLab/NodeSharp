@@ -4,6 +4,7 @@ using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Model;
+using Syncfusion.Maui.ListView;
 
 namespace NodeSharp.Client.Component;
 
@@ -156,5 +157,25 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     private void OnQuitTapped(object sender, EventArgs e)
     {
         Application.Current?.Quit();
+    }
+
+    private void OnItemDragging(object sender, ItemDraggingEventArgs e)
+    {
+        if (e.Action == DragAction.Start)
+        {
+            // The DataItem is already set by the control, you can access it here if needed
+            var draggedData = e.DataItem;
+        }
+
+
+    }
+    
+    private void OnDragStarting(object sender, DragStartingEventArgs e)
+    {
+        var border = (Element)sender;
+        var nodeInfo = (NodeInformationModel)border.BindingContext;
+
+        // Package the data so the DropGestureRecognizer can see it
+        e.Data.Properties.Add("Data", nodeInfo);
     }
 }

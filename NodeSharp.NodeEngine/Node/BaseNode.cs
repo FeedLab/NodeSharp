@@ -2,13 +2,13 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
 
 public abstract class BaseNode
 {
-    [JsonIgnore]
-    public BaseNodeList Nodes { get; }
+    [JsonIgnore] private BaseNodeList Nodes { get; }
     public string Id { get; }
     public string TypeId { get; }
     public string Name { get; }
@@ -16,8 +16,8 @@ public abstract class BaseNode
     public bool ActivateOnStart { get; }
     public int X { get; set; }
     public int Y { get; set; }
-    public Output[] Outputs { get; }
-    public Input[] Inputs { get; }
+    public IList<Output> Outputs { get; }
+    public IList<Input> Inputs { get; }
 
     protected BaseNode(
         BaseNodeList nodes,
@@ -26,7 +26,48 @@ public abstract class BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
-        int xPosition, 
+        int xPosition,
+        int yPosition,
+        Storage storage)
+    {
+        if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeType))
+        {
+            Inputs = new List<Input>();
+            Outputs = new List<Output>();
+
+            for(var input = 0 ; input < nodeType.NumberOfInputs ; input++)
+            {
+                Inputs.Add(new Input("Input 1", new List<string>()));
+            }
+            
+            for(var output = 0 ; output < nodeType.NumberOfOutputs ; output++)
+            {
+                Outputs.Add(new Output("Output 1", new List<string>()));
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException($"Node type not found: {typeId}");
+        }
+
+        Nodes = nodes;
+        Id = id;
+        TypeId = typeId;
+        Name = name;
+        IsEnabled = isEnabled;
+        ActivateOnStart = activateOnStart;
+        X = xPosition;
+        Y = yPosition;
+    }
+
+    protected BaseNode(
+        BaseNodeList nodes,
+        string id,
+        string typeId,
+        string name,
+        bool isEnabled,
+        bool activateOnStart,
+        int xPosition,
         int yPosition,
         Output[] outputs,
         Input[] inputs)
@@ -59,8 +100,6 @@ public abstract class BaseNode
         Debug.WriteLine($"Node {FormatNode()} has been activated by parent node {parent.FormatNode()}");
         return Task.FromResult(parametersJsonString);
     }
-
-    // ... existing code ...
 
     protected Task SendToConnectedChildrenAsync(string parametersJsonString)
     {
@@ -108,24 +147,28 @@ public abstract class BaseNode
 
     private void ValidateOutputConnections(BaseNodeList baseNodeList)
     {
-        Debug.WriteLine($"Validating {Outputs.Length} output connections");
+        Debug.WriteLine($"Validating {Outputs.Count} output connections");
 
         ValidateConnections(
             baseNodeList,
-            connections: Outputs.SelectMany(o => o.ConnectsToNodeId.Select(nodeId => (PortName: o.Name, NodeId: nodeId))),
+            connections: Outputs.SelectMany(o =>
+                o.ConnectsToNodeId.Select(nodeId => (PortName: o.Name, NodeId: nodeId))),
             idLabel: "Output ConnectsToNodeId",
-            missingNodeMessage: (portName, nodeId) => $"Output '{portName}' connects to non-existing node '{nodeId}'. ");
+            missingNodeMessage: (portName, nodeId) =>
+                $"Output '{portName}' connects to non-existing node '{nodeId}'. ");
     }
 
     private void ValidateInputConnections(BaseNodeList baseNodeList)
     {
-        Debug.WriteLine($"Validating {Inputs.Length} input connections");
+        Debug.WriteLine($"Validating {Inputs.Count} input connections");
 
         ValidateConnections(
             baseNodeList,
-            connections: Inputs.SelectMany(i => i.ConnectsToParentNodeId.Select(nodeId => (PortName: i.Name, NodeId: nodeId))),
+            connections: Inputs.SelectMany(i =>
+                i.ConnectsToParentNodeId.Select(nodeId => (PortName: i.Name, NodeId: nodeId))),
             idLabel: "Input ConnectsToParentNodeId",
-            missingNodeMessage: (portName, nodeId) => $"Input '{portName}' connects to non-existing parent node '{nodeId}'. ");
+            missingNodeMessage: (portName, nodeId) =>
+                $"Input '{portName}' connects to non-existing parent node '{nodeId}'. ");
     }
 
     private void ValidateConnections(

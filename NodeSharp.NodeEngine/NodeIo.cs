@@ -1,11 +1,13 @@
-﻿using System.Text.Json;
+﻿using System.Drawing;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using NodeSharp.NodeEngine.Model;
 using NodeSharp.NodeEngine.Node;
 
 namespace NodeSharp.NodeEngine;
 
-public class NodeIo
+public class NodeIo(Storage storage)
 {
     private readonly BaseNodeList nodes = [];
     private string? fileNameSaved;
@@ -85,7 +87,7 @@ public class NodeIo
             foreach (var node in nodes)
             {
                 Console.WriteLine(
-                    $"  - {node.Name} ({node.TypeId}): {node.Outputs.Length} outputs, {node.Inputs.Length} inputs");
+                    $"  - {node.Name} ({node.TypeId}): {node.Outputs.Count} outputs, {node.Inputs.Count} inputs");
             }
     }
 
@@ -196,30 +198,40 @@ public class NodeIo
     {
         Nodes.Clear();
     }
-}
 
-public class Input
-{
-    public string Name { get; }
-    public string[] ConnectsToParentNodeId { get; }
-
-    public Input(string name, string[] connectsToParentNodeId)
+    public void Add(string nodeTypeName, double dropX, double dropY)
     {
-        Name = name;
-        ConnectsToParentNodeId = connectsToParentNodeId;
+        var id = $"{Guid.CreateVersion7()}";
+        var typeId = nodeTypeName;
+        var name = $"{nodeTypeName} {nodes.Count + 1}";
+        var xPosition = (int)dropX;
+        var yPosition = (int)dropY;
+        var isEnabled = true;
+        var activateOnStart = false;
+
+        BaseNode node = nodeTypeName switch
+        {
+            "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage),
+            "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage),
+            "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage, new RandomDataPayload()),
+            "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage, new DelayPayload()),
+            _ => throw new InvalidOperationException($"Unknown node type: {nodeTypeName}")
+        };
+
+        nodes.Add(node);
     }
 }
 
-public class Output
+public class Input(string name, IList<string> connectsToParentNodeId)
 {
-    public string Name { get; }
-    public string[] ConnectsToNodeId { get; }
+    public string Name { get; } = name;
+    public IList<string> ConnectsToParentNodeId { get; } = connectsToParentNodeId;
+}
 
-    public Output(string name, string[] connectsToNodeId)
-    {
-        Name = name;
-        ConnectsToNodeId = connectsToNodeId;
-    }
+public class Output(string name, IList<string> connectsToNodeId)
+{
+    public string Name { get; } = name;
+    public IList<string> ConnectsToNodeId { get; } = connectsToNodeId;
 }
 
 public class ActivateAfter

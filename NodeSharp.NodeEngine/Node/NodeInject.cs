@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
 
@@ -16,7 +17,31 @@ public class NodeInject : BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
-        int xPosition, 
+        int xPosition,
+        int yPosition,
+        Storage storage)
+        : base(
+            nodes,
+            id,
+            typeId,
+            name,
+            isEnabled,
+            activateOnStart,
+            xPosition,
+            yPosition,
+            storage
+        )
+    {
+    }
+
+    public NodeInject(
+        BaseNodeList nodes,
+        string id,
+        string typeId,
+        string name,
+        bool isEnabled,
+        bool activateOnStart,
+        int xPosition,
         int yPosition,
         Output[] outputs,
         Input[] inputs,
@@ -58,7 +83,6 @@ public class NodeInject : BaseNode
                 );
             }).ToArray();
     }
-
 
 
     public override async Task Run()

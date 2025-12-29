@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Maui.Controls;
 using Microsoft.Maui.Layouts;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
+using NodeSharp.NodeEngine;
 
 namespace NodeSharp.Client.Component;
 
@@ -15,6 +17,7 @@ public partial class DiagramViewComponent : ContentView
     private readonly DiagramViewModel viewModel;
     private readonly CurvedLineDrawable curvedLineDrawable;
     private readonly LineConnectionManager lineConnectionManager;
+    private readonly NodeIo nodeIo;
 
     private NodeDraggingStatus DraggingStatus { get; set; } = new();
 
@@ -32,6 +35,7 @@ public partial class DiagramViewComponent : ContentView
         viewModel = AppService.GetRequiredService<DiagramViewModel>();
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
+        nodeIo = AppService.GetRequiredService<NodeIo>();
         
         InitializeComponent();
 
@@ -40,6 +44,9 @@ public partial class DiagramViewComponent : ContentView
         CanvasSurface.AnchorY = 0;
 
         this.BindingContext = viewModel;
+
+        // In the constructor after setting BindingContext
+        viewModel.BoxNodes.CollectionChanged += OnBoxNodesChanged;
 
         // Add pan gesture to CanvasSurface for canvas panning (empty space)
         var panCanvas = new PanGestureRecognizer();
@@ -50,8 +57,12 @@ public partial class DiagramViewComponent : ContentView
         var panGraphics = new PanGestureRecognizer();
         panGraphics.PanUpdated += OnCanvasPan;
         ConnectionCanvas.GestureRecognizers.Add(panGraphics);
-        
-        
+
+        // Add mouse wheel zoom support for Windows
+#if WINDOWS
+        this.HandlerChanged += OnHandlerChanged;
+#endif
+
         WeakReferenceMessenger.Default.Register<NodeDraggingStatus>(this, (sender, args) =>
         {
             MainThread.InvokeOnMainThreadAsync(() =>
@@ -71,13 +82,29 @@ public partial class DiagramViewComponent : ContentView
             }); 
         });
         
-        this.SizeChanged += (_, __) =>
+        this.SizeChanged += (sender, eventArgs) =>
         {
             viewportWidth = this.Width;
             viewportHeight = this.Height;
             ClampPan();
         };
 
+    }
+    
+    private void OnBoxNodesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+        {
+            lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
+
+            // Handle newly added items
+            ConnectionCanvas.Invalidate(); // Redraw lines
+            
+            foreach (var boxNode in viewModel.BoxNodes)
+            {
+             //   boxNode.OnPropertyChanged(nameof(boxNode.Height));
+            }
+        }
     }
     
     void ClampPan()
@@ -148,7 +175,32 @@ public partial class DiagramViewComponent : ContentView
         }
     }
 
-    
+#if WINDOWS
+    void OnHandlerChanged(object sender, EventArgs e)
+    {
+        if (this.Handler?.PlatformView is Microsoft.UI.Xaml.FrameworkElement nativeView)
+        {
+            nativeView.PointerWheelChanged += OnNativePointerWheelChanged;
+        }
+    }
+
+    void OnNativePointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        var delta = e.GetCurrentPoint(null).Properties.MouseWheelDelta;
+
+        if (delta != 0)
+        {
+            // Zoom in/out based on wheel direction
+            var zoomFactor = delta > 0 ? 1.1 : 0.9;
+            scale *= zoomFactor;
+            scale = Math.Clamp(scale, 0.3, 3.0);
+            UpdateTransform();
+
+            e.Handled = true;
+        }
+    }
+#endif
+
     void UpdateTransform()
     {
         ClampPan();
@@ -166,7 +218,36 @@ public partial class DiagramViewComponent : ContentView
         ConnectionCanvas.TranslationY = panY;
     }
 
-    
-    
+    private void OnDragOver(object sender, DragEventArgs e)
+    {
+        // Allow drop
+        e.AcceptedOperation = DataPackageOperation.Copy;
+    }
+
+    private void OnDrop(object sender, DropEventArgs e)
+    {
+        // Get the dropped data (NodeInformationModel from ListView)
+        var data = e.Data.Properties["Data"];
+
+        if (data is NodeInformationModel nodeInfo)
+        {
+            // Calculate drop position accounting for canvas transformations
+            var dropPosition = e.GetPosition(this);
+            if (dropPosition != null)
+            {
+                var dropX = (dropPosition.Value.X - panX) / scale;
+                var dropY = (dropPosition.Value.Y - panY) / scale;
+
+
+                nodeIo.Add(nodeInfo.TypeId, dropX, dropY);
+
+                lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
+                
+                // Add node to diagram at drop position
+                // viewModel.AddNode(nodeInfo, dropX, dropY);
+            }
+        }
+    }
+
 }
 

@@ -1,8 +1,9 @@
-﻿using NodeSharp.NodeEngine.Node;
+﻿using System.Collections.ObjectModel;
+using NodeSharp.NodeEngine.Node;
 
 namespace NodeSharp.NodeEngine;
 
-public class BaseNodeList : List<BaseNode>
+public class BaseNodeList : ObservableCollection<BaseNode>
 {
     public Dictionary<string, BaseNode> ToDictionary()
     {
@@ -32,4 +33,10 @@ public class BaseNodeList : List<BaseNode>
 
     private static bool ShouldRunOnStart(BaseNode candidate) =>
         candidate is { ActivateOnStart: true, IsEnabled: true };
+
+   
+    public BaseNode? Find(Func<BaseNode, bool> predicate)
+    {
+        return this.FirstOrDefault(predicate);
+    }
 }

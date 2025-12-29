@@ -7,9 +7,9 @@ public class NodeInformationDictionary : Dictionary<string, NodeInformation>
         var informationText =
             "Want me to refactor this to use MVVM entirely (no code-behind), with SelectedItem bound to your ViewModel and a CollectionChanged hook to keep highlights in sync";
         
-        Add("Inject", new NodeInformation("Inject", true, true, informationText,"\ue713"));
-        Add("Debug", new NodeInformation("Debug", false, true, informationText,"\ue714"));
-        Add("Delay", new NodeInformation("Delay", false, true, informationText,"\ue715"));
-        Add("RandomNumber", new NodeInformation("RandomNumber", false, true, informationText,"\ue716"));
+        Add("Inject", new NodeInformation("Inject", true, true, informationText,"\ue713", 0, 1));
+        Add("Debug", new NodeInformation("Debug", false, true, informationText,"\ue714", 1, 0));
+        Add("Delay", new NodeInformation("Delay", false, true, informationText,"\ue715", 1, 1));
+        Add("RandomNumber", new NodeInformation("RandomNumber", false, true, informationText,"\ue716", 1, 1));
     }
 }

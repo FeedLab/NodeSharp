@@ -38,6 +38,32 @@ public partial class AnchorPoint : ObservableObject
         }
     }
 
+    public double AbsoluteCenterX
+    {
+        get
+        {
+            if (connectionType == InOrOutConnection.In)
+            {
+                return BoxNode.X + (LayoutBounds.Width / 2.0);;
+            }
+            
+            return BoxNode.X + BoxNode.Width + (LayoutBounds.Width / 2.0);;
+        }
+    }
+    
+    public double AbsoluteCenterY
+    {
+        get
+        {
+            if (connectionType == InOrOutConnection.In)
+            {
+                return BoxNode.Y + Y + (LayoutBounds.Height / 2.0);
+            }
+            
+            return BoxNode.Y + Y + (LayoutBounds.Height / 2.0);
+        }
+    }
+    
     public double AbsoluteX
     {
         get
@@ -79,7 +105,10 @@ public partial class AnchorPoint : ObservableObject
     { 
         get
         {
-            var rect = new Rect(X, Y, 6, 6);
+            var width = 6;
+            var height = 6;
+            
+            var rect = new Rect(X, Y - (height / 2.0), width, height);
             System.Diagnostics.Debug.WriteLine($"LayoutBounds: {rect}");
             return rect;
         }
@@ -106,26 +135,7 @@ public partial class BoxNode : ObservableObject
         Height = 50;
     }
 
-    // public AnchorPoint TransformInputToAbsolutePosition(AnchorPoint anchorPoint)
-    // {
-    //     return new AnchorPoint(anchorPoint.Ids, anchorPoint.X + X, anchorPoint.Y + Y);
-    // }
-    //
-    // public AnchorPoint TransformOutPutToAbsolutePosition(AnchorPoint anchorPoint)
-    // {
-    //     return new AnchorPoint(anchorPoint.Ids, anchorPoint.X + X + Width, anchorPoint.Y + Y );
-    // }
-    
-    // public IList<AnchorPoint> TransformedInputNodesToAbsolutePosition()
-    // {
-    //     return InputNodes.Select(s => new AnchorPoint(s.Ids, s.X + X, s.Y + Y)).ToList();
-    // }
-    //
-    // public IList<AnchorPoint> TransformedOutputNodesToAbsolutePosition()
-    // {
-    //     return OutputNodes.Select(s => new AnchorPoint(s.Ids, s.X + X + Width, s.Y + Y)).ToList();
-    // }
-    
+   
     public Point PtCenter
     {
         get => new(XCenter, YCenter);
@@ -173,9 +183,6 @@ public partial class BoxNode : ObservableObject
     [ObservableProperty] private Color boxColor;
 
     [ObservableProperty] private BaseNode node;
-
-// [ObservableProperty] 
-// private DiagramViewModel diagramViewModel;
 
     [ObservableProperty] private string name;
 }

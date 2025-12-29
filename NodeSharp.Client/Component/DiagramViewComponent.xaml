@@ -10,22 +10,31 @@
              IsClippedToBounds="True">
 
     <Grid Background="Transparent" IsClippedToBounds="True">
+        <Grid.GestureRecognizers>
+            <PinchGestureRecognizer PinchUpdated="OnCanvasPinch" />
+        </Grid.GestureRecognizers>
         <GraphicsView x:Name="ConnectionCanvas" WidthRequest="3000" HeightRequest="2000" HorizontalOptions="Start"
                       VerticalOptions="Start">
             <GraphicsView.Drawable>
                 <component:CurvedLineDrawable />
             </GraphicsView.Drawable>
         </GraphicsView>
-        <AbsoluteLayout x:Name="CanvasSurface" WidthRequest="3000"
+        <AbsoluteLayout x:Name="CanvasSurface" AutomationId="CanvasSurface" WidthRequest="3000"
                         HeightRequest="2000"
                         HorizontalOptions="Start"
                         VerticalOptions="Start"
                         IsClippedToBounds="True"
                         BackgroundColor="Transparent"
                         BindableLayout.ItemsSource="{Binding BoxNodes}">
+            <AbsoluteLayout.GestureRecognizers>
+                <DropGestureRecognizer AllowDrop="True"
+                                       DragOver="OnDragOver"
+                                       Drop="OnDrop" />
+            </AbsoluteLayout.GestureRecognizers>
             <BindableLayout.ItemTemplate>
                 <DataTemplate>
                     <component:DraggableBoxComponent
+                        AutomationId="{Binding NodeId, Mode=TwoWay}"
                         X="{Binding X, Mode=TwoWay}"
                         Y="{Binding Y, Mode=TwoWay}"
                         BoxColor="{Binding BoxColor}"

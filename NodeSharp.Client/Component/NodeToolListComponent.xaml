@@ -67,11 +67,15 @@
                 SelectionMode="Single"
                 DragStartMode="OnHold"
                 SelectionBackground="LightBlue"
-                ItemSize="100">
+                ItemSize="100"
+                ItemDragging="OnItemDragging">
                 <syncfusion:SfListView.ItemTemplate>
                     <DataTemplate x:DataType="viewModel:NodeInformationModel">
                         <Border Margin="6, 3, 6, 3" Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray"
                                 StrokeShape="RoundRectangle 5">
+                            <Border.GestureRecognizers>
+                                <DragGestureRecognizer DragStarting="OnDragStarting" />
+                            </Border.GestureRecognizers>
                             <Border.Shadow>
                                 <Shadow Radius="10" Opacity="0.5" Brush="Black" Offset="10,10" />
                             </Border.Shadow>
