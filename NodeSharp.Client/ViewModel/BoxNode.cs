@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using NodeSharp.NodeEngine.Node;
@@ -11,110 +12,7 @@ public enum InOrOutConnection
     Out = 1002
 }
 
-public partial class AnchorPoint : ObservableObject
-{
-    private readonly InOrOutConnection connectionType;
-
-    public AnchorPoint(string id, double x, double y, BoxNode boxNode, InOrOutConnection connectionType)
-    {
-        this.connectionType = connectionType;
-        BoxNode= boxNode;
-        X = x;
-        Y = y;
-        
-        Ids.Add(id);
-    }
-    
-    public AnchorPoint(IEnumerable<string> ids, double x, double y, BoxNode boxNode, InOrOutConnection connectionType)
-    {
-        this.connectionType = connectionType;
-        BoxNode = boxNode;
-        X = x;
-        Y = y;
-
-        foreach (var id in ids)
-        {
-            Ids.Add(id);
-        }
-    }
-
-    public double AbsoluteCenterX
-    {
-        get
-        {
-            if (connectionType == InOrOutConnection.In)
-            {
-                return BoxNode.X + (LayoutBounds.Width / 2.0);;
-            }
-            
-            return BoxNode.X + BoxNode.Width + (LayoutBounds.Width / 2.0);;
-        }
-    }
-    
-    public double AbsoluteCenterY
-    {
-        get
-        {
-            if (connectionType == InOrOutConnection.In)
-            {
-                return BoxNode.Y + Y + (LayoutBounds.Height / 2.0);
-            }
-            
-            return BoxNode.Y + Y + (LayoutBounds.Height / 2.0);
-        }
-    }
-    
-    public double AbsoluteX
-    {
-        get
-        {
-            if (connectionType == InOrOutConnection.In)
-            {
-                return BoxNode.X;
-            }
-            
-            return BoxNode.X + BoxNode.Width;
-        }
-    }
-    
-    public double AbsoluteY
-    {
-        get
-        {
-            if (connectionType == InOrOutConnection.In)
-            {
-                return BoxNode.Y + Y;
-            }
-            
-            return BoxNode.Y + Y;
-        }
-    }
-    [ObservableProperty] 
-    private double x;
-    
-    [ObservableProperty] 
-    private double y;
-
-    [ObservableProperty] 
-    private BoxNode boxNode;
-    
-    [ObservableProperty]
-    private IList<string> ids = [];
-    
-    public Rect LayoutBounds 
-    { 
-        get
-        {
-            var width = 6;
-            var height = 6;
-            
-            var rect = new Rect(X, Y - (height / 2.0), width, height);
-            System.Diagnostics.Debug.WriteLine($"LayoutBounds: {rect}");
-            return rect;
-        }
-    }
-}
-
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class BoxNode : ObservableObject
 {
     public IList<(Point Start, Point End)> Connections { get; } = [];
@@ -133,6 +31,7 @@ public partial class BoxNode : ObservableObject
         Y = node.Y;
         Width = 130;
         Height = 50;
+        width = 0;
     }
 
    
@@ -167,7 +66,7 @@ public partial class BoxNode : ObservableObject
             return X;
         }
     }
-
+    
     [ObservableProperty] private double x;
 
     [ObservableProperty] private double y;
@@ -185,4 +84,53 @@ public partial class BoxNode : ObservableObject
     [ObservableProperty] private BaseNode node;
 
     [ObservableProperty] private string name;
+
+    private void CalculateInputNodePositions()
+    {
+        const double fromVerticalMargin = 8.0;
+        
+        InputNodes.Clear();
+
+        var inputs = Node.Inputs;
+        var verticalStep = (Height - fromVerticalMargin) / (inputs.Count + 1);
+        var yPositionDelta = (fromVerticalMargin / 2) + (verticalStep / 2);
+
+        for (var i = 0; i < inputs.Count; i++)
+        {
+            var fromSquareYPos = verticalStep * (i + 1);
+            var ptInputSquare = new AnchorPoint(Node.Id, 0, fromSquareYPos, this, InOrOutConnection.In);
+
+            InputNodes.Add(ptInputSquare);
+        }
+    }
+    
+    private void CalculateOutputNodePositions()
+    {
+        const double verticalMargin = 8.0;
+
+        OutputNodes.Clear();
+
+        var outputs = Node.Outputs;
+        var availableHeight = Height - verticalMargin;
+        var verticalStep = availableHeight / (outputs.Count + 1);
+        var yPositionDelta = (verticalMargin / 2);
+        var index = 1;
+        foreach (var output in outputs)
+        {
+            var connectedIds = output.ConnectsToNodeId.ToList();
+            var yPosition = (verticalStep * index);// - yPositionDelta;
+
+            //    var anchorPoint = new AnchorPoint(connectedIds, 0, yPosition + (verticalMargin / 2), boxNode,
+            var anchorPoint = new AnchorPoint(connectedIds, 0, yPosition, this, InOrOutConnection.Out);
+            OutputNodes.Add(anchorPoint);
+
+            index++;
+        }
+    }
+    
+    partial void OnHeightChanged(double value)
+    {
+       CalculateInputNodePositions();
+       CalculateOutputNodePositions();
+    }
 }

@@ -197,6 +197,7 @@ public class NodeIo(Storage storage)
     public void Clear()
     {
         Nodes.Clear();
+        fileNameSaved = null;
     }
 
     public void Add(string nodeTypeName, double dropX, double dropY)

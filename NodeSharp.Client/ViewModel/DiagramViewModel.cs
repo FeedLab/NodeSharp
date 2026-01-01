@@ -37,10 +37,9 @@ public class DiagramViewModel
     {
         switch (e.Action)
         {
-            case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                if (e.NewItems is { Count: 1 })
+            case NotifyCollectionChangedAction.Add:
+                if (e.NewItems is [BaseNode newNode])
                 {
-                    var newNode = (BaseNode)e.NewItems[0];
                     var boxNode = new BoxNode(newNode);
                     BoxNodes.Add(boxNode);
                 }
@@ -50,10 +49,10 @@ public class DiagramViewModel
                 }
 
                 break;
-            case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+            case NotifyCollectionChangedAction.Remove:
                 // Handle nodes removed
                 break;
-            case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+            case NotifyCollectionChangedAction.Reset:
                 // Handle list cleared
                 break;
         }

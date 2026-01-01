@@ -7,14 +7,34 @@ using NodeSharp.NodeEngine;
 
 namespace NodeSharp.Client.ViewModel;
 
-public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineConnectionManager lineConnectionManager, NodeIo nodeIo)
-    : ObservableObject
+public partial class ToolBarViewModel : ObservableObject
 {
-    [ObservableProperty] private bool isSaveEnabled = true;
-    [ObservableProperty] private bool isSaveAsEnabled = true;
+    [ObservableProperty] private bool isSaveEnabled = false;
+    [ObservableProperty] private bool isSaveAsEnabled = false;
     [ObservableProperty] private bool isLoadEnabled = true;
     [ObservableProperty] private bool isNewEnabled = true;
     [ObservableProperty] private bool isQuitEnabled = true;
+    private readonly DiagramViewModel diagramViewModel;
+    private readonly LineConnectionManager lineConnectionManager;
+    private readonly NodeIo nodeIo;
+
+    /// <inheritdoc/>
+    public ToolBarViewModel(DiagramViewModel diagramViewModel, LineConnectionManager lineConnectionManager, NodeIo nodeIo)
+    {
+        this.diagramViewModel = diagramViewModel;
+        this.lineConnectionManager = lineConnectionManager;
+        this.nodeIo = nodeIo;
+        
+        // Subscribe to collection changes to refresh command states
+        nodeIo.Nodes.CollectionChanged += (s, e) => { UpdateToolbarCommandStates(); };
+    }
+
+    private void UpdateToolbarCommandStates()
+    {
+        LoadCommand.NotifyCanExecuteChanged();
+        SaveCommand.NotifyCanExecuteChanged();
+        SaveAsCommand.NotifyCanExecuteChanged();
+    }
 
     [RelayCommand(CanExecute = nameof(CanDoSave))]
     private async Task Save()
@@ -60,6 +80,8 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
             // User picked a location, file saved successfully
             nodeIo.FileNameSaved = fileSaverResult.FilePath;
             Console.WriteLine($"File saved at: {nodeIo.FileNameSaved}");
+            
+            UpdateToolbarCommandStates();
         }
         else
         {
@@ -74,13 +96,13 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
         Console.WriteLine("Load executed!");
 
         diagramViewModel.Clear();
-        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
         
         await PickFileAsync();
 
         lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
 
-        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
     }
 
     [RelayCommand(CanExecute = nameof(CanDoNew))]
@@ -88,9 +110,11 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
     {
         Console.WriteLine("New executed!");
 
-        diagramViewModel.Clear();
-        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
+        nodeIo.Clear();
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
 
+        UpdateToolbarCommandStates();
+        
         return Task.CompletedTask;
     }
 
@@ -106,7 +130,7 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
 
     private bool CanDoSave()
     {
-        IsSaveEnabled = diagramViewModel.BoxNodes.Count != 0;
+        IsSaveEnabled = diagramViewModel.BoxNodes.Count != 0 && nodeIo.FileNameSaved != null;
         return IsSaveEnabled;
     }
 
@@ -119,6 +143,8 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
 
     private bool CanDoLoad()
     {
+        IsLoadEnabled = diagramViewModel.BoxNodes.Count == 0;
+        
         return IsLoadEnabled;
     }
 
@@ -160,5 +186,5 @@ public partial class ToolBarViewModel(DiagramViewModel diagramViewModel, LineCon
 
 public class ConnectionPointStatus
 {
-    public bool Dummy { get; set; }
+    public bool IsCanvasInvalid { get; set; }
 }

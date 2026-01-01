@@ -12,9 +12,10 @@
     <Grid Background="Transparent" IsClippedToBounds="True">
         <Grid.GestureRecognizers>
             <PinchGestureRecognizer PinchUpdated="OnCanvasPinch" />
+            <PanGestureRecognizer PanUpdated="OnCanvasPan" />
         </Grid.GestureRecognizers>
         <GraphicsView x:Name="ConnectionCanvas" WidthRequest="3000" HeightRequest="2000" HorizontalOptions="Start"
-                      VerticalOptions="Start">
+                      VerticalOptions="Start" InputTransparent="True">
             <GraphicsView.Drawable>
                 <component:CurvedLineDrawable />
             </GraphicsView.Drawable>
@@ -25,6 +26,7 @@
                         VerticalOptions="Start"
                         IsClippedToBounds="True"
                         BackgroundColor="Transparent"
+                        InputTransparent="False"
                         BindableLayout.ItemsSource="{Binding BoxNodes}">
             <AbsoluteLayout.GestureRecognizers>
                 <DropGestureRecognizer AllowDrop="True"

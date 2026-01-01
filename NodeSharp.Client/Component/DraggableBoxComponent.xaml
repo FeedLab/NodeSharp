@@ -22,7 +22,7 @@
         </Style>
     </ContentView.Resources>
 
-    <Grid InputTransparent="True">
+    <Grid InputTransparent="False">
         <Grid.GestureRecognizers>
             <PanGestureRecognizer PanUpdated="OnPanUpdated" />
         </Grid.GestureRecognizers>
@@ -48,10 +48,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Grid x:Name="LeftAnchorArea" BackgroundColor="Transparent" Grid.Column="0" Grid.Row="0">
+                <Grid x:Name="LeftAnchorArea" BackgroundColor="Transparent" Grid.Column="0" Grid.Row="0" InputTransparent="False">
                   <component:BoxAnchorLeftComponent BindableLayout.ItemsSource="{Binding .}"/>
                 </Grid>
-                <Grid x:Name="RightAnchorArea" BackgroundColor="Transparent" Grid.Column="2" Grid.Row="0">
+                <Grid x:Name="RightAnchorArea" BackgroundColor="Transparent" Grid.Column="2" Grid.Row="0" InputTransparent="False">
                     <component:BoxAnchorRightComponent BindableLayout.ItemsSource="{Binding .}"/>
 
                 </Grid>

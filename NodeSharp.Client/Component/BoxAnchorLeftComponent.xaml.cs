@@ -16,6 +16,7 @@ public partial class BoxAnchorLeftComponent : ContentView
         
         CanvasLeftAnchorArea.BindingContextChanged += OnBindingContextChanged;
     }
+
     
     private void OnBindingContextChanged(object? sender, EventArgs e)
     {

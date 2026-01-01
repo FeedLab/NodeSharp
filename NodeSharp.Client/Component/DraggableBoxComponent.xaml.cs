@@ -17,6 +17,7 @@ public partial class DraggableBoxComponent : ContentView
     double startX, startY;
     private readonly DiagramViewModel diagramViewModel;
     private readonly LineConnectionManager lineConnectionManager;
+    private readonly CurvedLineDrawable curvedLineDrawable;
 
     public static readonly BindableProperty XProperty =
         BindableProperty.Create(nameof(X), typeof(double), typeof(DraggableBoxComponent), 0.0);
@@ -69,7 +70,8 @@ public partial class DraggableBoxComponent : ContentView
 
         diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
-        
+        curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
+
 
         // Update AbsoluteLayout bounds when X or Y properties change
         PropertyChanged += (sender, e) =>
@@ -141,6 +143,13 @@ public partial class DraggableBoxComponent : ContentView
 
     void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
+        // Don't drag the box if we're dragging from an anchor
+        if (lineConnectionManager.IsDragging)
+        {
+            Debug.WriteLine("⚠️ Box drag blocked - anchor is being dragged");
+            return;
+        }
+
         if (Parent is not AbsoluteLayout layout)
             return;
 
@@ -180,7 +189,7 @@ public partial class DraggableBoxComponent : ContentView
                         boxNode.Node.Y = (int)newY;
                     }
 
-                    WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { Dummy = false });
+                    WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
 
                     // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
 
@@ -235,23 +244,40 @@ public partial class DraggableBoxComponent : ContentView
                 WidthRequest = 6,  // Make it larger for easier interaction
                 HeightRequest = 6,
                 Color = Colors.Black,
-                InputTransparent = false  // Explicitly enable input
+                InputTransparent = false,  // Explicitly enable input
+                AnchorX = 0.5,
+                AnchorY = 0.5,
+                ZIndex = 1000  // Ensure it's on top
             };
 
             var pointerGesture = new PointerGestureRecognizer();
             pointerGesture.PointerEntered += (s, e) =>
             {
                 boxView.Color = Colors.Blue;
-                boxView.WidthRequest = 8;
-                boxView.HeightRequest = 8;
-                Debug.WriteLine("✓ Input anchor ENTERED");
+                boxView.Scale = 1.5;
+                Debug.WriteLine($"✓ Input anchor ENTERED - IsDragging: {lineConnectionManager.IsDragging}");
             };
             pointerGesture.PointerExited += (s, e) =>
             {
                 boxView.Color = Colors.Black;
-                boxView.WidthRequest = 6;
-                boxView.HeightRequest = 6;
+                boxView.Scale = 1.0;
                 Debug.WriteLine("✓ Input anchor EXITED");
+            };
+            pointerGesture.PointerPressed += (s, e) =>
+            {
+                Debug.WriteLine($"🔵 POINTER PRESSED - Setting drag state (was: {lineConnectionManager.IsDragging})");
+                lineConnectionManager.StartDragging(anchor);
+                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
+            };
+            pointerGesture.PointerReleased += (s, e) =>
+            {
+                Debug.WriteLine("🔵 POINTER RELEASED - Clearing drag state and redrawing");
+                lineConnectionManager.EndDragging(anchor);
+                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
+                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+                
+                
+                // curvedLineDrawable.Draw();
             };
             boxView.GestureRecognizers.Add(pointerGesture);
 
@@ -284,23 +310,37 @@ public partial class DraggableBoxComponent : ContentView
                 WidthRequest = 6,
                 HeightRequest = 6,
                 Color = Colors.Black,
-                InputTransparent = false
+                InputTransparent = false,
+                AnchorX = 0.5,
+                AnchorY = 0.5,
+                ZIndex = 1000  // Ensure it's on top
             };
 
             var pointerGesture = new PointerGestureRecognizer();
             pointerGesture.PointerEntered += (s, e) =>
             {
                 boxView.Color = Colors.Red;
-                boxView.WidthRequest = 8;
-                boxView.HeightRequest = 8;
+                boxView.Scale = 1.5;
                 Debug.WriteLine("✓ Output anchor ENTERED");
             };
             pointerGesture.PointerExited += (s, e) =>
             {
                 boxView.Color = Colors.Black;
-                boxView.WidthRequest = 6;
-                boxView.HeightRequest = 6;
+                boxView.Scale = 1.0;
                 Debug.WriteLine("✓ Output anchor EXITED");
+            };
+            pointerGesture.PointerPressed += (s, e) =>
+            {
+                Debug.WriteLine($"🔴 POINTER PRESSED - Setting drag state (was: {lineConnectionManager.IsDragging})");
+                lineConnectionManager.StartDragging(anchor);
+                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
+            };
+            pointerGesture.PointerReleased += (s, e) =>
+            {
+                Debug.WriteLine("🔴 POINTER RELEASED - Clearing drag state and redrawing");
+                lineConnectionManager.EndDragging(anchor);
+                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
+                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
             };
             boxView.GestureRecognizers.Add(pointerGesture);
 
@@ -321,4 +361,9 @@ public class HasNodePositionChanged(bool isDirty, VisualElement element, Draggab
     public bool IsDirty { get; } = isDirty;
     public VisualElement? Element { get; } = element;
     public DraggableBoxComponent DraggableBox { get; } = draggableBox;
+}
+
+public class AnchorDraggingStatus
+{
+    public bool IsAnchorDragging { get; set; }
 }

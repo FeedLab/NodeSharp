@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ public partial class DiagramViewComponent : ContentView
     private readonly NodeIo nodeIo;
 
     private NodeDraggingStatus DraggingStatus { get; set; } = new();
+    private AnchorDraggingStatus AnchorDragging { get; set; } = new();
 
     double startX = 0;
     double startY = 0;
@@ -48,15 +50,12 @@ public partial class DiagramViewComponent : ContentView
         // In the constructor after setting BindingContext
         viewModel.BoxNodes.CollectionChanged += OnBoxNodesChanged;
 
-        // Add pan gesture to CanvasSurface for canvas panning (empty space)
-        var panCanvas = new PanGestureRecognizer();
-        panCanvas.PanUpdated += OnCanvasPan;
-        CanvasSurface.GestureRecognizers.Add(panCanvas);
+        // Pan gesture is now on the parent Grid in XAML
 
-        // Also add to ConnectionCanvas for when it's visible
-        var panGraphics = new PanGestureRecognizer();
-        panGraphics.PanUpdated += OnCanvasPan;
-        ConnectionCanvas.GestureRecognizers.Add(panGraphics);
+        // Add pointer gesture to track mouse movement for line dragging
+        var pointerGesture = new PointerGestureRecognizer();
+        pointerGesture.PointerMoved += OnPointerMoved;
+        CanvasSurface.GestureRecognizers.Add(pointerGesture);
 
         // Add mouse wheel zoom support for Windows
 #if WINDOWS
@@ -69,7 +68,13 @@ public partial class DiagramViewComponent : ContentView
             {
                 DraggingStatus.IsNodeInDraggingMode = args.IsNodeInDraggingMode;
                 return Task.CompletedTask;
-            }); 
+            });
+        });
+
+        WeakReferenceMessenger.Default.Register<AnchorDraggingStatus>(this, (sender, args) =>
+        {
+            AnchorDragging.IsAnchorDragging = args.IsAnchorDragging;
+            Debug.WriteLine($"✓ Anchor dragging status changed: {args.IsAnchorDragging}");
         });
         
         WeakReferenceMessenger.Default.Register<ConnectionPointStatus>(this, (sender, args) =>
@@ -93,18 +98,18 @@ public partial class DiagramViewComponent : ContentView
     
     private void OnBoxNodesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-        {
-            lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
-
-            // Handle newly added items
-            ConnectionCanvas.Invalidate(); // Redraw lines
-            
-            foreach (var boxNode in viewModel.BoxNodes)
-            {
-             //   boxNode.OnPropertyChanged(nameof(boxNode.Height));
-            }
-        }
+        // if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+        // {
+        //     lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
+        //
+        //     // Handle newly added items
+        //     ConnectionCanvas.Invalidate(); // Redraw lines
+        //     
+        //     foreach (var boxNode in viewModel.BoxNodes)
+        //     {
+        //      //   boxNode.OnPropertyChanged(nameof(boxNode.Height));
+        //     }
+        // }
     }
     
     void ClampPan()
@@ -125,19 +130,33 @@ public partial class DiagramViewComponent : ContentView
 
     void OnCanvasPan(object sender, PanUpdatedEventArgs e)
     {
-        // If a node is being dragged, don't pan the canvas
-        if (DraggingStatus.IsNodeInDraggingMode)
+        // Check immediately if we're dragging - don't wait for messages
+        if (lineConnectionManager.IsDragging)
+        {
+            Debug.WriteLine($"⚠️ Pan blocked - anchor is dragging (status: {e.StatusType})");
+            return;
+        }
+
+        // If a node is being dragged or line is being drawn, don't pan the canvas
+        if (DraggingStatus.IsNodeInDraggingMode || AnchorDragging.IsAnchorDragging)
         {
             if (e.StatusType == GestureStatus.Running)
             {
                 ConnectionCanvas.Invalidate();
             }
+            Debug.WriteLine($"⚠️ Pan blocked - node dragging (status: {e.StatusType})");
             return;
         }
 
         switch (e.StatusType)
         {
             case GestureStatus.Started:
+                // Double-check here too before allowing pan to start
+                if (lineConnectionManager.IsDragging || AnchorDragging.IsAnchorDragging)
+                {
+                    Debug.WriteLine("⚠️ Pan START blocked - anchor is dragging");
+                    return;
+                }
                 System.Diagnostics.Debug.WriteLine("Canvas pan ACTUALLY started");
                 startX = panX;
                 startY = panY;
@@ -224,6 +243,19 @@ public partial class DiagramViewComponent : ContentView
         e.AcceptedOperation = DataPackageOperation.Copy;
     }
 
+    private void OnPointerMoved(object sender, PointerEventArgs e)
+    {
+        if (lineConnectionManager.IsDragging)
+        {
+            var position = e.GetPosition(CanvasSurface);
+            if (position != null)
+            {
+                lineConnectionManager.UpdateDragPosition(position.Value);
+                ConnectionCanvas.Invalidate();
+            }
+        }
+    }
+
     private void OnDrop(object sender, DropEventArgs e)
     {
         // Get the dropped data (NodeInformationModel from ListView)
@@ -242,7 +274,7 @@ public partial class DiagramViewComponent : ContentView
                 nodeIo.Add(nodeInfo.TypeId, dropX, dropY);
 
                 lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
-                
+
                 // Add node to diagram at drop position
                 // viewModel.AddNode(nodeInfo, dropX, dropY);
             }
