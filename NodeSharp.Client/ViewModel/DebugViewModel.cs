@@ -21,7 +21,7 @@ public partial class DebugViewModel : ObservableObject
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 System.Diagnostics.Debug.WriteLine($"Adding to DebugInfo collection. Count before: {DebugInfo.Count}");
-                DebugInfo.Add(new DebugData(tuple.message, tuple.level, tuple.entry));
+                DebugInfo.Add(new DebugData(tuple.message, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss:}: {tuple.level}", tuple.entry));
                 System.Diagnostics.Debug.WriteLine($"Count after: {DebugInfo.Count}");
             });
         };
@@ -61,6 +61,6 @@ public partial class DebugData : ObservableObject
         Level = level;
         Entry = entry;
         
-        messages.Add(message);
+        messages.Insert(0, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss:}: {message}");
     }
 }

@@ -23,10 +23,16 @@
           ]
         }
       ],
+      
       "Inputs": [],
       "ActivateAfter": {
         "Type": "Seconds",
         "Value": 10
+      },
+      "Repeat": {
+        "IsEnabled": true,
+        "Type": "Seconds",
+        "Value": 2
       },
       "Parameters": [
         {

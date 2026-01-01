@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using NodeSharp.NodeEngine.Model;
@@ -8,6 +9,7 @@ namespace NodeSharp.NodeEngine.Node;
 public class NodeInject : BaseNode
 {
     public ActivateAfter ActivateAfter { get; }
+    public Repeat Repeat { get; }
     public List<Parameter> Parameters { get; }
 
     public NodeInject(
@@ -32,6 +34,7 @@ public class NodeInject : BaseNode
             storage
         )
     {
+        Repeat = new Repeat("Seconds", 10, true);
         ActivateAfter = new ActivateAfter("Seconds", 1);
         Parameters = new List<Parameter>();
     }
@@ -61,42 +64,72 @@ public class NodeInject : BaseNode
             inputs
         )
     {
+        Repeat = new Repeat(
+            nodeElement.GetProperty("Repeat").GetProperty("Type").GetString()!,
+            nodeElement.GetProperty("Repeat").GetProperty("Value").GetInt32(),
+            nodeElement.GetProperty("Repeat").GetProperty("IsEnabled").GetBoolean()
+        );
+
         ActivateAfter = new ActivateAfter(
             nodeElement.GetProperty("ActivateAfter").GetProperty("Type").GetString()!,
             nodeElement.GetProperty("ActivateAfter").GetProperty("Value").GetInt32());
 
-            Parameters = nodeElement.GetProperty("Parameters").EnumerateArray()
-                .Select(p =>
-                {
-                    var source = p.TryGetProperty("Source", out var sourceProp)
-                        ? sourceProp.GetString() ?? "primitive"
-                        : "primitive";
+        Parameters = nodeElement.GetProperty("Parameters").EnumerateArray()
+            .Select(p =>
+            {
+                var source = p.TryGetProperty("Source", out var sourceProp)
+                    ? sourceProp.GetString() ?? "primitive"
+                    : "primitive";
 
-                    var declaredType = p.GetProperty("Type").GetString() ?? "string";
-                    var effectiveType = string.Equals(source, "environment", StringComparison.OrdinalIgnoreCase)
-                        ? "environment"
-                        : declaredType;
+                var declaredType = p.GetProperty("Type").GetString() ?? "string";
+                var effectiveType = string.Equals(source, "environment", StringComparison.OrdinalIgnoreCase)
+                    ? "environment"
+                    : declaredType;
 
-                    return new Parameter(
-                        p.GetProperty("Name").GetString() ?? "Unknown",
-                        effectiveType,
-                        source,
-                        p.TryGetProperty("Value", out var val) ? (val.GetString() ?? "") : ""
-                    );
-                }).ToList();
-        }
-        public override async Task Run()
+                return new Parameter(
+                    p.GetProperty("Name").GetString() ?? "Unknown",
+                    effectiveType,
+                    source,
+                    p.TryGetProperty("Value", out var val) ? (val.GetString() ?? "") : ""
+                );
+            }).ToList();
+    }
+
+    public override async Task Run()
     {
         if (!ActivateOnStart)
         {
             return;
         }
 
-        await base.Run();
+        if (Repeat.IsEnabled)
+        {
+            var timer = new PeriodicTimer(TimeSpan.FromSeconds(Repeat.Value));
 
-        var parametersJsonString = BuildParametersJson(Parameters);
-
-        await SendToConnectedChildrenAsync(parametersJsonString);
+            try
+            {
+                do
+                {
+                    await base.Run();
+                    var parametersJsonString = BuildParametersJson(Parameters);
+                    await SendToConnectedChildrenAsync(parametersJsonString);
+                } while (await timer.WaitForNextTickAsync(cts.Token));
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.WriteLine("Inject timer cancelled.");
+            }
+            finally
+            {
+                timer?.Dispose();
+            }
+        }
+        else
+        {
+            await base.Run();
+            var parametersJsonString = BuildParametersJson(Parameters);
+            await SendToConnectedChildrenAsync(parametersJsonString);
+        }
     }
 
     private static string BuildParametersJson(IList<Parameter> parameters)
@@ -119,7 +152,7 @@ public class NodeInject : BaseNode
             else if (parameter.Source.Equals("environment", StringComparison.OrdinalIgnoreCase))
             {
                 var envValue = GetRequiredEnvironmentVariable(parameter.Value);
-                
+
                 if (IsNumeric(envValue))
                 {
                     var param = new Parameter(parameter.Name, "number", "primitive", envValue);
@@ -130,7 +163,6 @@ public class NodeInject : BaseNode
                     var param = new Parameter(parameter.Name, "string", "primitive", envValue);
                     AppendParameterJson(sb, param);
                 }
-
             }
             else
             {
@@ -152,7 +184,7 @@ public class NodeInject : BaseNode
             CultureInfo.CurrentCulture,
             out _);
     }
-    
+
     private static void AppendParameterJson(StringBuilder sb, Parameter parameter)
     {
         var name = parameter.Name;

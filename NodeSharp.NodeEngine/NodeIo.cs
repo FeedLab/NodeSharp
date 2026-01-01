@@ -247,6 +247,21 @@ public class ActivateAfter
     }
 }
 
+public class Repeat
+{
+    public string Type { get; }
+    public int Value { get; }
+    
+    public bool IsEnabled { get; }
+
+    public Repeat(string type, int value, bool isEnabled)
+    {
+        Type = type;
+        Value = value;
+        IsEnabled = isEnabled;
+    }
+}
+
 public class Parameter
 {
     public string Name { get; }

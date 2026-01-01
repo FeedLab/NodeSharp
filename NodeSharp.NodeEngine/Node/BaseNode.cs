@@ -11,6 +11,8 @@ public abstract class BaseNode
 {
     public event EventHandler<(BaseNode baseNode, string level, string message, string entry)> OnInfoAdded;
 
+    protected CancellationTokenSource cts;
+
     [JsonIgnore] private BaseNodeList Nodes { get; }
     public string Id { get; }
     public string TypeId { get; }
@@ -33,6 +35,8 @@ public abstract class BaseNode
         int yPosition,
         Storage storage)
     {
+        cts = new CancellationTokenSource();
+        
         if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeType))
         {
             Inputs = new List<Input>();
@@ -75,6 +79,8 @@ public abstract class BaseNode
         Output[] outputs,
         Input[] inputs)
     {
+        cts = new CancellationTokenSource();
+        
         Nodes = nodes;
         Id = id;
         TypeId = typeId;
@@ -85,6 +91,11 @@ public abstract class BaseNode
         Y = yPosition;
         Outputs = outputs;
         Inputs = inputs;
+    }
+    
+    public void Abort()
+    {
+        cts?.Cancel();
     }
     
     protected virtual void RaiseOnInfoAdded(BaseNode baseNode, string level, string message, string entry)
