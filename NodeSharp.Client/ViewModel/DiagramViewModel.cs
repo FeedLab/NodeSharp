@@ -35,26 +35,30 @@ public class DiagramViewModel
 
     private void OnNodesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        switch (e.Action)
+        if (e.NewItems is [BaseNode newNode])
         {
-            case NotifyCollectionChangedAction.Add:
-                if (e.NewItems is [BaseNode newNode])
-                {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
                     var boxNode = new BoxNode(newNode);
                     BoxNodes.Add(boxNode);
-                }
-                else
-                {
-                    throw new Exception("Only one node can be added at a time.");
-                }
-
-                break;
-            case NotifyCollectionChangedAction.Remove:
-                // Handle nodes removed
-                break;
-            case NotifyCollectionChangedAction.Reset:
-                // Handle list cleared
-                break;
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    var lookupBoxNode = BoxNodes.First(x => x.Node.Id == newNode.Id);
+                    BoxNodes.Remove(lookupBoxNode);
+                    break;
+            }
+        }
+        else
+        {
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                BoxNodes.Clear();
+            }
+            else
+            {
+                throw new InvalidOperationException("New items must be a single BaseNode.");
+            }
         }
     }
 

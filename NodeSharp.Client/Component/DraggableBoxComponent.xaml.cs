@@ -275,9 +275,6 @@ public partial class DraggableBoxComponent : ContentView
                 lineConnectionManager.EndDragging(anchor);
                 WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
                 WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
-                
-                
-                // curvedLineDrawable.Draw();
             };
             boxView.GestureRecognizers.Add(pointerGesture);
 

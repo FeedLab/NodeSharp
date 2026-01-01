@@ -6,8 +6,11 @@ using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
 
+
 public abstract class BaseNode
 {
+    public event EventHandler<(BaseNode baseNode, string level, string message, string entry)> OnInfoAdded;
+
     [JsonIgnore] private BaseNodeList Nodes { get; }
     public string Id { get; }
     public string TypeId { get; }
@@ -82,6 +85,11 @@ public abstract class BaseNode
         Y = yPosition;
         Outputs = outputs;
         Inputs = inputs;
+    }
+    
+    protected virtual void RaiseOnInfoAdded(BaseNode baseNode, string level, string message, string entry)
+    {
+        OnInfoAdded?.Invoke(this, (baseNode, level, message, entry));
     }
 
     public virtual Task Run()

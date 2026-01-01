@@ -8,7 +8,7 @@ namespace NodeSharp.NodeEngine.Node;
 public class NodeInject : BaseNode
 {
     public ActivateAfter ActivateAfter { get; }
-    public Parameter[] Parameters { get; }
+    public List<Parameter> Parameters { get; }
 
     public NodeInject(
         BaseNodeList nodes,
@@ -32,6 +32,8 @@ public class NodeInject : BaseNode
             storage
         )
     {
+        ActivateAfter = new ActivateAfter("Seconds", 1);
+        Parameters = new List<Parameter>();
     }
 
     public NodeInject(
@@ -63,29 +65,27 @@ public class NodeInject : BaseNode
             nodeElement.GetProperty("ActivateAfter").GetProperty("Type").GetString()!,
             nodeElement.GetProperty("ActivateAfter").GetProperty("Value").GetInt32());
 
-        Parameters = nodeElement.GetProperty("Parameters").EnumerateArray()
-            .Select(p =>
-            {
-                var source = p.TryGetProperty("source", out var sourceProp)
-                    ? sourceProp.GetString()
-                    : "primitive";
+            Parameters = nodeElement.GetProperty("Parameters").EnumerateArray()
+                .Select(p =>
+                {
+                    var source = p.TryGetProperty("Source", out var sourceProp)
+                        ? sourceProp.GetString() ?? "primitive"
+                        : "primitive";
 
-                var declaredType = p.GetProperty("Type").GetString()!;
-                var effectiveType = string.Equals(source, "environment", StringComparison.OrdinalIgnoreCase)
-                    ? "environment"
-                    : declaredType;
+                    var declaredType = p.GetProperty("Type").GetString() ?? "string";
+                    var effectiveType = string.Equals(source, "environment", StringComparison.OrdinalIgnoreCase)
+                        ? "environment"
+                        : declaredType;
 
-                return new Parameter(
-                    p.GetProperty("Name").GetString()!,
-                    effectiveType,
-                    p.GetProperty("Source").GetString()!,
-                    p.TryGetProperty("Value", out var val) ? val.GetString()! : ""
-                );
-            }).ToArray();
-    }
-
-
-    public override async Task Run()
+                    return new Parameter(
+                        p.GetProperty("Name").GetString() ?? "Unknown",
+                        effectiveType,
+                        source,
+                        p.TryGetProperty("Value", out var val) ? (val.GetString() ?? "") : ""
+                    );
+                }).ToList();
+        }
+        public override async Task Run()
     {
         if (!ActivateOnStart)
         {
@@ -99,10 +99,10 @@ public class NodeInject : BaseNode
         await SendToConnectedChildrenAsync(parametersJsonString);
     }
 
-    private static string BuildParametersJson(Parameter[] parameters)
+    private static string BuildParametersJson(IList<Parameter> parameters)
     {
         var sb = new StringBuilder();
-        sb.Append('[');
+        sb.Append("{\"Parameters\": [");
 
         var isFirstItem = true;
         foreach (var parameter in parameters)
@@ -119,9 +119,18 @@ public class NodeInject : BaseNode
             else if (parameter.Source.Equals("environment", StringComparison.OrdinalIgnoreCase))
             {
                 var envValue = GetRequiredEnvironmentVariable(parameter.Value);
-                var param = new Parameter(parameter.Name, parameter.Type, "primitive", envValue);
+                
+                if (IsNumeric(envValue))
+                {
+                    var param = new Parameter(parameter.Name, "number", "primitive", envValue);
+                    AppendParameterJson(sb, param);
+                }
+                else
+                {
+                    var param = new Parameter(parameter.Name, "string", "primitive", envValue);
+                    AppendParameterJson(sb, param);
+                }
 
-                AppendParameterJson(sb, param);
             }
             else
             {
@@ -131,10 +140,19 @@ public class NodeInject : BaseNode
             isFirstItem = false;
         }
 
-        sb.Append(']');
+        sb.Append("]}");
         return sb.ToString();
     }
 
+    private static bool IsNumeric(string? value)
+    {
+        return decimal.TryParse(
+            value,
+            NumberStyles.Number,
+            CultureInfo.CurrentCulture,
+            out _);
+    }
+    
     private static void AppendParameterJson(StringBuilder sb, Parameter parameter)
     {
         var name = parameter.Name;

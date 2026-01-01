@@ -46,6 +46,8 @@ public class NodeDebug : BaseNode
         
         Debug.WriteLine($"{Name}: {parametersJsonString}");
         
+        RaiseOnInfoAdded(this, "Output",parametersJsonString, Name); 
+        
         return Task.FromResult(parametersJsonString);
     }
 

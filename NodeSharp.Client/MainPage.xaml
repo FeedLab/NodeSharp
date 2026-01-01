@@ -15,6 +15,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="250" />
         </Grid.ColumnDefinitions>
 
         <component:NodeToolListComponent
@@ -22,6 +23,8 @@
             Title="Hello MAUI Component!" />
 
         <component:DiagramViewComponent Grid.Column="1" IsClippedToBounds="True"> </component:DiagramViewComponent>
+        
+        <component:DebugComponent Grid.Column="2" BackgroundColor="Bisque"></component:DebugComponent>
     </Grid>
 
 </ContentPage>

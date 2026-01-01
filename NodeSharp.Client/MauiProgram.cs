@@ -38,6 +38,7 @@ public static class MauiProgram
         
         builder.Services.AddSingleton<Storage>();
         builder.Services.AddSingleton<NodeToolListModel>();
+        builder.Services.AddSingleton<DebugViewModel>();
         builder.Services.AddSingleton<DiagramViewModel>();
         builder.Services.AddScoped<NodeInformationModel>();
         builder.Services.AddScoped<MainPageModel>();

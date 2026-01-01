@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:treeView="clr-namespace:Syncfusion.Maui.TreeView;assembly=Syncfusion.Maui.TreeView"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             x:Class="NodeSharp.Client.Component.DebugComponent">
+
+    <Grid Background="Transparent" IsClippedToBounds="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <CollectionView Grid.Row="0" x:Name="CollectionViewDebug"
+                        ItemsSource="{Binding DebugInfo}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="8,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        
+                        <Label
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            Text="{Binding Level}"
+                            FontSize="14"
+                            Margin="0,0,10,0"
+                            FontAttributes="Bold"
+                            VerticalTextAlignment="Center"
+                            LineBreakMode="TailTruncation" />
+                        <Label
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            Text="{Binding Message}"
+                            FontSize="11"
+                            FontFamily="monospace"
+                            VerticalTextAlignment="Center"
+                            LineBreakMode="WordWrap" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="1">
+            <buttons:SfButton Margin="8" Text="Execute" HorizontalOptions="Fill" HorizontalTextAlignment="Center"
+                              VerticalOptions="Fill" VerticalTextAlignment="Center" Command="{Binding RunCommand}" />
+        </Grid>
+    </Grid>
+</ContentView>
