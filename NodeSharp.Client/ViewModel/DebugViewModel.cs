@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -26,19 +27,42 @@ public partial class DebugViewModel : ObservableObject
             });
         };
     }
+    
+    public void UpdateToolbarCommandStates()
+    {
+        RunCommand.NotifyCanExecuteChanged();
+        StopCommand.NotifyCanExecuteChanged();
+    }
+    
     public ObservableCollection<DebugData>? DebugInfo { get; }
     
     [RelayCommand(CanExecute = nameof(CanDoRun))]
     private async Task Run()
     {
-        Console.WriteLine("Run executed!");
+        Debug.WriteLine("Run executed!");
 
         await nodeIo.Run();
+        
+        UpdateToolbarCommandStates();
+    }
+    
+    [RelayCommand(CanExecute = nameof(CanDoStop))]
+    private void Stop()
+    {
+        Debug.WriteLine("Stop executed!");
+        
+        nodeIo.Abort();
+        UpdateToolbarCommandStates();
+    }
+    
+    private bool CanDoStop()
+    {
+        return nodeIo.IsFlowRunning;
     }
     
     private bool CanDoRun()
     {
-        return true;
+        return nodeIo.Nodes.Count > 0 && !nodeIo.IsFlowRunning;
     }
 }
 

@@ -1,9 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace NodeSharp.Client.ViewModel;
 
+
 public partial class ErrorPopupViewModel : ObservableObject, IQueryAttributable
 {
+    public event EventHandler<bool>? CloseRequested;
+    
     [ObservableProperty] private string label;
     [ObservableProperty] private string errorMessage;
 
@@ -17,5 +22,20 @@ public partial class ErrorPopupViewModel : ObservableObject, IQueryAttributable
     {
         Label = "Error";
         ErrorMessage = "Something went wrong. Please try again.";
+    }
+    
+    [RelayCommand(CanExecute = nameof(CanDoClosePopup))]
+    private Task Ok()
+    {
+        Console.WriteLine("Closing popup!");
+
+        CloseRequested?.Invoke(this, true);
+
+        return Task.CompletedTask;
+    }
+    
+    private bool CanDoClosePopup()
+    {
+        return true;
     }
 }

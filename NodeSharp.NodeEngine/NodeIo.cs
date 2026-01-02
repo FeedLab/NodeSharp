@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -21,6 +22,8 @@ public class NodeIo(Storage storage)
         get => fileNameSaved;
         set => fileNameSaved = value;
     }
+
+    public bool IsFlowRunning { get; set; }
 
     public async Task SaveToFileAsync()
     {
@@ -104,8 +107,14 @@ public class NodeIo(Storage storage)
 
     public async Task Run()
     {
-        await nodes.Run();
+        await Task.Run(() =>
+        {
+            IsFlowRunning = true;
+
+            _ = nodes.Run();
+        });
     }
+
 
     public T? FindNodeFromId<T>(string id) where T : BaseNode => nodes.OfType<T>().SingleOrDefault(x => x.Id == id);
 
@@ -153,15 +162,13 @@ public class NodeIo(Storage storage)
                         nodeElement),
                     _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
                 };
-                
-                nodes.Add(node);
 
+                nodes.Add(node);
             }
             catch (System.Exception e)
             {
                 throw;
             }
-
         }
 
         static bool ReadBool(JsonElement element, string preferredPropertyName, string fallbackPropertyName)
@@ -269,6 +276,16 @@ public class NodeIo(Storage storage)
         };
 
         nodes.Add(node);
+    }
+
+    public void Abort()
+    {
+        foreach (var node in Nodes)
+        {
+            node.Abort();
+        }
+
+        IsFlowRunning = false;
     }
 }
 

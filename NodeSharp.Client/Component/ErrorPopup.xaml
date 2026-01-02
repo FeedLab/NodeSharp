@@ -33,6 +33,7 @@
                 <buttons:SfButton x:Name="GotItButton"
                                   Text="Got it"
                                   HorizontalOptions="Center"
+                                  Command="{Binding OkCommand}"
                                   WidthRequest="120"/>
             </StackLayout>
         </Border>

@@ -18,7 +18,7 @@ public class BaseNodeList : ObservableCollection<BaseNode>
         }
     }
 
-    public async Task Run()
+    public Task Run()
     {
         foreach (var candidate in this)
         {
@@ -27,8 +27,10 @@ public class BaseNodeList : ObservableCollection<BaseNode>
                 continue;
             }
 
-            await candidate.Run().ConfigureAwait(false);
+            _ = candidate.Run();
         }
+
+        return Task.CompletedTask;
     }
 
     private static bool ShouldRunOnStart(BaseNode candidate) =>

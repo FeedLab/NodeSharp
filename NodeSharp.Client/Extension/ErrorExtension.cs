@@ -20,7 +20,6 @@ public static class ErrorExtension
             [nameof(ErrorPopupViewModel.Label)] = label
         };
 
-        // errorPopupViewModel.ErrorMessage = e.Message;
         await PopupService.ShowPopupAsync<ErrorPopupViewModel>(
             Shell.Current,
             options: null,

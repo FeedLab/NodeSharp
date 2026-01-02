@@ -20,15 +20,15 @@
                 <DataTemplate>
                     <Grid Padding="8,4">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        
+
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
-                        
+
                         <Label
                             Grid.Column="0"
                             Grid.Row="0"
@@ -51,9 +51,18 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Grid Grid.Row="1">
-            <buttons:SfButton Margin="8" Text="Execute" HorizontalOptions="Fill" HorizontalTextAlignment="Center"
+        <Grid Grid.Row="1" Padding="8,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <buttons:SfButton Grid.Column="0" Margin="8" Text="Run" HorizontalOptions="Fill"
+                              HorizontalTextAlignment="Center"
                               VerticalOptions="Fill" VerticalTextAlignment="Center" Command="{Binding RunCommand}" />
+
+            <buttons:SfButton Grid.Column="1" Margin="8" Text="Stop" HorizontalOptions="Fill"
+                              HorizontalTextAlignment="Center"
+                              VerticalOptions="Fill" VerticalTextAlignment="Center" Command="{Binding StopCommand}" />
         </Grid>
     </Grid>
 </ContentView>

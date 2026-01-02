@@ -25,16 +25,18 @@ public partial class ToolBarViewModel : ObservableObject
     private readonly NodeIo nodeIo;
     private readonly IPopupService popupService;
     private readonly ErrorPopupViewModel errorPopupViewModel;
+    private readonly DebugViewModel debugViewModel;
 
     /// <inheritdoc/>
     public ToolBarViewModel(DiagramViewModel diagramViewModel, LineConnectionManager lineConnectionManager,
-        NodeIo nodeIo, IPopupService popupService, ErrorPopupViewModel errorPopupViewModel)
+        NodeIo nodeIo, IPopupService popupService, ErrorPopupViewModel errorPopupViewModel, DebugViewModel debugViewModel)
     {
         this.diagramViewModel = diagramViewModel;
         this.lineConnectionManager = lineConnectionManager;
         this.nodeIo = nodeIo;
         this.popupService = popupService;
         this.errorPopupViewModel = errorPopupViewModel;
+        this.debugViewModel = debugViewModel;
 
         // Subscribe to collection changes to refresh command states
         nodeIo.Nodes.CollectionChanged += (s, e) => { UpdateToolbarCommandStates(); };
@@ -116,6 +118,8 @@ public partial class ToolBarViewModel : ObservableObject
             lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
 
             WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+
+            debugViewModel.UpdateToolbarCommandStates();
         }
         // catch (NodeParseException nodeParseException)
         // {       
@@ -138,6 +142,7 @@ public partial class ToolBarViewModel : ObservableObject
         WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
 
         UpdateToolbarCommandStates();
+        debugViewModel.UpdateToolbarCommandStates();
 
         return Task.CompletedTask;
     }
