@@ -1,12 +1,18 @@
-﻿using CommunityToolkit.Maui.Storage;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.Client.Component;
+using NodeSharp.Client.Extension;
 using NodeSharp.NodeEngine;
+using NodeSharp.NodeEngine.Exception;
 
 namespace NodeSharp.Client.ViewModel;
 
+[SuppressMessage("Usage", "CsWinRT1030:Project does not enable unsafe blocks")]
 public partial class ToolBarViewModel : ObservableObject
 {
     [ObservableProperty] private bool isSaveEnabled = false;
@@ -17,14 +23,19 @@ public partial class ToolBarViewModel : ObservableObject
     private readonly DiagramViewModel diagramViewModel;
     private readonly LineConnectionManager lineConnectionManager;
     private readonly NodeIo nodeIo;
+    private readonly IPopupService popupService;
+    private readonly ErrorPopupViewModel errorPopupViewModel;
 
     /// <inheritdoc/>
-    public ToolBarViewModel(DiagramViewModel diagramViewModel, LineConnectionManager lineConnectionManager, NodeIo nodeIo)
+    public ToolBarViewModel(DiagramViewModel diagramViewModel, LineConnectionManager lineConnectionManager,
+        NodeIo nodeIo, IPopupService popupService, ErrorPopupViewModel errorPopupViewModel)
     {
         this.diagramViewModel = diagramViewModel;
         this.lineConnectionManager = lineConnectionManager;
         this.nodeIo = nodeIo;
-        
+        this.popupService = popupService;
+        this.errorPopupViewModel = errorPopupViewModel;
+
         // Subscribe to collection changes to refresh command states
         nodeIo.Nodes.CollectionChanged += (s, e) => { UpdateToolbarCommandStates(); };
     }
@@ -50,7 +61,7 @@ public partial class ToolBarViewModel : ObservableObject
                 nodeBox.Node.X = (int)nodeBox.X;
                 nodeBox.Node.Y = (int)nodeBox.Y;
             }
-            
+
             if (!string.IsNullOrEmpty(nodeIo.FileNameSaved))
             {
                 await nodeIo.SaveToFileAsync();
@@ -69,9 +80,9 @@ public partial class ToolBarViewModel : ObservableObject
 
         var ms = new MemoryStream();
         await nodeIo.SaveToFileAsync(ms);
-            
+
         var fileSaverResult = await FileSaver.Default.SaveAsync(
-            "Nodes.json", 
+            "Nodes.json",
             ms,
             CancellationToken.None);
 
@@ -80,7 +91,7 @@ public partial class ToolBarViewModel : ObservableObject
             // User picked a location, file saved successfully
             nodeIo.FileNameSaved = fileSaverResult.FilePath;
             Console.WriteLine($"File saved at: {nodeIo.FileNameSaved}");
-            
+
             UpdateToolbarCommandStates();
         }
         else
@@ -95,14 +106,27 @@ public partial class ToolBarViewModel : ObservableObject
     {
         Console.WriteLine("Load executed!");
 
-        diagramViewModel.Clear();
-        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
-        
-        await PickFileAsync();
+        try
+        {
+            diagramViewModel.Clear();
+            WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
 
-        lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+            await PickFileAsync();
 
-        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+            lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+
+            WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+        }
+        // catch (NodeParseException nodeParseException)
+        // {       
+        //     Debug.WriteLine(nodeParseException.Message);
+        // }
+        catch (Exception e)
+        {
+            await e.ShowPopupAsync("Error!!!");
+
+            Debug.WriteLine(e.Message);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanDoNew))]
@@ -114,7 +138,7 @@ public partial class ToolBarViewModel : ObservableObject
         WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
 
         UpdateToolbarCommandStates();
-        
+
         return Task.CompletedTask;
     }
 
@@ -137,14 +161,14 @@ public partial class ToolBarViewModel : ObservableObject
     private bool CanDoSaveAs()
     {
         IsSaveAsEnabled = diagramViewModel.BoxNodes.Count != 0;
-        
+
         return IsSaveAsEnabled;
     }
 
     private bool CanDoLoad()
     {
         IsLoadEnabled = diagramViewModel.BoxNodes.Count == 0;
-        
+
         return IsLoadEnabled;
     }
 

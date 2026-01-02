@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using NodeSharp.NodeEngine.Exception;
 using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
@@ -62,13 +63,20 @@ public class NodeRandomNumber : BaseNode
             inputs
         )
     {
-        if (!nodeElement.TryGetProperty("RandomData", out var randomProp) ||
-            randomProp.ValueKind != JsonValueKind.Object)
+        try
         {
-            throw new InvalidOperationException("RandomData object not found or invalid");
-        }
+            if (!nodeElement.TryGetProperty("RandomData", out var randomProp) ||
+                randomProp.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidOperationException("RandomData object not found or invalid");
+            }
 
-        RandomData = new RandomDataPayload(randomProp);
+            RandomData = new RandomDataPayload(randomProp);
+        }
+        catch (System.Exception e)
+        {
+            throw new NodeParseException(this, nameof(RandomData), e);
+        }
     }
 
     public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)

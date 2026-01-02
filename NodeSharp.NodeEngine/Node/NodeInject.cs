@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using NodeSharp.NodeEngine.Exception;
 using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
@@ -64,35 +65,56 @@ public class NodeInject : BaseNode
             inputs
         )
     {
-        Repeat = new Repeat(
-            nodeElement.GetProperty("Repeat").GetProperty("Type").GetString()!,
-            nodeElement.GetProperty("Repeat").GetProperty("Value").GetInt32(),
-            nodeElement.GetProperty("Repeat").GetProperty("IsEnabled").GetBoolean()
-        );
+        try
+        {
+            Repeat = new Repeat(
+                nodeElement.GetProperty("Repeat").GetProperty("Type").GetString()!,
+                nodeElement.GetProperty("Repeat").GetProperty("Value").GetInt32(),
+                nodeElement.GetProperty("Repeat").GetProperty("IsEnabled").GetBoolean()
+            );
+        }
+        catch (System.Exception e)
+        {
+            throw new NodeParseException(this, nameof(Repeat), e);
+        }
 
-        ActivateAfter = new ActivateAfter(
-            nodeElement.GetProperty("ActivateAfter").GetProperty("Type").GetString()!,
-            nodeElement.GetProperty("ActivateAfter").GetProperty("Value").GetInt32());
+        try
+        {
+            ActivateAfter = new ActivateAfter(
+                nodeElement.GetProperty("ActivateAfter").GetProperty("Type").GetString()!,
+                nodeElement.GetProperty("ActivateAfter").GetProperty("Value").GetInt32());
+        }
+        catch (System.Exception e)
+        {
+            throw new NodeParseException(this, nameof(ActivateAfter), e);
+        }
 
-        Parameters = nodeElement.GetProperty("Parameters").EnumerateArray()
-            .Select(p =>
-            {
-                var source = p.TryGetProperty("Source", out var sourceProp)
-                    ? sourceProp.GetString() ?? "primitive"
-                    : "primitive";
+        try
+        {
+            Parameters = nodeElement.GetProperty("Parameters").EnumerateArray()
+                .Select(p =>
+                {
+                    var source = p.TryGetProperty("Source", out var sourceProp)
+                        ? sourceProp.GetString() ?? "primitive"
+                        : "primitive";
 
-                var declaredType = p.GetProperty("Type").GetString() ?? "string";
-                var effectiveType = string.Equals(source, "environment", StringComparison.OrdinalIgnoreCase)
-                    ? "environment"
-                    : declaredType;
+                    var declaredType = p.GetProperty("Type").GetString() ?? "string";
+                    var effectiveType = string.Equals(source, "environment", StringComparison.OrdinalIgnoreCase)
+                        ? "environment"
+                        : declaredType;
 
-                return new Parameter(
-                    p.GetProperty("Name").GetString() ?? "Unknown",
-                    effectiveType,
-                    source,
-                    p.TryGetProperty("Value", out var val) ? (val.GetString() ?? "") : ""
-                );
-            }).ToList();
+                    return new Parameter(
+                        p.GetProperty("Name").GetString() ?? "Unknown",
+                        effectiveType,
+                        source,
+                        p.TryGetProperty("Value", out var val) ? (val.GetString() ?? "") : ""
+                    );
+                }).ToList();
+        }
+        catch (System.Exception e)
+        {
+            throw new NodeParseException(this, nameof(Parameters), e);
+        }
     }
 
     public override async Task Run()

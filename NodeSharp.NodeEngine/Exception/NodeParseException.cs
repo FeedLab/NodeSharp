@@ -1,0 +1,16 @@
+﻿using System.Text.Json;
+using NodeSharp.NodeEngine.Node;
+
+namespace NodeSharp.NodeEngine.Exception;
+
+public class NodeParseException : System.Exception
+{
+    public NodeParseException(BaseNode node, string subNode, System.Exception inner) : base($"Error parsing node: {node.Name}-> {subNode}", inner)
+    {
+    }
+    
+    public NodeParseException(string nodeName, System.Exception inner) : base($"Error parsing node: {nodeName}", inner)
+    {
+    }
+}
+

@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using NodeSharp.NodeEngine.Exception;
 using NodeSharp.NodeEngine.Extension;
 using NodeSharp.NodeEngine.Model;
 
@@ -69,7 +70,14 @@ public class NodeDelay : BaseNode
             throw new InvalidOperationException("Delay object not found or invalid");
         }
 
-        Delay = new DelayPayload(delayProp);
+        try
+        {
+            Delay = new DelayPayload(delayProp);
+        }
+        catch (System.Exception e)
+        {
+            throw new NodeParseException(this, nameof(Delay), e);
+        }
         
 
     }
