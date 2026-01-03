@@ -62,24 +62,21 @@ public class LineConnectionManager(NodeIo nodeIo)
             var targetNodeId = inputAnchor.BoxNode.NodeId;
 
             // Find the output that corresponds to this anchor and add the connection
-            if (sourceNode.Outputs.Count > 0)
+            var anchorIndex = outputAnchor.BoxNode.OutputNodes.IndexOf(outputAnchor);
+            if (anchorIndex >= 0 && anchorIndex < sourceNode.Outputs.Count)
             {
-                var output = sourceNode.Outputs[0]; // TODO: Match the correct output based on anchor
+                var output = sourceNode.Outputs[anchorIndex];
                 if (!output.ConnectsToNodeId.Contains(targetNodeId))
                 {
                     output.ConnectsToNodeId.Add(targetNodeId);
 
                     // Also add to the anchor's Ids list so RecalculateLines can find it
-                    if (outputAnchor.BoxNode.OutputNodes.Count > 0)
+                    if (!outputAnchor.Ids.Contains(targetNodeId))
                     {
-                        var anchorPoint = outputAnchor.BoxNode.OutputNodes[0]; // TODO: Match correct anchor
-                        if (!anchorPoint.Ids.Contains(targetNodeId))
-                        {
-                            anchorPoint.Ids.Add(targetNodeId);
-                        }
+                        outputAnchor.Ids.Add(targetNodeId);
                     }
 
-                    System.Diagnostics.Debug.WriteLine($"✅ Connection created: {sourceNode.Id} -> {targetNodeId}");
+                    System.Diagnostics.Debug.WriteLine($"✅ Connection created: {sourceNode.Id} (anchor {anchorIndex}) -> {targetNodeId}");
                 }
                 else
                 {
@@ -88,7 +85,7 @@ public class LineConnectionManager(NodeIo nodeIo)
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine($"⚠️ Source node has no outputs");
+                System.Diagnostics.Debug.WriteLine($"⚠️ Invalid anchor index: {anchorIndex} (Outputs count: {sourceNode.Outputs.Count})");
             }
         }
         else

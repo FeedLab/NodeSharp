@@ -10,8 +10,7 @@ namespace NodeSharp.NodeEngine.Node;
 
 public class NodeDelay : BaseNode
 {
-    [JsonInclude]
-    private DelayPayload Delay { get; set; }
+    [JsonInclude] private DelayPayload Delay { get; set; }
 
     public NodeDelay(
         BaseNodeList nodes,
@@ -24,7 +23,7 @@ public class NodeDelay : BaseNode
         int yPosition,
         Storage storage,
         DelayPayload delay
-            )
+    )
         : base(
             nodes,
             id,
@@ -47,10 +46,10 @@ public class NodeDelay : BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
-        int xPosition, 
+        int xPosition,
         int yPosition,
-        Output[] outputs,
-        Input[] inputs,
+        List<Output> outputs,
+        List<Input> inputs,
         JsonElement nodeElement)
         : base(
             nodes,
@@ -58,12 +57,12 @@ public class NodeDelay : BaseNode
             typeId,
             name,
             isEnabled,
-            activateOnStart, 
-            xPosition, 
+            activateOnStart,
+            xPosition,
             yPosition,
             outputs,
             inputs
-)
+        )
     {
         if (!nodeElement.TryGetProperty("Delay", out var delayProp) || delayProp.ValueKind != JsonValueKind.Object)
         {
@@ -78,81 +77,92 @@ public class NodeDelay : BaseNode
         {
             throw new NodeParseException(this, nameof(Delay), e);
         }
-        
-
     }
 
     public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
     {
-        await base.RunFromInput(parentNode, parametersJsonString);
-
-        var delayMilliseconds = 0;
-
-        if (Delay.Source.Equals("Fixed", StringComparison.OrdinalIgnoreCase))
+        try
         {
-            delayMilliseconds = Delay.Type.ToLowerInvariant() switch
+            EnterNode(this);
+
+            await base.RunFromInput(parentNode, parametersJsonString);
+
+            var delayMilliseconds = 0;
+
+            if (Delay.Source.Equals("Fixed", StringComparison.OrdinalIgnoreCase))
             {
-                "milliseconds" => Delay.Value,
-                "seconds" => Delay.Value * 1000,
-                "minutes" => Delay.Value * 60 * 1000,
-                _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Delay.Type}")
-            };
-        }
-        else if (Delay.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
-        {
-            var root = string.IsNullOrWhiteSpace(parametersJsonString)
-                ? null
-                : JsonNode.Parse(parametersJsonString);
-
-            
-            var delayNode = root.GetByPath(Delay.PathToDelayNode) as JsonObject;
-
-            var valueNode = delayNode?[nameof(Delay.Value)];
-            var typeNode = delayNode?[nameof(Type)];
-
-            var delayValue = valueNode?.GetValue<int>()
-                             ?? throw new InvalidOperationException($"NodeDelay '{Name}' missing or invalid 'Value' at '{Delay.PathToDelayNode}.Value'");
-
-            var delayType = typeNode?.GetValue<string>()
-                            ?? throw new InvalidOperationException($"NodeDelay '{Name}' missing or invalid 'Type' at '{Delay.PathToDelayNode}.Type'");
-
-            delayMilliseconds = delayType.ToLowerInvariant() switch
+                delayMilliseconds = Delay.Type.ToLowerInvariant() switch
+                {
+                    "milliseconds" => Delay.Value,
+                    "seconds" => Delay.Value * 1000,
+                    "minutes" => Delay.Value * 60 * 1000,
+                    _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Delay.Type}")
+                };
+            }
+            else if (Delay.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
             {
-                "milliseconds" => delayValue,
-                "seconds" => delayValue * 1000,
-                "minutes" => delayValue * 60 * 1000,
-                _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Delay.Type}")
-            };
+                var root = string.IsNullOrWhiteSpace(parametersJsonString)
+                    ? null
+                    : JsonNode.Parse(parametersJsonString);
+
+
+                var delayNode = root.GetByPath(Delay.PathToDelayNode) as JsonObject;
+
+                var valueNode = delayNode?[nameof(Delay.Value)];
+                var typeNode = delayNode?[nameof(Type)];
+
+                var delayValue = valueNode?.GetValue<int>()
+                                 ?? throw new InvalidOperationException(
+                                     $"NodeDelay '{Name}' missing or invalid 'Value' at '{Delay.PathToDelayNode}.Value'");
+
+                var delayType = typeNode?.GetValue<string>()
+                                ?? throw new InvalidOperationException(
+                                    $"NodeDelay '{Name}' missing or invalid 'Type' at '{Delay.PathToDelayNode}.Type'");
+
+                delayMilliseconds = delayType.ToLowerInvariant() switch
+                {
+                    "milliseconds" => delayValue,
+                    "seconds" => delayValue * 1000,
+                    "minutes" => delayValue * 60 * 1000,
+                    _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Delay.Type}")
+                };
+            }
+            else
+            {
+                throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Source: {Delay.Source}.");
+            }
+
+            Debug.WriteLine($"NodeDelay '{Name}' delaying for {delayMilliseconds}ms");
+            await Task.Delay(delayMilliseconds);
+
+            await SendToConnectedChildrenAsync(parametersJsonString);
+
+            return await Task.FromResult(parametersJsonString);
         }
-        else
+        finally
         {
-            throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Source: {Delay.Source}.");
+            LeaveNode(this);
         }
-
-        Debug.WriteLine($"NodeDelay '{Name}' delaying for {delayMilliseconds}ms");
-        await Task.Delay(delayMilliseconds);
-
-        await SendToConnectedChildrenAsync(parametersJsonString);
-        
-        return await Task.FromResult(parametersJsonString);
     }
-    
 }
 
 public class DelayPayload
 {
     public DelayPayload(JsonElement element)
     {
-        PathToDelayNode = !element.TryGetProperty("PathToDelayNode", out var pathToDelayNodeProp) || pathToDelayNodeProp.ValueKind != JsonValueKind.String 
+        PathToDelayNode = !element.TryGetProperty("PathToDelayNode", out var pathToDelayNodeProp) ||
+                          pathToDelayNodeProp.ValueKind != JsonValueKind.String
             ? throw new InvalidOperationException("Delay.PathToDelayNode value not found or invalid")
-            : pathToDelayNodeProp.GetString() ?? throw new InvalidOperationException("Delay.PathToDelayNode is null");
-        
-        Source = !element.TryGetProperty("Source", out var sourceProp) || sourceProp.ValueKind != JsonValueKind.String 
+            : pathToDelayNodeProp.GetString() ??
+              throw new InvalidOperationException("Delay.PathToDelayNode is null");
+
+        Source = !element.TryGetProperty("Source", out var sourceProp) ||
+                 sourceProp.ValueKind != JsonValueKind.String
             ? throw new InvalidOperationException("Delay.Source value not found or invalid")
             : sourceProp.GetString() ?? throw new InvalidOperationException("Delay.Source is null");
 
         Type = !element.TryGetProperty("Type", out var typeProp) || typeProp.ValueKind != JsonValueKind.String
-            ? throw new InvalidOperationException("Delay.Type value not found or invalid") 
+            ? throw new InvalidOperationException("Delay.Type value not found or invalid")
             : typeProp.GetString() ?? throw new InvalidOperationException("Delay.Type is null");
 
         Value = !element.TryGetProperty("Value", out var valueProp) || valueProp.ValueKind != JsonValueKind.Number
@@ -160,7 +170,8 @@ public class DelayPayload
             : valueProp.GetInt32();
     }
 
-    public DelayPayload(string pathToDelayNode = "payload", string source = "Fixed", string type = "seconds", int value = 5)
+    public DelayPayload(string pathToDelayNode = "payload", string source = "Fixed", string type = "seconds",
+        int value = 5)
     {
         PathToDelayNode = pathToDelayNode;
         Source = source;
@@ -169,12 +180,10 @@ public class DelayPayload
     }
 
     public string PathToDelayNode { get; }
-    
+
     public string Source { get; }
-    
+
     public string Type { get; }
-    
+
     public int Value { get; }
-    
-    
 }

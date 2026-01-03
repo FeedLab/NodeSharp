@@ -47,8 +47,8 @@ public class NodeRandomNumber : BaseNode
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Output[] outputs,
-        Input[] inputs,
+        List<Output> outputs,
+        List<Input> inputs,
         JsonElement nodeElement)
         : base(
             nodes,
@@ -81,57 +81,66 @@ public class NodeRandomNumber : BaseNode
 
     public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
     {
-        await base.RunFromInput(parentNode, parametersJsonString);
-
-        var random = new Random();
-        var randomNumber = 0;
-
-        if (RandomData.Source.Equals("Fixed", StringComparison.OrdinalIgnoreCase))
-        {
-            randomNumber = RandomNumberFromFixedData(random);
-        }
-        else if (RandomData.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
-        {
-            randomNumber = RandomNumberFromInputData(parametersJsonString, randomNumber, random);
-        }
-        else
-        {
-            throw new InvalidOperationException($"NodeRandomNumber '{Name}' has invalid Source: {RandomData.Source}.");
-        }
-
-        string updatedJsonString;
-
         try
         {
-            var parsed = string.IsNullOrWhiteSpace(parametersJsonString)
-                ? null
-                : JsonNode.Parse(parametersJsonString);
+            EnterNode(this);
+        
+            await base.RunFromInput(parentNode, parametersJsonString);
 
-            if (parsed is JsonObject obj)
+            var random = new Random();
+            var randomNumber = 0;
+
+            if (RandomData.Source.Equals("Fixed", StringComparison.OrdinalIgnoreCase))
             {
-                obj["RandomNumber"] = randomNumber;
-                updatedJsonString = obj.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                randomNumber = RandomNumberFromFixedData(random);
             }
-            else if (parsed is JsonArray arr)
+            else if (RandomData.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
             {
-                arr.Add(new JsonObject { ["RandomNumber"] = randomNumber });
-                updatedJsonString = arr.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                randomNumber = RandomNumberFromInputData(parametersJsonString, randomNumber, random);
             }
             else
             {
-                var obj2 = new JsonObject { ["RandomNumber"] = randomNumber };
-                updatedJsonString = obj2.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                throw new InvalidOperationException($"NodeRandomNumber '{Name}' has invalid Source: {RandomData.Source}.");
             }
+
+            string updatedJsonString;
+
+            try
+            {
+                var parsed = string.IsNullOrWhiteSpace(parametersJsonString)
+                    ? null
+                    : JsonNode.Parse(parametersJsonString);
+
+                if (parsed is JsonObject obj)
+                {
+                    obj["RandomNumber"] = randomNumber;
+                    updatedJsonString = obj.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                }
+                else if (parsed is JsonArray arr)
+                {
+                    arr.Add(new JsonObject { ["RandomNumber"] = randomNumber });
+                    updatedJsonString = arr.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                }
+                else
+                {
+                    var obj2 = new JsonObject { ["RandomNumber"] = randomNumber };
+                    updatedJsonString = obj2.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+                }
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException(
+                    $"NodeRandomNumber '{Name}' received invalid JSON from parent '{parentNode.Name}'.", ex);
+            }
+
+            await SendToConnectedChildrenAsync(updatedJsonString);
+
+            return await Task.FromResult(updatedJsonString);
         }
-        catch (JsonException ex)
+        finally
         {
-            throw new InvalidOperationException(
-                $"NodeRandomNumber '{Name}' received invalid JSON from parent '{parentNode.Name}'.", ex);
+            LeaveNode(this);
         }
-
-        await SendToConnectedChildrenAsync(updatedJsonString);
-
-        return await Task.FromResult(updatedJsonString);
     }
 
     private int RandomNumberFromFixedData(Random random)

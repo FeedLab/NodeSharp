@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text.Json;
+using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.Client.Component;
 using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Node;
@@ -22,7 +23,6 @@ public class DiagramViewModel
 
     public async Task Init(StreamReader reader, string filePath)
     {
-
         await nodeIo.LoadFromFileAsync(reader, filePath);
 
         // foreach (var node in nodeIo.Nodes)
@@ -42,10 +42,18 @@ public class DiagramViewModel
                 case NotifyCollectionChangedAction.Add:
                     var boxNode = new BoxNode(newNode);
                     BoxNodes.Add(boxNode);
+                    
+                    WeakReferenceMessenger.Default.Send(new NodeActionEvent
+                        { ActionEventType = NodeActionEventType.Add });
+                    
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     var lookupBoxNode = BoxNodes.First(x => x.Node.Id == newNode.Id);
                     BoxNodes.Remove(lookupBoxNode);
+                    
+                    WeakReferenceMessenger.Default.Send(new NodeActionEvent
+                        { ActionEventType = NodeActionEventType.Delete });
+
                     break;
             }
         }

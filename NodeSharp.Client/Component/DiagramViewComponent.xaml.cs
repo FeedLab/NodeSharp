@@ -29,7 +29,7 @@ public partial class DiagramViewComponent : ContentView
     double scale = 1.0;
 
     double viewportWidth, viewportHeight;
-    double canvasWidth = 3000;   // virtual size
+    double canvasWidth = 3000; // virtual size
     double canvasHeight = 2000;
 
     public DiagramViewComponent()
@@ -38,7 +38,7 @@ public partial class DiagramViewComponent : ContentView
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
         nodeIo = AppService.GetRequiredService<NodeIo>();
-        
+
         InitializeComponent();
 
         // Set Anchors to top-left to make translation math consistent
@@ -76,26 +76,24 @@ public partial class DiagramViewComponent : ContentView
             AnchorDragging.IsAnchorDragging = args.IsAnchorDragging;
             Debug.WriteLine($"✓ Anchor dragging status changed: {args.IsAnchorDragging}");
         });
-        
+
         WeakReferenceMessenger.Default.Register<ConnectionPointStatus>(this, (sender, args) =>
         {
             MainThread.InvokeOnMainThreadAsync(() =>
             {
-
                 ConnectionCanvas.Invalidate();
                 return Task.CompletedTask;
-            }); 
+            });
         });
-        
+
         this.SizeChanged += (sender, eventArgs) =>
         {
             viewportWidth = this.Width;
             viewportHeight = this.Height;
             ClampPan();
         };
-
     }
-    
+
     private void OnBoxNodesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         // if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
@@ -111,7 +109,7 @@ public partial class DiagramViewComponent : ContentView
         //     }
         // }
     }
-    
+
     void ClampPan()
     {
         // Calculate based on the virtual canvas size vs the actual visible area (viewportWidth/Height)
@@ -144,6 +142,7 @@ public partial class DiagramViewComponent : ContentView
             {
                 ConnectionCanvas.Invalidate();
             }
+
             Debug.WriteLine($"⚠️ Pan blocked - node dragging (status: {e.StatusType})");
             return;
         }
@@ -157,6 +156,7 @@ public partial class DiagramViewComponent : ContentView
                     Debug.WriteLine("⚠️ Pan START blocked - anchor is dragging");
                     return;
                 }
+
                 System.Diagnostics.Debug.WriteLine("Canvas pan ACTUALLY started");
                 startX = panX;
                 startY = panY;
@@ -166,7 +166,8 @@ public partial class DiagramViewComponent : ContentView
                 panX = startX + e.TotalX;
                 panY = startY + e.TotalY;
 
-                System.Diagnostics.Debug.WriteLine($"Before clamp: panX={panX}, panY={panY}, viewport={viewportWidth}x{viewportHeight}, canvas=3000x2000");
+                System.Diagnostics.Debug.WriteLine(
+                    $"Before clamp: panX={panX}, panY={panY}, viewport={viewportWidth}x{viewportHeight}, canvas=3000x2000");
                 ClampPan();
                 System.Diagnostics.Debug.WriteLine($"After clamp: panX={panX}, panY={panY}");
 
@@ -183,7 +184,7 @@ public partial class DiagramViewComponent : ContentView
                 break;
         }
     }
-    
+
     void OnCanvasPinch(object sender, PinchGestureUpdatedEventArgs e)
     {
         if (e.Status == GestureStatus.Running)
@@ -263,6 +264,11 @@ public partial class DiagramViewComponent : ContentView
 
         if (data is NodeInformationModel nodeInfo)
         {
+            if (nodeInfo is null)
+            {
+                throw new InvalidOperationException("Node information is null.");
+            }
+            
             // Calculate drop position accounting for canvas transformations
             var dropPosition = e.GetPosition(this);
             if (dropPosition != null)
@@ -275,11 +281,12 @@ public partial class DiagramViewComponent : ContentView
 
                 lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
 
+                WeakReferenceMessenger.Default.Send(new NodeActionEvent
+                    { ActionEventType = NodeActionEventType.Add });
+
                 // Add node to diagram at drop position
                 // viewModel.AddNode(nodeInfo, dropX, dropY);
             }
         }
     }
-
 }
-

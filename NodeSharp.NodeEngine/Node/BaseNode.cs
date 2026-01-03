@@ -9,9 +9,11 @@ namespace NodeSharp.NodeEngine.Node;
 
 public abstract class BaseNode
 {
-    public event EventHandler<(BaseNode baseNode, string level, string message, string entry)> OnInfoAdded;
+    public event EventHandler<(BaseNode baseNode, string level, string message, string entry)>? OnExitNodeMessage;
+    public event EventHandler<BaseNode>? OnEnterNode;
+    public event EventHandler<BaseNode>? OnLeaveNode;
 
-    protected CancellationTokenSource cts;
+    protected readonly CancellationTokenSource Cts;
 
     [JsonIgnore] private BaseNodeList Nodes { get; }
     public string Id { get; }
@@ -35,7 +37,7 @@ public abstract class BaseNode
         int yPosition,
         Storage storage)
     {
-        cts = new CancellationTokenSource();
+        Cts = new CancellationTokenSource();
         
         if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeType))
         {
@@ -76,10 +78,10 @@ public abstract class BaseNode
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Output[] outputs,
-        Input[] inputs)
+        List<Output> outputs,
+        List<Input> inputs)
     {
-        cts = new CancellationTokenSource();
+        Cts = new CancellationTokenSource();
         
         Nodes = nodes;
         Id = id;
@@ -95,12 +97,22 @@ public abstract class BaseNode
     
     public void Abort()
     {
-        cts?.Cancel();
+        Cts?.Cancel();
     }
     
-    protected virtual void RaiseOnInfoAdded(BaseNode baseNode, string level, string message, string entry)
+    protected virtual void ExitNodeMessage(BaseNode baseNode, string level, string message, string entry)
     {
-        OnInfoAdded?.Invoke(this, (baseNode, level, message, entry));
+        OnExitNodeMessage?.Invoke(this, (baseNode, level, message, entry));
+    }
+    
+    protected virtual void EnterNode(BaseNode node)
+    {
+        OnEnterNode?.Invoke(this, node);
+    }
+    
+    protected virtual void LeaveNode(BaseNode node)
+    {
+        OnLeaveNode?.Invoke(this, node);
     }
 
     public virtual Task Run()
@@ -122,23 +134,28 @@ public abstract class BaseNode
 
     protected Task SendToConnectedChildrenAsync(string parametersJsonString)
     {
-        var tasks = new List<Task>();
-
-        foreach (var output in Outputs)
+        Task.Run(() =>
         {
-            foreach (var nodeId in output.ConnectsToNodeId)
+            var tasks = new List<Task>();
+
+            foreach (var output in Outputs)
             {
-                var targetNode = Nodes.Find(f => f.Id == nodeId);
-                if (targetNode is null)
+                foreach (var nodeId in output.ConnectsToNodeId)
                 {
-                    throw new InvalidOperationException($"Node not found: {nodeId}");
+                    var targetNode = Nodes.Find(f => f.Id == nodeId);
+                    if (targetNode is null)
+                    {
+                        throw new InvalidOperationException($"Node not found: {nodeId}");
+                    }
+
+                    tasks.Add(targetNode.RunFromInput(this, parametersJsonString));
                 }
-
-                tasks.Add(targetNode.RunFromInput(this, parametersJsonString));
             }
-        }
 
-        return Task.WhenAll(tasks);
+            return Task.FromResult(Task.WhenAll(tasks));
+        });
+        
+        return Task.CompletedTask;
     }
 
     public void ValidateInputAndOutput()

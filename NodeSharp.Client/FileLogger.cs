@@ -44,7 +44,7 @@ public static class FileLogger
                                 });
                             };
                             Handlers[addNode] = handler;
-                            addNode.OnInfoAdded += handler;
+                            addNode.OnExitNodeMessage += handler;
                         }
                     }
                     break;
@@ -55,7 +55,7 @@ public static class FileLogger
                         {
                             if (Handlers.Remove(deleteNode, out var handler))
                             {
-                                deleteNode.OnInfoAdded -= handler;
+                                deleteNode.OnExitNodeMessage -= handler;
                             }
                         }
                     }
@@ -71,7 +71,7 @@ public static class FileLogger
                         {
                             if (Handlers.Remove(deleteNode, out var handler))
                             {
-                                deleteNode.OnInfoAdded -= handler;
+                                deleteNode.OnExitNodeMessage -= handler;
                             }
                         }
                     }

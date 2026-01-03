@@ -37,6 +37,7 @@
             
 
 
+
             <Grid Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -67,6 +68,16 @@
                            LineBreakMode="NoWrap"
                            HorizontalOptions="Center"
                            FontAttributes="None" TextColor="DarkRed" FontSize="12" >
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding HasFocus}" Value="True">
+                                <Setter Property="Scale" Value="1.05" />
+                                <Setter Property="Shadow">
+                                    <Setter.Value>
+                                        <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Label.Triggers>
                         <!-- <Label.Triggers> -->
                         <!--     <DataTrigger TargetType="Label" Binding="{Binding IsHovered, Source={x:Reference Root}}" Value="True"> -->
                         <!--         <Setter Property="Scale" Value="1.05" /> -->

@@ -14,14 +14,14 @@ public class NodeDebug : BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
-        int xPosition, 
+        int xPosition,
         int yPosition,
         Storage storage)
         : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage)
     {
         OutputJsonMessage = "";
     }
-    
+
     public NodeDebug(
         BaseNodeList nodes,
         string id,
@@ -29,10 +29,10 @@ public class NodeDebug : BaseNode
         string name,
         bool isEnabled,
         bool activateOnStart,
-        int xPosition, 
+        int xPosition,
         int yPosition,
-        Output[] outputs,
-        Input[] inputs,
+        List<Output> outputs,
+        List<Input> inputs,
         JsonElement nodeElement)
         : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs)
     {
@@ -41,16 +41,24 @@ public class NodeDebug : BaseNode
 
     public override Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
     {
-        base.RunFromInput(parentNode, parametersJsonString);
-        OutputJsonMessage = parametersJsonString;
-        
-        Debug.WriteLine($"{Name}: {parametersJsonString}");
-        
-        RaiseOnInfoAdded(this, "Output",parametersJsonString, Name); 
-        
-        return Task.FromResult(parametersJsonString);
+        try
+        {
+            EnterNode(this);
+
+            base.RunFromInput(parentNode, parametersJsonString);
+            OutputJsonMessage = parametersJsonString;
+
+            Debug.WriteLine($"{Name}: {parametersJsonString}");
+
+            ExitNodeMessage(this, "Output", parametersJsonString, Name);
+
+            return Task.FromResult(parametersJsonString);
+        }
+        finally
+        {
+            LeaveNode(this);
+        }
     }
 
-    [JsonIgnore]
-    public string OutputJsonMessage { get; set; }
+    [JsonIgnore] public string OutputJsonMessage { get; set; }
 }

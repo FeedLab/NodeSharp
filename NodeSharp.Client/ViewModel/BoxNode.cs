@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -18,6 +19,7 @@ public partial class BoxNode : ObservableObject
     public IList<(Point Start, Point End)> Connections { get; } = [];
     public IList<AnchorPoint> InputNodes { get; } = [];
     public IList<AnchorPoint> OutputNodes { get; } = [];
+    
 
     public BoxNode(BaseNode baseNode)
     {
@@ -32,6 +34,20 @@ public partial class BoxNode : ObservableObject
         Width = 130;
         Height = 50;
         width = 0;
+        
+        baseNode.OnEnterNode += (o, node) =>
+        {
+            Debug.WriteLine($"Node entered: {Name} ({NodeId})");
+            
+            HasFocus = true;
+        };
+        
+        baseNode.OnLeaveNode += (o, node) =>
+        {
+            Debug.WriteLine($"Node exited: {Name} ({NodeId})");
+            
+            HasFocus = false;
+        };
     }
 
    
@@ -84,6 +100,8 @@ public partial class BoxNode : ObservableObject
     [ObservableProperty] private BaseNode node;
 
     [ObservableProperty] private string name;
+    
+    [ObservableProperty] private bool hasFocus;
 
     private void CalculateInputNodePositions()
     {

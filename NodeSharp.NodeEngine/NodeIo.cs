@@ -206,44 +206,44 @@ public class NodeIo(Storage storage)
         }
     }
 
-    static Output[] ParseOutputs(JsonElement outputsElement)
+    static List<Output> ParseOutputs(JsonElement outputsElement)
     {
         // Supports:
         // 1) [{ "Name": "...", "ConnectsToNodeId": ["..."] }, ...]
         // 2) ["nodeId-1", "nodeId-2", ...]
         return outputsElement.ValueKind switch
         {
-            JsonValueKind.Array when outputsElement.GetArrayLength() == 0 => Array.Empty<Output>(),
+            JsonValueKind.Array when outputsElement.GetArrayLength() == 0 => [],
 
             JsonValueKind.Array when outputsElement[0].ValueKind == JsonValueKind.Object =>
                 outputsElement.EnumerateArray()
                     .Select(o => new Output(
                         o.GetProperty("Name").GetString()!,
-                        o.GetProperty("ConnectsToNodeId").EnumerateArray().Select(x => x.GetString()!).ToArray()
+                        o.GetProperty("ConnectsToNodeId").EnumerateArray().Select(x => x.GetString()!).ToList()
                     ))
-                    .ToArray(),
+                    .ToList(),
 
             JsonValueKind.Array when outputsElement[0].ValueKind == JsonValueKind.String =>
                 outputsElement.EnumerateArray()
                     .Select((nodeIdElement, index) => new Output(
                         $"Output {index + 1}",
-                        [nodeIdElement.GetString()!]
+                        new List<string> { nodeIdElement.GetString()! }
                     ))
-                    .ToArray(),
+                    .ToList(),
 
             _ => throw new InvalidOperationException(
                 "Invalid 'Outputs' JSON shape. Expected array of objects or array of strings.")
         };
     }
 
-    static Input[] ParseInputs(JsonElement inputsElement)
+    static List<Input> ParseInputs(JsonElement inputsElement)
     {
         return inputsElement.EnumerateArray()
             .Select(i => new Input(
                 i.GetProperty("Name").GetString()!,
                 i.GetProperty("ConnectsToParentNodeId").EnumerateArray().Select(x => x.GetString()!).ToArray()
             ))
-            .ToArray();
+            .ToList();
     }
 
     public void Clear()

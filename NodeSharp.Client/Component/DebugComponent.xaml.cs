@@ -21,20 +21,24 @@ public partial class DebugComponent : ContentView
             if (messages.Count == 0)
                 return;
 
-            MainThread.BeginInvokeOnMainThread(async void () =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
                 try
                 {
-                    await Task.Yield();
+                    // Ensure the UI has actually rendered the new items before scrolling
+                    await Task.Delay(100); 
 
-                    CollectionViewDebug.ScrollTo(
-                        index: messages.Count - 1,
-                        position: ScrollToPosition.End,
-                        animate: true);
+                    if (CollectionViewDebug.ItemsSource != null && messages.Count > 0)
+                    {
+                        CollectionViewDebug.ScrollTo(
+                            index: messages.Count - 1,
+                            position: ScrollToPosition.End,
+                            animate: true);
+                    }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    throw; // TODO handle exception
+                    System.Diagnostics.Debug.WriteLine($"Scroll error: {ex.Message}");
                 }
             });
         };

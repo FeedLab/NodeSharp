@@ -111,6 +111,8 @@ public partial class ToolBarViewModel : ObservableObject
         try
         {
             diagramViewModel.Clear();
+            WeakReferenceMessenger.Default.Send(new NodeActionEvent { ActionEventType = NodeActionEventType.Reset});
+            
             WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
 
             await PickFileAsync();
@@ -139,6 +141,7 @@ public partial class ToolBarViewModel : ObservableObject
         Console.WriteLine("New executed!");
 
         nodeIo.Clear();
+            WeakReferenceMessenger.Default.Send(new NodeActionEvent { ActionEventType = NodeActionEventType.Reset});
         WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
 
         UpdateToolbarCommandStates();

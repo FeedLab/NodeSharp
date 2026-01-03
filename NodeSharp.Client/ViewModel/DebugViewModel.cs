@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.NodeEngine;
 
 namespace NodeSharp.Client.ViewModel;
@@ -26,6 +27,15 @@ public partial class DebugViewModel : ObservableObject
                 System.Diagnostics.Debug.WriteLine($"Count after: {DebugInfo.Count}");
             });
         };
+            WeakReferenceMessenger.Default.Register<NodeActionEvent>(this, (sender, args) =>
+            {
+                if (args.ActionEventType == NodeActionEventType.Add ||
+                    args.ActionEventType == NodeActionEventType.Delete)
+                {
+                    UpdateToolbarCommandStates();
+                }
+            });
+            
     }
     
     public void UpdateToolbarCommandStates()

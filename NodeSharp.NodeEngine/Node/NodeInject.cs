@@ -49,8 +49,8 @@ public class NodeInject : BaseNode
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Output[] outputs,
-        Input[] inputs,
+        List<Output> outputs,
+        List<Input> inputs,
         JsonElement nodeElement)
         : base(
             nodes,
@@ -119,39 +119,51 @@ public class NodeInject : BaseNode
 
     public override async Task Run()
     {
-        if (!ActivateOnStart)
-        {
-            return;
-        }
-
-        if (Repeat.IsEnabled)
-        {
-            var timer = new PeriodicTimer(TimeSpan.FromSeconds(Repeat.Value));
+            EnterNode(this);
 
             try
             {
-                do
+                if (!ActivateOnStart)
                 {
-                    await base.Run();
-                    var parametersJsonString = BuildParametersJson(Parameters);
-                    await SendToConnectedChildrenAsync(parametersJsonString);
-                } while (await timer.WaitForNextTickAsync(cts.Token));
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.WriteLine("Inject timer cancelled.");
+                    return;
+                }
+
+                Task.Run(async () =>
+                {
+                    if (Repeat.IsEnabled)
+                    {
+                        var timer = new PeriodicTimer(TimeSpan.FromSeconds(Repeat.Value));
+
+                        try
+                        {
+                            do
+                            {
+                                await base.Run();
+                                var parametersJsonString = BuildParametersJson(Parameters);
+                                await SendToConnectedChildrenAsync(parametersJsonString);
+                            } while (await timer.WaitForNextTickAsync(Cts.Token));
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            Debug.WriteLine("Inject timer cancelled.");
+                        }
+                        finally
+                        {
+                            timer?.Dispose();
+                        }
+                    }
+                    else
+                    {
+                        await base.Run();
+                        var parametersJsonString = BuildParametersJson(Parameters);
+                        await SendToConnectedChildrenAsync(parametersJsonString);
+                    }
+                });
             }
             finally
             {
-                timer?.Dispose();
+                LeaveNode(this);
             }
-        }
-        else
-        {
-            await base.Run();
-            var parametersJsonString = BuildParametersJson(Parameters);
-            await SendToConnectedChildrenAsync(parametersJsonString);
-        }
     }
 
     private static string BuildParametersJson(IList<Parameter> parameters)

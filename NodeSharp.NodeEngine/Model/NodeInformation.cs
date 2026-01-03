@@ -2,9 +2,9 @@
 
 namespace NodeSharp.NodeEngine.Model;
 
-public class NodeInformation(string? typeId, bool activateOnStart, bool isEnabled, string information, string symbol, int numberOfInputs, int numberOfOutputs)
+public class NodeInformation(string typeId, bool activateOnStart, bool isEnabled, string information, string symbol, int numberOfInputs, int numberOfOutputs)
 {
-    public string? TypeId { get; set; } = typeId;
+    public string TypeId { get; set; } = typeId;
     public bool ActivateOnStart { get; set; } = activateOnStart;
     public bool IsEnabled { get; set; } = isEnabled;
     public string? Information { get; set; } = information;
