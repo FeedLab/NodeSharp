@@ -11,5 +11,6 @@ public class NodeInformationDictionary : Dictionary<string, NodeInformation>
         Add("Debug", new NodeInformation("Debug", false, true, informationText,"\ue714", 1, 0));
         Add("Delay", new NodeInformation("Delay", false, true, informationText,"\ue715", 1, 1));
         Add("RandomNumber", new NodeInformation("RandomNumber", false, true, informationText,"\ue716", 1, 1));
+        Add("Function", new NodeInformation("Function", false, true, informationText,"\ue718", 1, 1));
     }
 }

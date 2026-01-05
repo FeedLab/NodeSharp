@@ -1,0 +1,76 @@
+﻿        <ContentView.Resources>
+            <Style x:Key="BaseButtonStyle" TargetType="buttons:SfButton">
+                <Setter Property="Margin" Value="8" />
+                <Setter Property="HorizontalOptions" Value="Fill" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="VerticalOptions" Value="Fill" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+                <Setter Property="Shadow">
+                    <Setter.Value>
+                        <Shadow Brush="Black" Offset="2,2" Opacity="0.4" Radius="4" />
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="Background" Value="Gray" />
+                                    <Setter Property="TextColor" Value="LightGray" />
+                                    <Setter Property="Opacity" Value="0.6" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+        </ContentView.Resources>
+                        <Grid>
+                            <buttons:SfButton Grid.Column="0" 
+                                                  Style="{StaticResource BaseButtonStyle}"
+                                                  Text="Run" 
+                                                  Command="{Binding RunCommand}"
+                                                  IsEnabled="{Binding CanRun}">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup List>
+                                            <VisualState Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="Background" Value="DarkGreen" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                            </buttons:SfButton>
+
+                            <buttons:SfButton Grid.Column="1" 
+                                                  Style="{StaticResource BaseButtonStyle}"
+                                                  Text="Stop" 
+                                                  Command="{Binding StopCommand}">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup List>
+                                            <VisualState Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="Background" Value="DarkRed" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                            </buttons:SfButton>
+
+                            <buttons:SfButton Grid.Column="2" 
+                                                  Style="{StaticResource BaseButtonStyle}"
+                                                  Text="Clear" 
+                                                  Command="{Binding ClearCommand}">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup List>
+                                            <VisualState Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="Background" Value="DarkBlue" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                            </buttons:SfButton>
+                        </Grid>

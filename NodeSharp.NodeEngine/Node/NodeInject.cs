@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using NodeSharp.NodeEngine.Exception;
+using NodeSharp.NodeEngine.Extension;
 using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
@@ -35,8 +36,8 @@ public class NodeInject : BaseNode
             storage
         )
     {
-        Repeat = new Repeat("Seconds", 10, true);
-        ActivateAfter = new ActivateAfter("Seconds", 1);
+        Repeat = new Repeat("Second", 10, true);
+        ActivateAfter = new ActivateAfter("Second", 1);
         Parameters = new List<Parameter>();
     }
 
@@ -127,12 +128,22 @@ public class NodeInject : BaseNode
                 {
                     return;
                 }
-
+                
+                
                 Task.Run(async () =>
                 {
+                    if (ActivateAfter.Value > 0)
+                    {
+                        Debug.WriteLine($"Inject: Delay is enabled. Waiting {ActivateAfter.ActivateAfterMilliseconds} milliseconds before execute.");
+                        
+                        await Task.Delay(ActivateAfter.ActivateAfterMilliseconds);
+                    }
+                    
                     if (Repeat.IsEnabled)
                     {
-                        var timer = new PeriodicTimer(TimeSpan.FromSeconds(Repeat.Value));
+                        Debug.WriteLine("Inject: Starting repeating");
+                    
+                        var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(Repeat.Value));
 
                         try
                         {
@@ -154,6 +165,7 @@ public class NodeInject : BaseNode
                     }
                     else
                     {
+                        Debug.WriteLine("Inject: Starting once.");
                         await base.Run();
                         var parametersJsonString = BuildParametersJson(Parameters);
                         await SendToConnectedChildrenAsync(parametersJsonString);
@@ -165,6 +177,7 @@ public class NodeInject : BaseNode
                 LeaveNode(this);
             }
     }
+
 
     private static string BuildParametersJson(IList<Parameter> parameters)
     {

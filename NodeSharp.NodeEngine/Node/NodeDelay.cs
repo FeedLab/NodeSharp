@@ -119,13 +119,15 @@ public class NodeDelay : BaseNode
                                 ?? throw new InvalidOperationException(
                                     $"NodeDelay '{Name}' missing or invalid 'Type' at '{Delay.PathToDelayNode}.Type'");
 
-                delayMilliseconds = delayType.ToLowerInvariant() switch
-                {
-                    "milliseconds" => delayValue,
-                    "seconds" => delayValue * 1000,
-                    "minutes" => delayValue * 60 * 1000,
-                    _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Delay.Type}")
-                };
+                delayMilliseconds = delayType.ConvertTimeToMilliseconds(delayValue);
+
+                // delayMilliseconds = delayType.ToLowerInvariant() switch
+                // {
+                //     "milliseconds" => delayValue,
+                //     "seconds" => delayValue * 1000,
+                //     "minutes" => delayValue * 60 * 1000,
+                //     _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Delay.Type}")
+                // };
             }
             else
             {

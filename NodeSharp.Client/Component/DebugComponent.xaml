@@ -2,67 +2,128 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:treeView="clr-namespace:Syncfusion.Maui.TreeView;assembly=Syncfusion.Maui.TreeView"
              xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="NodeSharp.Client.Component.DebugComponent">
 
-    <Grid Background="Transparent" IsClippedToBounds="True">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <ContentView.Resources>
+        <SolidColorBrush x:Key="GreenColorBrush">Green</SolidColorBrush>
+        <SolidColorBrush x:Key="DimGreenColorBrush">Red</SolidColorBrush>
+        <SolidColorBrush x:Key="RedColorBrush">Green</SolidColorBrush>
+        <SolidColorBrush x:Key="DimRedColorBrush">Red</SolidColorBrush>
+        <SolidColorBrush x:Key="BlueColorBrush">Green</SolidColorBrush>
+        <SolidColorBrush x:Key="DimBlueColorBrush">Red</SolidColorBrush>
+        
+        <toolkit:BoolToObjectConverter x:Key="ClearBtnConverter" 
+                                       TrueObject="{StaticResource BlueColorBrush}" 
+                                       FalseObject="{StaticResource DimBlueColorBrush}"/>
+        
+        <toolkit:BoolToObjectConverter x:Key="RunBtnConverter" 
+                                       TrueObject="{StaticResource GreenColorBrush}" 
+                                       FalseObject="{StaticResource DimGreenColorBrush}"/>
+        
+        <toolkit:BoolToObjectConverter x:Key="StopBtnConverter" 
+                                       TrueObject="{StaticResource RedColorBrush}" 
+                                       FalseObject="{StaticResource DimRedColorBrush}"/>
+            
+            <Style x:Key="BaseButtonStyle" TargetType="buttons:SfButton">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="HorizontalOptions" Value="Fill" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="VerticalOptions" Value="Fill" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+            <Setter Property="Shadow">
+                <Setter.Value>
+                    <Shadow Brush="Black" Offset="2,2" Opacity="0.4" Radius="4" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ContentView.Resources>
 
-        <CollectionView Grid.Row="0" x:Name="CollectionViewDebug"
-                        ItemsSource="{Binding DebugInfo}"
-                        VerticalScrollBarVisibility="Always"
-                        ItemsLayout="VerticalList">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Padding="8,4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+    <Border Stroke="LightGray"
+            StrokeThickness="1"
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                        </Grid.RowDefinitions>
+            Background="White"
+            Shadow="{Shadow Brush=Black, Offset='2,2', Opacity=0.25}">
+        <Grid IsClippedToBounds="True" HorizontalOptions="Fill" VerticalOptions="Fill" Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-                        <Label
-                            Grid.Column="0"
-                            Grid.Row="0"
-                            Text="{Binding Level}"
-                            FontSize="12"
-                            Margin="0,0,10,0"
-                            FontAttributes="Bold"
-                            VerticalTextAlignment="Center"
-                            LineBreakMode="TailTruncation" />
-                        <Label
-                            Grid.Column="0"
-                            Grid.Row="1"
-                            Text="{Binding Message}"
-                            FontSize="10"
-                            FontFamily="monospace"
-                            VerticalTextAlignment="Center"
-                            LineBreakMode="WordWrap" />
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
 
-        <Grid Grid.Row="1" Padding="8,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <buttons:SfButton Grid.Column="0" Margin="8" Text="Run" HorizontalOptions="Fill"
-                              HorizontalTextAlignment="Center"
-                              VerticalOptions="Fill" VerticalTextAlignment="Center" Command="{Binding RunCommand}" />
+            <CollectionView Grid.Row="0" x:Name="CollectionViewDebug"
+                            HorizontalOptions="Fill" VerticalOptions="Fill"
+                            ItemsSource="{Binding DebugInfo}"
+                            VerticalScrollBarVisibility="Always"
+                            ItemsLayout="VerticalList">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="8,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-            <buttons:SfButton Grid.Column="1" Margin="8" Text="Stop" HorizontalOptions="Fill"
-                              HorizontalTextAlignment="Center"
-                              VerticalOptions="Fill" VerticalTextAlignment="Center" Command="{Binding StopCommand}" />
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <Label
+                                Grid.Column="0"
+                                Grid.Row="0"
+                                Text="{Binding Level}"
+                                FontSize="12"
+                                Margin="0,0,10,0"
+                                FontAttributes="Bold"
+                                VerticalTextAlignment="Center"
+                                LineBreakMode="TailTruncation" />
+                            <Label
+                                Grid.Column="0"
+                                Grid.Row="1"
+                                Text="{Binding Message}"
+                                FontSize="10"
+                                FontFamily="monospace"
+                                VerticalTextAlignment="Center"
+                                LineBreakMode="WordWrap" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Border Grid.Row="1" Stroke="LightGray"
+                    StrokeThickness="0"
+                    Background="White">
+                <Grid Padding="8,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <buttons:SfButton Grid.Column="0"
+                                      Style="{StaticResource BaseButtonStyle}"
+                                      Text="Run"
+                                      Command="{Binding RunCommand}"
+                                      IsEnabled="{Binding CanRun}">
+                    </buttons:SfButton>
+
+                    <buttons:SfButton Grid.Column="1"
+                                      Style="{StaticResource BaseButtonStyle}"
+                                      Text="Stop"
+                                      IsEnabled="{Binding CanStop}"
+                                      Command="{Binding StopCommand}">
+                    </buttons:SfButton>
+
+                    <buttons:SfButton Grid.Column="2"
+                                      Style="{StaticResource BaseButtonStyle}"
+                                      Text="Clear"
+                                      IsEnabled="{Binding CanClear}"
+                                      Command="{Binding ClearCommand}">
+                    </buttons:SfButton>
+                </Grid>
+            </Border>
         </Grid>
-    </Grid>
+    </Border>
 </ContentView>

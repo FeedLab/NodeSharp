@@ -15,7 +15,7 @@
       ],
       "Inputs": [],
       "ActivateAfter": {
-        "Type": "Seconds",
+        "Type": "Second",
         "Value": 10
       },
       "Parameters": [

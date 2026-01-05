@@ -19,7 +19,7 @@
       ],
       "Inputs": [],
       "ActivateAfter": {
-        "Type": "Seconds",
+        "Type": "Second",
         "Value": 10
       },
       "Parameters": [
@@ -155,7 +155,7 @@
       "Delay": {
         "PathToDelayNode": "",
         "Source": "Fixed",
-        "Type": "Seconds",
+        "Type": "Second",
         "Value": 10
       }
     }

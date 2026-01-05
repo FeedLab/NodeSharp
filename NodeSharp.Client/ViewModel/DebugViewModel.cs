@@ -42,10 +42,22 @@ public partial class DebugViewModel : ObservableObject
     {
         RunCommand.NotifyCanExecuteChanged();
         StopCommand.NotifyCanExecuteChanged();
+        ClearCommand.NotifyCanExecuteChanged();
     }
     
     public ObservableCollection<DebugData>? DebugInfo { get; }
-    
+
+    [RelayCommand(CanExecute = nameof(CanDoClear))]
+    private void Clear()
+    {
+        Debug.WriteLine("Clear debug window!");
+
+        DebugInfo?.Clear();
+        
+        UpdateToolbarCommandStates();
+    }
+
+
     [RelayCommand(CanExecute = nameof(CanDoRun))]
     private async Task Run()
     {
@@ -64,12 +76,16 @@ public partial class DebugViewModel : ObservableObject
         nodeIo.Abort();
         UpdateToolbarCommandStates();
     }
-    
+
+    private bool CanDoClear()
+    {
+        return nodeIo.IsFlowRunning;
+    }
     private bool CanDoStop()
     {
         return nodeIo.IsFlowRunning;
     }
-    
+
     private bool CanDoRun()
     {
         return nodeIo.Nodes.Count > 0 && !nodeIo.IsFlowRunning;

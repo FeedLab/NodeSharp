@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using NodeSharp.NodeEngine.Exception;
+using NodeSharp.NodeEngine.Extension;
 using NodeSharp.NodeEngine.Model;
 using NodeSharp.NodeEngine.Node;
 
@@ -148,7 +149,7 @@ public class NodeIo(Storage storage)
 
                 BaseNode node = typeId switch
                 {
-                    "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition,
+                    "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, true, xPosition,
                         yPosition, outputs, inputs,
                         nodeElement),
                     "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
@@ -158,6 +159,9 @@ public class NodeIo(Storage storage)
                         xPosition, yPosition, outputs,
                         inputs, nodeElement),
                     "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
+                        outputs, inputs,
+                        nodeElement),
+                    "Function" => new NodeFunction(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
                         outputs, inputs,
                         nodeElement),
                     _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
@@ -264,7 +268,7 @@ public class NodeIo(Storage storage)
 
         BaseNode node = nodeTypeName switch
         {
-            "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
+            "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, true, xPosition, yPosition,
                 storage),
             "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
                 storage),
@@ -272,6 +276,8 @@ public class NodeIo(Storage storage)
                 yPosition, storage, new RandomDataPayload()),
             "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage,
                 new DelayPayload()),
+            "Function" => new NodeFunction(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition,
+                yPosition, storage, new FunctionData()),
             _ => throw new InvalidOperationException($"Unknown node type: {nodeTypeName}")
         };
 
@@ -306,26 +312,36 @@ public class ActivateAfter
     public string Type { get; }
     public int Value { get; }
 
+    [JsonIgnore] public int ActivateAfterMilliseconds { get; }
+
     public ActivateAfter(string type, int value)
     {
         Type = type;
         Value = value;
+
+        ActivateAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
     }
 }
 
 public class Repeat
 {
     public string Type { get; }
+ 
     public int Value { get; }
 
     public bool IsEnabled { get; }
+
+    public int RepeatAfterMilliseconds { get; }
 
     public Repeat(string type, int value, bool isEnabled)
     {
         Type = type;
         Value = value;
         IsEnabled = isEnabled;
+        
+        RepeatAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
     }
+
 }
 
 public class Parameter

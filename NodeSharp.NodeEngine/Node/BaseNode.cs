@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NodeSharp.NodeEngine.Exception;
 using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.NodeEngine.Node;
@@ -13,7 +14,7 @@ public abstract class BaseNode
     public event EventHandler<BaseNode>? OnEnterNode;
     public event EventHandler<BaseNode>? OnLeaveNode;
 
-    protected readonly CancellationTokenSource Cts;
+    protected CancellationTokenSource Cts;
 
     [JsonIgnore] private BaseNodeList Nodes { get; }
     public string Id { get; }
@@ -122,12 +123,17 @@ public abstract class BaseNode
             return Task.CompletedTask;
         }
 
-        Debug.WriteLine($"Node {FormatNode()} is activated on start");
+        Cts = new CancellationTokenSource();
+
+        Debug.WriteLine($"BaseNode {FormatNode()} has been activated during start of node");
+        
         return Task.CompletedTask;
     }
 
     public virtual Task<string> RunFromInput(BaseNode parent, string parametersJsonString)
     {
+        Cts = new CancellationTokenSource();
+        
         Debug.WriteLine($"Node {FormatNode()} has been activated by parent node {parent.FormatNode()}");
         return Task.FromResult(parametersJsonString);
     }
@@ -240,6 +246,30 @@ public abstract class BaseNode
         {
             Debug.WriteLine($"Validation errors found: {errors}");
             throw new InvalidOperationException(errors.ToString().Trim());
+        }
+    }
+    
+    protected static JsonElement GetProperty(JsonElement nodeElement, string propertyName)
+    {
+        try
+        {
+            return nodeElement.GetProperty(propertyName);
+        }
+        catch (System.Exception e)
+        {
+            throw new NodeParseException(propertyName, e);
+        }
+    }
+
+    protected static bool TryGetProperty(JsonElement nodeElement, string propertyName, out JsonElement propertyValue)
+    {
+        try
+        {
+            return nodeElement.TryGetProperty(propertyName, out propertyValue);
+        }
+        catch (System.Exception e)
+        {
+            throw new NodeParseException(propertyName, e);
         }
     }
 
