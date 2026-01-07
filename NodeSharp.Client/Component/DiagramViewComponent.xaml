@@ -13,13 +13,20 @@
         <Grid.GestureRecognizers>
             <PinchGestureRecognizer PinchUpdated="OnCanvasPinch" />
             <PanGestureRecognizer PanUpdated="OnCanvasPan" />
+            <TapGestureRecognizer Tapped="OnCanvasTapped" />
         </Grid.GestureRecognizers>
-        <GraphicsView x:Name="ConnectionCanvas" WidthRequest="3000" HeightRequest="2000" HorizontalOptions="Start"
-                      VerticalOptions="Start" InputTransparent="True">
+
+        <GraphicsView x:Name="ConnectionCanvas"
+                      WidthRequest="3000"
+                      HeightRequest="2000"
+                      HorizontalOptions="Start"
+                      VerticalOptions="Start"
+                      InputTransparent="True">
             <GraphicsView.Drawable>
                 <component:CurvedLineDrawable />
             </GraphicsView.Drawable>
         </GraphicsView>
+
         <AbsoluteLayout x:Name="CanvasSurface" AutomationId="CanvasSurface" WidthRequest="3000"
                         HeightRequest="2000"
                         HorizontalOptions="Start"

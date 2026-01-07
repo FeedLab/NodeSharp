@@ -189,8 +189,9 @@ public partial class DraggableBoxComponent : ContentView
                         boxNode.Node.Y = (int)newY;
                     }
 
-                    WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
-
+                    WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
+                    lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+                    
                     // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
 
                     break;
@@ -273,8 +274,11 @@ public partial class DraggableBoxComponent : ContentView
             {
                 Debug.WriteLine("🔵 POINTER RELEASED - Clearing drag state and redrawing");
                 lineConnectionManager.EndDragging(anchor);
+                
+                lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+                
                 WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
-                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
             };
             boxView.GestureRecognizers.Add(pointerGesture);
 

@@ -4,9 +4,25 @@ using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.Client;
 
+public class LineConnection
+{
+    public Point Start { get; set; }
+    public Point End { get; set; }
+
+    public bool IsSelected { get; set; }
+
+
+    public LineConnection(Point from, Point fo)
+    {
+        Start = from;
+        End = fo;
+    }
+}
+
 public class LineConnectionManager(NodeIo nodeIo)
 {
-    private IList<(Point Start, Point End)> Connections { get; set; } = [];
+    public IList<LineConnection> Connections { get; set; } = [];
+    // private IList<(Point Start, Point End)> Connections { get; set; } = [];
 
     public AnchorPoint? DragStartAnchor { get; set; }
     public Point? DragCurrentPoint { get; set; }
@@ -97,7 +113,7 @@ public class LineConnectionManager(NodeIo nodeIo)
         DragCurrentPoint = null;
     }
 
-    public IList<(Point Start, Point End)> RecalculateLines(IEnumerable<BoxNode> boxNodes)
+    public IList<LineConnection> RecalculateLines(IEnumerable<BoxNode> boxNodes)
     {
         Connections.Clear();
         System.Diagnostics.Debug.WriteLine($"📊 RecalculateLines - Processing {boxNodes.Count()} nodes");
@@ -151,7 +167,7 @@ public class LineConnectionManager(NodeIo nodeIo)
                     var cpTo = new Point(target.AbsoluteCenterX, target.AbsoluteCenterY);
 
                     System.Diagnostics.Debug.WriteLine($"📍 Adding connection: {anchorPoint.BoxNode.NodeId} -> {targetNodeId}");
-                    Connections.Add((cpFrom, cpTo));
+                    Connections.Add(new LineConnection(cpFrom, cpTo));
                 }
             }
         }
@@ -160,45 +176,94 @@ public class LineConnectionManager(NodeIo nodeIo)
         return Connections;
     }
 
-    // private static void CalculateOutputNodePositions(BoxNode boxNode)
-    // {
-    //     const double verticalMargin = 8.0;
-    //
-    //     boxNode.OutputNodes.Clear();
-    //
-    //     var outputs = boxNode.Node.Outputs;
-    //     var availableHeight = boxNode.Height - verticalMargin;
-    //     var verticalStep = availableHeight / (outputs.Count + 1);
-    //     var yPositionDelta = (verticalMargin / 2);
-    //     var index = 1;
-    //     foreach (var output in outputs)
-    //     {
-    //         var connectedIds = output.ConnectsToNodeId.ToList();
-    //         var yPosition = (verticalStep * index);// - yPositionDelta;
-    //
-    //     //    var anchorPoint = new AnchorPoint(connectedIds, 0, yPosition + (verticalMargin / 2), boxNode,
-    //         var anchorPoint = new AnchorPoint(connectedIds, 0, yPosition, boxNode, InOrOutConnection.Out);
-    //         boxNode.OutputNodes.Add(anchorPoint);
-    //
-    //         index++;
-    //     }
-    // }
-    //
-    // private static void CalculateInputNodePositions(BoxNode boxNode)
-    // {
-    //     const double fromVerticalMargin = 8.0;
-    //
-    //     var inputs = boxNode.Node.Inputs;
-    //     var verticalStep = (boxNode.Height - fromVerticalMargin) / (inputs.Count + 1);
-    //     var yPositionDelta = (fromVerticalMargin / 2) + (verticalStep / 2);
-    //
-    //     for (var i = 0; i < inputs.Count; i++)
-    //     {
-    //         var fromSquareYPos = verticalStep * (i + 1); // + (yPositionDelta);
-    //         // var ptInputSquare = new AnchorPoint(boxNode.Node.Id, 0, fromSquareYPos + (fromVerticalMargin / 2), boxNode, InOrOutConnection.In);
-    //         var ptInputSquare = new AnchorPoint(boxNode.Node.Id, 0, fromSquareYPos, boxNode, InOrOutConnection.In);
-    //
-    //         boxNode.InputNodes.Add(ptInputSquare);
-    //     }
-    // }
+    /// <summary>
+    /// Finds a connection line near the specified point within a tolerance threshold.
+    /// </summary>
+    /// <param name="clickPoint">The point where the user clicked</param>
+    /// <param name="tolerance">Maximum distance in pixels to consider "near" (default: 10)</param>
+    /// <returns>The connection line if found, otherwise null</returns>
+    public LineConnection? FindLineAtPoint(Point clickPoint, double tolerance = 10.0)
+    {
+        foreach (var connection in Connections)
+        {
+            if (IsPointNearLine(clickPoint, connection.Start, connection.End, tolerance))
+            {
+                System.Diagnostics.Debug.WriteLine($"🎯 Line found near click point: {connection.Start} -> {connection.End}");
+                return connection;
+            }
+        }
+
+        System.Diagnostics.Debug.WriteLine($"❌ No line found near click point: {clickPoint}");
+        return null;
+    }
+
+    /// <summary>
+    /// Calculates whether a point is near a line segment within a given tolerance.
+    /// Uses perpendicular distance from point to line segment.
+    /// </summary>
+    private static bool IsPointNearLine(Point point, Point lineStart, Point lineEnd, double tolerance)
+    {
+        var distance = DistanceFromPointToLineSegment(point, lineStart, lineEnd);
+        return distance <= tolerance;
+    }
+
+    /// <summary>
+    /// Calculates the minimum distance from a point to a line segment.
+    /// </summary>
+    private static double DistanceFromPointToLineSegment(Point point, Point lineStart, Point lineEnd)
+    {
+        // Vector from lineStart to lineEnd
+        var dx = lineEnd.X - lineStart.X;
+        var dy = lineEnd.Y - lineStart.Y;
+
+        // Handle degenerate case where start and end are the same point
+        if (Math.Abs(dx) < 0.001 && Math.Abs(dy) < 0.001)
+        {
+            return Distance(point, lineStart);
+        }
+
+        // Calculate the parameter t that represents the projection of the point onto the line
+        // t = 0 means the projection is at lineStart, t = 1 means it's at lineEnd
+        var t = ((point.X - lineStart.X) * dx + (point.Y - lineStart.Y) * dy) / (dx * dx + dy * dy);
+
+        // Clamp t to [0, 1] to stay within the line segment
+        t = Math.Max(0, Math.Min(1, t));
+
+        // Find the closest point on the line segment
+        var closestX = lineStart.X + t * dx;
+        var closestY = lineStart.Y + t * dy;
+        var closestPoint = new Point(closestX, closestY);
+
+        // Return the distance from the point to the closest point on the segment
+        return Distance(point, closestPoint);
+    }
+
+    /// <summary>
+    /// Calculates the Euclidean distance between two points.
+    /// </summary>
+    private static double Distance(Point p1, Point p2)
+    {
+        var dx = p2.X - p1.X;
+        var dy = p2.Y - p1.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    public LineConnection? SelectLineAtPoint(Point position)
+    {
+        var lineAtPoint = FindLineAtPoint(position, tolerance: 15.0);
+
+        if (lineAtPoint is null)
+        {
+            return null;
+        }
+        
+        foreach (var connection in Connections)
+        {
+            connection.IsSelected = false;
+        }
+        
+        lineAtPoint.IsSelected = true;
+        
+        return lineAtPoint;
+    }
 }

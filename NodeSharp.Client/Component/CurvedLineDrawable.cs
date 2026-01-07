@@ -13,11 +13,13 @@ public class CurvedLineDrawable : IDrawable
         canvas.StrokeColor = Colors.DarkRed;
         canvas.StrokeSize = 2;
 
-        var lines = lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+       // var lines = lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
 
-        foreach (var (start, end) in lines)
+       var lines = lineConnectionManager.Connections;
+
+        foreach (var connection in lines)
         {
-            DrawCurve(canvas, start, end);
+            DrawCurve(canvas, connection.Start, connection.End, connection.IsSelected);
         }
 
         // Draw temporary line while dragging
@@ -46,7 +48,7 @@ public class CurvedLineDrawable : IDrawable
     }
 
 
-    private void DrawCurve(ICanvas canvas, Point start, Point end)
+    private void DrawCurve(ICanvas canvas, Point start, Point end, bool isSelected)
     {
         // Curve strength (tweakable)
         var dx = (float)Math.Clamp(Math.Abs(end.X - start.X), 40, 200);
@@ -54,12 +56,28 @@ public class CurvedLineDrawable : IDrawable
         var c1 = new Point(start.X + dx, start.Y);
         var c2 = new Point(end.X - dx, end.Y);
 
-            var path = new PathF();
-            path.MoveTo((float)start.X, (float)start.Y);
-            path.CurveTo((float)c1.X, (float)c1.Y, (float)c2.X, (float)c2.Y, (float)end.X, (float)end.Y);
+        var path = new PathF();
+        path.MoveTo((float)start.X, (float)start.Y);
+        path.CurveTo((float)c1.X, (float)c1.Y, (float)c2.X, (float)c2.Y, (float)end.X, (float)end.Y);
 
+        if (isSelected)
+        {
+            // Draw glow effect for selected curve (wider background stroke)
+            canvas.StrokeColor = Color.FromRgba(255, 165, 0, 128); // Semi-transparent orange glow
+            canvas.StrokeSize = 8;
+            canvas.DrawPath(path);
+
+            // Draw main selected curve on top
+            canvas.StrokeColor = Colors.Orange;
+            canvas.StrokeSize = 4;
+            canvas.DrawPath(path);
+        }
+        else
+        {
+            // Draw normal curve
             canvas.StrokeColor = Colors.DeepSkyBlue;
-        canvas.StrokeSize = 3;
-        canvas.DrawPath(path);
+            canvas.StrokeSize = 3;
+            canvas.DrawPath(path);
+        }
     }
 }

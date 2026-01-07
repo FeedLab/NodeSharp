@@ -118,7 +118,7 @@ public class NodeInject : BaseNode
         }
     }
 
-    public override async Task Run()
+    public override Task Run()
     {
             EnterNode(this);
 
@@ -126,11 +126,11 @@ public class NodeInject : BaseNode
             {
                 if (!ActivateOnStart)
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
                 
                 
-                Task.Run(async () =>
+                var _ =Task.Run(async () =>
                 {
                     if (ActivateAfter.Value > 0)
                     {
@@ -176,6 +176,8 @@ public class NodeInject : BaseNode
             {
                 LeaveNode(this);
             }
+
+            return Task.CompletedTask;
     }
 
 

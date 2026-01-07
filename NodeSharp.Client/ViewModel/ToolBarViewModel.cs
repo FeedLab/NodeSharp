@@ -142,7 +142,7 @@ public partial class ToolBarViewModel : ObservableObject
 
         nodeIo.Clear();
             WeakReferenceMessenger.Default.Send(new NodeActionEvent { ActionEventType = NodeActionEventType.Reset});
-        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
 
         UpdateToolbarCommandStates();
         debugViewModel.UpdateToolbarCommandStates();

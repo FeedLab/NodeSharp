@@ -289,4 +289,28 @@ public partial class DiagramViewComponent : ContentView
             }
         }
     }
+    
+    private void OnCanvasTapped(object? sender, TappedEventArgs e)
+    {
+        // This gives you the position relative to the ConnectionCanvas
+        Point? position = e.GetPosition(ConnectionCanvas);
+    
+        if (position.HasValue)
+        {
+            var clickedLine = lineConnectionManager.SelectLineAtPoint(position.Value);
+        
+            if (clickedLine is not null)
+            {
+                // User clicked on a line!
+                Debug.WriteLine($"Line clicked: {clickedLine.Start} -> {clickedLine.End}");
+                
+                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
+                
+            }
+            else
+            {
+                // Clicked on empty canvas
+            }
+        }
+    }
 }
