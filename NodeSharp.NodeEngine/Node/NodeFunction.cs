@@ -1,10 +1,11 @@
-﻿using System.Diagnostics;
+﻿using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using NodeSharp.NodeEngine.Exception;
 using NodeSharp.NodeEngine.Model;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
 
@@ -90,10 +91,10 @@ public class NodeFunction : BaseNode
 
             await base.RunFromInput(parentNode, parametersJsonString);
 
-            //         var codeUpdated = string.Format(FunctionData.SourceCodeTemplate, parametersJsonString);
+            var runStatus = FunctionData.ExecuteScript(parametersJsonString);
 
-            var updatedJsonString = await ExecuteScriptAsync(FunctionData.SourceCodeTemplate);
-
+            var updatedJsonString = runStatus.Output ?? parametersJsonString;
+            
             await SendToConnectedChildrenAsync(updatedJsonString);
 
             return await Task.FromResult(updatedJsonString);
@@ -103,71 +104,83 @@ public class NodeFunction : BaseNode
             LeaveNode(this);
         }
     }
-
-    private async Task<string?> ExecuteScriptAsync(string code)
-    {
-        // var result = await CSharpScript
-        //     .RunAsync(code, ScriptOptions.Default
-        //         .AddReferences(
-        //             typeof(object).Assembly, 
-        //             typeof(JsonConvert).Assembly,
-        //             typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly)
-        //         .AddImports("System", "System.Dynamic", "Newtonsoft.Json"));
-
-        var result = await FunctionData.Script.RunAsync(cancellationToken: Cts.Token);
-        
-        return result.ReturnValue?.ToString();
-    }
 }
 
 public class FunctionData
 {
-    public Script<object> Script;
+    private MethodInfo? method;
+
     public string SourceCode { get; set; }
-    public string SourceCodeTemplate { get; set; }
+    
+    public (bool Success, string? Output, System.Exception? Error) ExecuteScript(string json)
+    {
+        if (method == null)
+            return (false, null, new InvalidOperationException("Runner.Execute method not found"));
+
+        try
+        {
+            var output = method.Invoke(null, [json]);
+            return (true, output?.ToString(), null);
+        }
+        catch (TargetInvocationException tie)
+        {
+            // unwrap inner exception thrown by the script
+            return (false, null, tie.InnerException ?? tie);
+        }
+        catch (System.Exception ex)
+        {
+            return (false, null, ex);
+        }
+    }
+
 
     private void CompileScript()
     {
-        Script = CSharpScript.Create(MessageTemplate,
-            ScriptOptions.Default
-                .AddReferences(
-                    typeof(object).Assembly, 
-                    typeof(JsonConvert).Assembly,
-                    typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly)
-                .AddImports("System", "System.Dynamic", "Newtonsoft.Json"));
-        
-        Script.Compile();
+        var code = MessageTemplate.Replace("##@@##", SourceCode);
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+
+        var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
+
+        // Collect core references
+        var references = new[]
+        {
+            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Private.CoreLib.dll")),
+            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")),
+            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "netstandard.dll")),
+            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(System.Dynamic.ExpandoObject).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly.Location)
+
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "RunnerAssembly",
+            new[] { syntaxTree },
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+        );
+
+        using var ms = new MemoryStream();
+        var result = compilation.Emit(ms);
+
+        if (!result.Success)
+        {
+            foreach (var diag in result.Diagnostics)
+                Console.WriteLine(diag);
+            return;
+        }
+
+        ms.Seek(0, SeekOrigin.Begin);
+        var assembly = Assembly.Load(ms.ToArray());
+        var type = assembly.GetType("Runner");
+        method = type.GetMethod("Execute");
     }
 
-    private const string MessageTemplate = $$"""
-                                             string json = @"{
-                                               ""payload"": {
-                                                 ""deviceId"": ""SR4314-F03"",
-                                                 ""temperature"": 23.3,
-                                                 ""ema"": 23.3
-                                               },
-                                               ""_msgid"": ""7e72d0c68a4535f4""
-                                             }";
 
-                                             // Deserialize into dynamic ExpandoObject
-                                             dynamic msg = JsonConvert.DeserializeObject<ExpandoObject>(json);
-
-                                             // Add new fields dynamically
-                                             msg.payload.newField = "hello world";
-                                             msg.payload.calibrationOffset = 1.25;
-                                             msg.extraInfo = "added at runtime";
-
-                                             // Access them
-                                             Console.WriteLine(msg.payload.newField);          // hello world
-                                             Console.WriteLine(msg.payload.calibrationOffset); // 1.25
-                                             Console.WriteLine(msg.extraInfo);                 // added at runtime
-
-                                             // Serialize back to JSON
-                                             string updatedJson = JsonConvert.SerializeObject(msg, Formatting.Indented);
-                                             Console.WriteLine(updatedJson);
-
-                                             return updatedJson;
-                                             """;
+    private const string MessageTemplate =
+        "using System;\nusing System.Dynamic;\nusing Newtonsoft.Json;\n\npublic class Runner \n{\n    public static string Execute(string json) \n    {\n        dynamic msg = JsonConvert.DeserializeObject<ExpandoObject>(json);\n\n        // Serialize back to JSON\n        ##@@##\n\n        string updatedJson = JsonConvert.SerializeObject(msg, Formatting.Indented);\n        return updatedJson;\n    } \n}";
 
 
     public FunctionData(JsonElement element)
@@ -184,19 +197,6 @@ public class FunctionData
 
         SourceCode = sourceCode!;
 
-        var existsSourceCodeTemplate = element.TryGetProperty("SourceCodeTemplate", out var sourceTemplateProp);
-        var sourceCodeTemplate = !existsSourceCodeTemplate || sourceTemplateProp.ValueKind != JsonValueKind.String
-            ? throw new NodeParseException(nameof(SourceCodeTemplate), "Must exists and be of type string")
-            : sourceTemplateProp.GetString();
-
-        if (string.IsNullOrWhiteSpace(sourceCodeTemplate))
-        {
-            throw new NodeParseException(nameof(SourceCode), "SourceCode can not be empty or null");
-        }
-
-        // SourceCodeTemplate = sourceCodeTemplate;
-        SourceCodeTemplate = MessageTemplate;
-
         CompileScript();
     }
 
@@ -204,6 +204,5 @@ public class FunctionData
     public FunctionData(string sourceCode = "int index = 100; return index;")
     {
         SourceCode = sourceCode;
-        SourceCodeTemplate = MessageTemplate;
     }
 }

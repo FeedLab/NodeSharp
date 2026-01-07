@@ -266,4 +266,26 @@ public class LineConnectionManager(NodeIo nodeIo)
         
         return lineAtPoint;
     }
+
+    /// <summary>
+    /// Cancels any line selection and clears drag state.
+    /// </summary>
+    public bool CancelSelection()
+    {
+        var hasStartAnchor = DragStartAnchor != null;
+        
+        // Deselect all lines
+        foreach (var connection in Connections)
+        {
+            connection.IsSelected = false;
+        }
+
+        // Cancel any ongoing drag operation
+        DragStartAnchor = null;
+        DragCurrentPoint = null;
+
+        System.Diagnostics.Debug.WriteLine("❌ Line selection and dragging canceled");
+        
+        return hasStartAnchor;
+    }
 }
