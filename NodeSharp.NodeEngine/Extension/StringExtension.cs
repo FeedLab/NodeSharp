@@ -1,4 +1,9 @@
-﻿namespace NodeSharp.NodeEngine.Extension;
+﻿using System.Reflection;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Newtonsoft.Json;
+
+namespace NodeSharp.NodeEngine.Extension;
 
 public static class StringExtension
 {
@@ -28,6 +33,7 @@ public static class StringExtension
                 words[i] = char.ToUpper(words[i][0]) + words[i][1..].ToLower();
             }
         }
+
         return string.Join(" ", words);
     }
 
@@ -39,8 +45,59 @@ public static class StringExtension
 
     public static string RemoveSpecialCharacters(this string input)
     {
-        return string.IsNullOrEmpty(input) 
-            ? input 
+        return string.IsNullOrEmpty(input)
+            ? input
             : new string(input.Where(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)).ToArray());
+    }
+
+    public static MethodInfo? CompileRoslyn(this string foo, string codeTemplate, string sourceCode)
+    {
+        return CompileScript(codeTemplate, sourceCode);
+    }
+
+    private static MethodInfo? CompileScript(string codeTemplate, string sourceCode)
+    {
+        var code = codeTemplate.Replace("##@@##", sourceCode);
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+
+        var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
+
+        // Collect core references
+        var references = new[]
+        {
+            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Private.CoreLib.dll")),
+            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")),
+            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "netstandard.dll")),
+            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(System.Dynamic.ExpandoObject).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
+            MetadataReference.CreateFromFile(
+                typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly.Location)
+        };
+
+        var compilation = CSharpCompilation.Create(
+            "RunnerAssembly",
+            [syntaxTree],
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+        );
+
+        using var ms = new MemoryStream();
+        var result = compilation.Emit(ms);
+
+        if (!result.Success)
+        {
+            foreach (var diag in result.Diagnostics)
+                Console.WriteLine(diag);
+            return null;
+        }
+
+        ms.Seek(0, SeekOrigin.Begin);
+        var assembly = Assembly.Load(ms.ToArray());
+        var type = assembly.GetType("Runner");
+        var method = type?.GetMethod("Execute");
+
+        return method;
     }
 }

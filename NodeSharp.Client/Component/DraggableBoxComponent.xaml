@@ -25,6 +25,7 @@
     <Grid InputTransparent="False">
         <Grid.GestureRecognizers>
             <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+            <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnDoubleTapped" />
         </Grid.GestureRecognizers>
         <Border
             x:Name="MainBorder"

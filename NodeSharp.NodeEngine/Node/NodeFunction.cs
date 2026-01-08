@@ -8,12 +8,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Scripting;
 using Newtonsoft.Json;
+using NodeSharp.NodeEngine.Helper;
 
 namespace NodeSharp.NodeEngine.Node;
 
 public class NodeFunction : BaseNode
 {
-    [JsonInclude] private FunctionData FunctionData { get; set; }
+    [JsonInclude] public FunctionData FunctionData { get; set; }
 
     public NodeFunction(
         BaseNodeList nodes,
@@ -94,7 +95,7 @@ public class NodeFunction : BaseNode
             var runStatus = FunctionData.ExecuteScript(parametersJsonString);
 
             var updatedJsonString = runStatus.Output ?? parametersJsonString;
-            
+
             await SendToConnectedChildrenAsync(updatedJsonString);
 
             return await Task.FromResult(updatedJsonString);
@@ -111,7 +112,7 @@ public class FunctionData
     private MethodInfo? method;
 
     public string SourceCode { get; set; }
-    
+
     public (bool Success, string? Output, System.Exception? Error) ExecuteScript(string json)
     {
         if (method == null)
@@ -133,56 +134,17 @@ public class FunctionData
         }
     }
 
+    public const string MessageTemplate =
+        "using System;\n\rusing System.Dynamic;\n\rusing Newtonsoft.Json;\n\n\rpublic class Runner \n\r{\n\r    public static string Execute(string json) \n\r    {\n\r        dynamic msg = JsonConvert.DeserializeObject<ExpandoObject>(json);\n\n        // Serialize back to JSON\n\r\n\r        ##@@##\n\n        string updatedJson = JsonConvert.SerializeObject(msg, Formatting.Indented);\n\r\n\r        return updatedJson;\n\r    }\n\r}";
 
-    private void CompileScript()
+
+    public void CompileScript()
     {
-        var code = MessageTemplate.Replace("##@@##", SourceCode);
-        var syntaxTree = CSharpSyntaxTree.ParseText(code);
-
-        var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
-
-        // Collect core references
-        var references = new[]
-        {
-            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Private.CoreLib.dll")),
-            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")),
-            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "netstandard.dll")),
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(System.Dynamic.ExpandoObject).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly.Location)
-
-        };
-
-        var compilation = CSharpCompilation.Create(
-            "RunnerAssembly",
-            new[] { syntaxTree },
-            references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-        );
-
-        using var ms = new MemoryStream();
-        var result = compilation.Emit(ms);
-
-        if (!result.Success)
-        {
-            foreach (var diag in result.Diagnostics)
-                Console.WriteLine(diag);
-            return;
-        }
-
-        ms.Seek(0, SeekOrigin.Begin);
-        var assembly = Assembly.Load(ms.ToArray());
-        var type = assembly.GetType("Runner");
-        method = type.GetMethod("Execute");
+        var roslynHelper = new RoslynHelper(MessageTemplate, SourceCode);
+        roslynHelper.CompileScript();
+        method = roslynHelper.GetExecutionMethod();
     }
-
-
-    private const string MessageTemplate =
-        "using System;\nusing System.Dynamic;\nusing Newtonsoft.Json;\n\npublic class Runner \n{\n    public static string Execute(string json) \n    {\n        dynamic msg = JsonConvert.DeserializeObject<ExpandoObject>(json);\n\n        // Serialize back to JSON\n        ##@@##\n\n        string updatedJson = JsonConvert.SerializeObject(msg, Formatting.Indented);\n        return updatedJson;\n    } \n}";
-
-
+    
     public FunctionData(JsonElement element)
     {
         var existsSourceCode = element.TryGetProperty("SourceCode", out var sourceProp);
@@ -197,12 +159,14 @@ public class FunctionData
 
         SourceCode = sourceCode!;
 
-        CompileScript();
+        Task.Run(CompileScript);
     }
 
     /*START_USER_CODE*/
-    public FunctionData(string sourceCode = "int index = 100; return index;")
+    public FunctionData(string sourceCode = "msg.extraInfo = \"added at runtime\";")
     {
         SourceCode = sourceCode;
+        
+        Task.Run(CompileScript);
     }
 }

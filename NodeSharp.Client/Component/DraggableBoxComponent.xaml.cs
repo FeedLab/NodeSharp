@@ -1,23 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
 using NodeSharp.Client.Extension;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
+using NodeSharp.NodeEngine.Exception;
+using NodeSharp.NodeEngine.Node;
 
 namespace NodeSharp.Client.Component;
 
+[SuppressMessage("ReSharper", "AsyncVoidThrowException")]
 public partial class DraggableBoxComponent : ContentView
 {
     double startX, startY;
     private readonly DiagramViewModel diagramViewModel;
     private readonly LineConnectionManager lineConnectionManager;
     private readonly CurvedLineDrawable curvedLineDrawable;
+    private readonly IPopupService popupService;
 
     public static readonly BindableProperty XProperty =
         BindableProperty.Create(nameof(X), typeof(double), typeof(DraggableBoxComponent), 0.0);
@@ -71,6 +78,7 @@ public partial class DraggableBoxComponent : ContentView
         diagramViewModel = AppService.GetRequiredService<DiagramViewModel>();
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
+        popupService = AppService.GetRequiredService<IPopupService>();
 
 
         // Update AbsoluteLayout bounds when X or Y properties change
@@ -349,6 +357,56 @@ public partial class DraggableBoxComponent : ContentView
             AbsoluteLayout.SetLayoutFlags(boxView, AbsoluteLayoutFlags.None);
             absoluteLayout.Children.Add(boxView);
         }
+    }
+    
+    private async void OnDoubleTapped(object sender, TappedEventArgs e)
+    {
+        try
+        {
+            Debug.WriteLine("Double-click detected!");
+
+            if (BindingContext is not BoxNode boxNode)
+            {
+                throw new InvalidOperationException("OnDoubleTapped: BindingContext is not a BoxNode.");
+            }
+
+            if (boxNode.Node is not NodeFunction nodeFunction)
+            {
+                return;
+            }
+        
+            await DisplayPopup(nodeFunction);
+        }
+        catch (Exception exception)
+        {
+            throw new NodeException("OnDoubleTapped: An error occurred.", exception);
+        }
+    }   
+    
+    public async Task DisplayPopup(NodeFunction nodeFunction)
+    {
+        var queryAttributes = new Dictionary<string, object>
+        {
+            [nameof(NodeFunction)] = nodeFunction
+        };
+
+        var popupOptions = new PopupOptions
+        {
+            CanBeDismissedByTappingOutsideOfPopup = false
+        };
+
+        await popupService.ShowPopupAsync<CodeViewModel>(
+            Shell.Current,
+            options: popupOptions,
+            shellParameters: queryAttributes);
+        
+        var codeViewModel = AppService.GetRequiredService<CodeViewModel>();
+
+        if (codeViewModel.HasChangedCode)
+        {
+            nodeFunction.FunctionData.CompileScript();
+        }
+        
     }
 }
 

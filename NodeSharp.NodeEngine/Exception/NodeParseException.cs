@@ -3,7 +3,7 @@ using NodeSharp.NodeEngine.Node;
 
 namespace NodeSharp.NodeEngine.Exception;
 
-public class NodeParseException : System.Exception
+public class NodeParseException : NodeException
 {
     public NodeParseException(BaseNode node, string subNode, System.Exception inner) : base($"Error parsing node: {node.Name}-> {subNode}", inner)
     {

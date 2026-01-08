@@ -10,14 +10,18 @@ public static class FileLogger
 {
     private static readonly NodeIo nodeIo;
     private static readonly string LogPath = Path.Combine(FileSystem.AppDataDirectory, "app_log.txt");
-    private static readonly Dictionary<BaseNode, EventHandler<(BaseNode baseNode, string level, string message, string entry)>> Handlers = new();
+
+    private static readonly
+        Dictionary<BaseNode, EventHandler<(BaseNode baseNode, string level, string message, string entry)>> Handlers =
+            new();
+
     private static readonly StringBuilder MemoryLog = new();
-    
+
     // Subscription: Event that others can subscribe to
     static FileLogger()
     {
         nodeIo = AppService.GetRequiredService<NodeIo>();
-        
+
         nodeIo.Nodes.CollectionChanged += async (s, e) =>
         {
             switch (e.Action)
@@ -27,26 +31,28 @@ public static class FileLogger
                     {
                         foreach (BaseNode addNode in e.NewItems)
                         {
-                            EventHandler<(BaseNode baseNode, string level, string message, string entry)> handler = (sender, tuple) =>
-                            {
-                                // Fire and forget with error handling to avoid async void crashes
-                                _ = Task.Run(async () =>
+                            EventHandler<(BaseNode baseNode, string level, string message, string entry)> handler =
+                                (sender, tuple) =>
                                 {
-                                    try
+                                    // Fire and forget with error handling to avoid async void crashes
+                                    _ = Task.Run(async () =>
                                     {
-                                        await Log($"{tuple.level}: {tuple.baseNode.Name}", tuple.message);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        // Log the exception to a fallback location
-                                        System.Diagnostics.Debug.WriteLine($"Logging failed: {ex.Message}");
-                                    }
-                                });
-                            };
+                                        try
+                                        {
+                                            await Log($"{tuple.level}: {tuple.baseNode.Name}", tuple.message);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            // Log the exception to a fallback location
+                                            System.Diagnostics.Debug.WriteLine($"Logging failed: {ex.Message}");
+                                        }
+                                    });
+                                };
                             Handlers[addNode] = handler;
                             addNode.OnExitNodeMessage += handler;
                         }
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     if (e.OldItems != null)
@@ -59,6 +65,7 @@ public static class FileLogger
                             }
                         }
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Replace:
                     break;
@@ -75,6 +82,7 @@ public static class FileLogger
                             }
                         }
                     }
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -96,17 +104,17 @@ public static class FileLogger
         }
 
         // 3. Notify Subscribers (Real-time updates)
-        // Use MainThread if you intend to update UI directly
-        MainThread.BeginInvokeOnMainThread(() => {
-            OnLogAdded?.Invoke(null, (level, message, entry)); 
-        });
+        OnLogAdded?.Invoke(null, (level, message, entry));
 
         // 4. Save to Disk
         try
         {
             await File.AppendAllTextAsync(LogPath, entry);
         }
-        catch { /* Handle IO errors */ }
+        catch
+        {
+            /* Handle IO errors */
+        }
     }
 
     // Helper to get the full log from memory

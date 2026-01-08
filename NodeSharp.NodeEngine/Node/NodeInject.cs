@@ -36,7 +36,7 @@ public class NodeInject : BaseNode
             storage
         )
     {
-        Repeat = new Repeat("Second", 10, true);
+        Repeat = new Repeat("Second", 10, false);
         ActivateAfter = new ActivateAfter("Second", 1);
         Parameters = new List<Parameter>();
     }
@@ -136,14 +136,16 @@ public class NodeInject : BaseNode
                     {
                         Debug.WriteLine($"Inject: Delay is enabled. Waiting {ActivateAfter.ActivateAfterMilliseconds} milliseconds before execute.");
                         
-                        await Task.Delay(ActivateAfter.ActivateAfterMilliseconds);
+                        var activateAfterMs =  ActivateAfter.Type.ConvertTimeToMilliseconds(ActivateAfter.Value);
+                        await Task.Delay(activateAfterMs);
                     }
                     
                     if (Repeat.IsEnabled)
                     {
                         Debug.WriteLine("Inject: Starting repeating");
-                    
-                        var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(Repeat.Value));
+
+                        var repeatMs =  Repeat.Type.ConvertTimeToMilliseconds(Repeat.Value);
+                        var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(repeatMs));
 
                         try
                         {

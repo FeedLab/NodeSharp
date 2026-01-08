@@ -46,6 +46,7 @@ public static class MauiProgram
         builder.Services.AddScoped<ToolBarViewModel>();
         builder.Services.AddSingleton<CurvedLineDrawable>();
         builder.Services.AddSingleton<LineConnectionManager>();
+        builder.Services.AddSingletonPopup<CodeComponent, CodeViewModel>();
         
         builder.Services.AddTransientPopup<ErrorPopup, ErrorPopupViewModel>();
 
