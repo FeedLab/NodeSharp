@@ -1,6 +1,5 @@
 ﻿using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
-using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.Client;
 

@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using NodeSharp.NodeEngine.Node;
 
-namespace NodeSharp.NodeEngine;
+namespace NodeSharp.Nodes.Common;
 
 public class BaseNodeList : ObservableCollection<BaseNode>
 {

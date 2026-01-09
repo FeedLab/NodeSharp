@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Facet;
-using NodeSharp.NodeEngine.Model;
+using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.Client.ViewModel;
 

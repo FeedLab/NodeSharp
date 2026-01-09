@@ -4,10 +4,11 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using NodeSharp.NodeEngine.Exception;
-using NodeSharp.NodeEngine.Extension;
-using NodeSharp.NodeEngine.Model;
 using NodeSharp.NodeEngine.Node;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Inject;
 
 namespace NodeSharp.NodeEngine;
 
@@ -295,67 +296,4 @@ public class NodeIo(Storage storage)
     }
 }
 
-public class Input(string name, IList<string> connectsToParentNodeId)
-{
-    public string Name { get; } = name;
-    public IList<string> ConnectsToParentNodeId { get; } = connectsToParentNodeId;
-}
 
-public class Output(string name, IList<string> connectsToNodeId)
-{
-    public string Name { get; } = name;
-    public IList<string> ConnectsToNodeId { get; } = connectsToNodeId;
-}
-
-public class ActivateAfter
-{
-    public string Type { get; }
-    public int Value { get; }
-
-    [JsonIgnore] public int ActivateAfterMilliseconds { get; }
-
-    public ActivateAfter(string type, int value)
-    {
-        Type = type;
-        Value = value;
-
-        ActivateAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
-    }
-}
-
-public class Repeat
-{
-    public string Type { get; }
- 
-    public int Value { get; }
-
-    public bool IsEnabled { get; }
-
-    public int RepeatAfterMilliseconds { get; }
-
-    public Repeat(string type, int value, bool isEnabled)
-    {
-        Type = type;
-        Value = value;
-        IsEnabled = isEnabled;
-        
-        RepeatAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
-    }
-
-}
-
-public class Parameter
-{
-    public string Name { get; }
-    public string Type { get; }
-    public string Source { get; }
-    public string Value { get; }
-
-    public Parameter(string name, string type, string source, string value)
-    {
-        Name = name;
-        Type = type;
-        Source = source;
-        Value = value;
-    }
-}

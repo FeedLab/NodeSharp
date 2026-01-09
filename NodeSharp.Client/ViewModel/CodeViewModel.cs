@@ -7,8 +7,8 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
-using NodeSharp.NodeEngine.Helper;
 using NodeSharp.NodeEngine.Node;
+using NodeSharp.Nodes.Common.Helper;
 
 namespace NodeSharp.Client.ViewModel
 {

@@ -1,4 +1,4 @@
-﻿namespace NodeSharp.NodeEngine.Exception;
+﻿namespace NodeSharp.Nodes.Common.Exception;
 
 public class NodeException : System.Exception
 {

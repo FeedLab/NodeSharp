@@ -2,8 +2,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using NodeSharp.NodeEngine.Exception;
-using NodeSharp.NodeEngine.Model;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.NodeEngine.Node;
 
@@ -86,31 +87,25 @@ public class NodeRandomNumber : BaseNode
             EnterNode(this);
         
             await base.RunFromInput(parentNode, parametersJsonString);
-
-            var random = new Random();
             var randomNumber = 0;
-
             if (RandomData.Source.Equals("Fixed", StringComparison.OrdinalIgnoreCase))
             {
-                randomNumber = RandomNumberFromFixedData(random);
+                randomNumber = RandomNumberFromFixedData();
             }
             else if (RandomData.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
             {
-                randomNumber = RandomNumberFromInputData(parametersJsonString, randomNumber, random);
+                randomNumber = RandomNumberFromInputData(parametersJsonString);
             }
             else
             {
                 throw new InvalidOperationException($"NodeRandomNumber '{Name}' has invalid Source: {RandomData.Source}.");
             }
-
             string updatedJsonString;
-
             try
             {
                 var parsed = string.IsNullOrWhiteSpace(parametersJsonString)
                     ? null
                     : JsonNode.Parse(parametersJsonString);
-
                 if (parsed is JsonObject obj)
                 {
                     obj["RandomNumber"] = randomNumber;
@@ -132,62 +127,60 @@ public class NodeRandomNumber : BaseNode
                 throw new InvalidOperationException(
                     $"NodeRandomNumber '{Name}' received invalid JSON from parent '{parentNode.Name}'.", ex);
             }
-
             await SendToConnectedChildrenAsync(updatedJsonString);
-
-            return await Task.FromResult(updatedJsonString);
+            return updatedJsonString;
         }
         finally
         {
             LeaveNode(this);
         }
     }
-
-    private int RandomNumberFromFixedData(Random random)
+    private int RandomNumberFromFixedData()
     {
-        int randomNumber;
         if (RandomData.Max < RandomData.Min)
         {
             throw new InvalidOperationException(
                 $"NodeRandomNumber '{Name}' has invalid range: Min ({RandomData.Min}) must be <= Max ({RandomData.Max}).");
         }
-
-        randomNumber = random.Next(RandomData.Min, RandomData.Max + 1);
-        return randomNumber;
+        return Random.Shared.Next(RandomData.Min, RandomData.Max + 1);
     }
-
-    private int RandomNumberFromInputData(string parametersJsonString, int randomNumber, Random random)
+    private int RandomNumberFromInputData(string parametersJsonString)
     {
         var parsed = string.IsNullOrWhiteSpace(parametersJsonString)
             ? null
             : JsonNode.Parse(parametersJsonString);
 
-        if (parsed is JsonArray parameters)
+        int randomMin, randomMax;
+
+        if (parsed is JsonObject obj)
+        {
+            randomMin = obj["RandomMin"]?.GetValue<int>() ?? throw new InvalidOperationException("Missing 'RandomMin' in input object.");
+            randomMax = obj["RandomMax"]?.GetValue<int>() ?? throw new InvalidOperationException("Missing 'RandomMax' in input object.");
+        }
+        else if (parsed is JsonArray parameters)
         {
             int GetNumber(string name)
             {
                 var param = parameters
                                 .OfType<JsonObject>()
                                 .FirstOrDefault(p => p.ContainsKey(name))
-                            ?? throw new InvalidOperationException($"Missing parameter '{name}'");
-
-                return int.Parse(param[name]!.ToString());
+                            ?? throw new InvalidOperationException($"Missing parameter '{name}' in input array.");
+                return param[name]!.GetValue<int>();
             }
-
-            var randomMin = GetNumber("RandomMin");
-            var randomMax = GetNumber("RandomMax");
-
-
-            if (randomMax < randomMin)
-            {
-                throw new InvalidOperationException(
-                    $"NodeRandomNumber '{Name}' has invalid range: Min ({randomMin}) must be <= Max ({randomMax}).");
-            }
-
-            randomNumber = random.Next(randomMin, randomMax + 1);
+            randomMin = GetNumber("RandomMin");
+            randomMax = GetNumber("RandomMax");
+        }
+        else
+        {
+            throw new InvalidOperationException("Input data is not a valid JSON Object or Array.");
         }
 
-        return randomNumber;
+        if (randomMax < randomMin)
+        {
+            throw new InvalidOperationException(
+                $"NodeRandomNumber '{Name}' has invalid range: Min ({randomMin}) must be <= Max ({randomMax}).");
+        }
+        return Random.Shared.Next(randomMin, randomMax + 1);
     }
 }
 

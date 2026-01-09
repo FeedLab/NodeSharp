@@ -2,9 +2,10 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using NodeSharp.NodeEngine.Exception;
-using NodeSharp.NodeEngine.Extension;
-using NodeSharp.NodeEngine.Model;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.NodeEngine.Node;
 
@@ -96,7 +97,8 @@ public class NodeDelay : BaseNode
                     "milliseconds" => Delay.Value,
                     "seconds" => Delay.Value * 1000,
                     "minutes" => Delay.Value * 60 * 1000,
-                    _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Delay.Type}")
+                    _ => throw new InvalidOperationException(
+                        $"NodeDelay '{this.GetType().Name}' has invalid Type: {Delay.Type}")
                 };
             }
             else if (Delay.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
@@ -108,34 +110,50 @@ public class NodeDelay : BaseNode
 
                 var delayNode = root.GetByPath(Delay.PathToDelayNode) as JsonObject;
 
-                var valueNode = delayNode?[nameof(Delay.Value)];
-                var typeNode = delayNode?[nameof(Type)];
+                if (delayNode == null)
+                {
+                    throw new InvalidOperationException(
+                        $"NodeDelay at path '{Delay.PathToDelayNode}' not found or is not an object.");
+                }
 
-                var delayValue = valueNode?.GetValue<int>()
-                                 ?? throw new InvalidOperationException(
-                                     $"NodeDelay '{Name}' missing or invalid 'Value' at '{Delay.PathToDelayNode}.Value'");
+                int delayValue;
+                try
+                {
+                    delayValue = delayNode[nameof(Delay.Value)]?.GetValue<int>()
+                                 ?? throw new InvalidOperationException("Value node is missing.");
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        $"NodeDelay missing or invalid 'Value' at '{Delay.PathToDelayNode}.Value'", ex);
+                }
 
-                var delayType = typeNode?.GetValue<string>()
-                                ?? throw new InvalidOperationException(
-                                    $"NodeDelay '{Name}' missing or invalid 'Type' at '{Delay.PathToDelayNode}.Type'");
+                string delayType;
+                try
+                {
+                    // Using a string literal or ensuring the correct property name is used
+                    delayType = delayNode["Type"]?.GetValue<string>()
+                                ?? throw new InvalidOperationException("Type node is missing.");
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        $"NodeDelay missing or invalid 'Type' at '{Delay.PathToDelayNode}.Type'", ex);
+                }
 
                 delayMilliseconds = delayType.ConvertTimeToMilliseconds(delayValue);
-
-                // delayMilliseconds = delayType.ToLowerInvariant() switch
-                // {
-                //     "milliseconds" => delayValue,
-                //     "seconds" => delayValue * 1000,
-                //     "minutes" => delayValue * 60 * 1000,
-                //     _ => throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Type: {Delay.Type}")
-                // };
             }
             else
             {
-                throw new InvalidOperationException($"NodeDelay '{Name}' has invalid Source: {Delay.Source}.");
+                throw new InvalidOperationException(
+                    $"NodeDelay '{this.GetType().Name}' has invalid Source: {Delay.Source}.");
             }
 
-            Debug.WriteLine($"NodeDelay '{Name}' delaying for {delayMilliseconds}ms");
-            await Task.Delay(delayMilliseconds);
+            if (delayMilliseconds > 0)
+            {
+                Debug.WriteLine($"NodeDelay '{this.GetType().Name}' delaying for {delayMilliseconds}ms");
+                await Task.Delay(delayMilliseconds);
+            }
 
             await SendToConnectedChildrenAsync(parametersJsonString);
 

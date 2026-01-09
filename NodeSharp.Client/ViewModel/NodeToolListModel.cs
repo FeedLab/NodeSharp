@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Facet.Extensions;
 using Microsoft.Extensions.Logging;
-using NodeSharp.NodeEngine.Model;
+using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.Client.ViewModel;
 

@@ -1,4 +1,4 @@
-﻿namespace NodeSharp.NodeEngine.Model;
+﻿namespace NodeSharp.Nodes.Common.Model;
 
 public class Storage
 {

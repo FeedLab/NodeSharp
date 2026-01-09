@@ -1,10 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Text.Json;
 using CommunityToolkit.Mvvm.Messaging;
-using NodeSharp.Client.Component;
 using NodeSharp.NodeEngine;
-using NodeSharp.NodeEngine.Node;
+using NodeSharp.Nodes.Common;
 
 namespace NodeSharp.Client.ViewModel;
 

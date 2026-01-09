@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using NodeSharp.NodeEngine.Model;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Inject;
 
 namespace NodeSharp.NodeEngine.Node;
 

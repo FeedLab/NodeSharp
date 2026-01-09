@@ -1,12 +1,9 @@
 ﻿using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
 using Newtonsoft.Json;
 
-namespace NodeSharp.NodeEngine.Helper;
+namespace NodeSharp.Nodes.Common.Helper;
 
 public class RoslynHelper(string codeTemplate, string sourceCode)
 {

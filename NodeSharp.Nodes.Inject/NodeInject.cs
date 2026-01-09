@@ -2,11 +2,13 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using NodeSharp.NodeEngine.Exception;
-using NodeSharp.NodeEngine.Extension;
-using NodeSharp.NodeEngine.Model;
+using System.Text.Json.Serialization;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.Model;
 
-namespace NodeSharp.NodeEngine.Node;
+namespace NodeSharp.Nodes.Inject;
 
 public class NodeInject : BaseNode
 {
@@ -295,5 +297,58 @@ public class NodeInject : BaseNode
         }
 
         return value;
+    }
+}
+
+public class ActivateAfter
+{
+    public string Type { get; }
+    public int Value { get; }
+
+    [JsonIgnore] public int ActivateAfterMilliseconds { get; }
+
+    public ActivateAfter(string type, int value)
+    {
+        Type = type;
+        Value = value;
+
+        ActivateAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
+    }
+}
+
+public class Repeat
+{
+    public string Type { get; }
+ 
+    public int Value { get; }
+
+    public bool IsEnabled { get; }
+
+    public int RepeatAfterMilliseconds { get; }
+
+    public Repeat(string type, int value, bool isEnabled)
+    {
+        Type = type;
+        Value = value;
+        IsEnabled = isEnabled;
+        
+        RepeatAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
+    }
+
+}
+
+public class Parameter
+{
+    public string Name { get; }
+    public string Type { get; }
+    public string Source { get; }
+    public string Value { get; }
+
+    public Parameter(string name, string type, string source, string value)
+    {
+        Name = name;
+        Type = type;
+        Source = source;
+        Value = value;
     }
 }

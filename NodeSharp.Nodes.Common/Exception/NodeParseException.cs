@@ -1,7 +1,4 @@
-﻿using System.Text.Json;
-using NodeSharp.NodeEngine.Node;
-
-namespace NodeSharp.NodeEngine.Exception;
+﻿namespace NodeSharp.Nodes.Common.Exception;
 
 public class NodeParseException : NodeException
 {

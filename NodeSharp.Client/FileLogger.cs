@@ -3,6 +3,7 @@ using System.Text;
 using NodeSharp.Client.Services;
 using NodeSharp.NodeEngine;
 using NodeSharp.NodeEngine.Node;
+using NodeSharp.Nodes.Common;
 
 namespace NodeSharp.Client;
 

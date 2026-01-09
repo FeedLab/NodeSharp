@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace NodeSharp.NodeEngine.Model;
+namespace NodeSharp.Nodes.Common.Model;
 
 public class NodeInformation(string typeId, bool activateOnStart, bool isEnabled, string information, string symbol, int numberOfInputs, int numberOfOutputs)
 {

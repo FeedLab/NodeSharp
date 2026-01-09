@@ -84,35 +84,35 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NodeSharp.NodeEngine\NodeSharp.NodeEngine.csproj" />
+        <ProjectReference Include="..\NodeSharp.NodeEngine\NodeSharp.NodeEngine.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Syncfusion.Maui.Core">
-        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.core\32.1.20\lib\net10.0-android36.0\Syncfusion.Maui.Core.dll</HintPath>
-      </Reference>
-      <Reference Include="Syncfusion.Maui.ListView">
-        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.listview\32.1.21\lib\net10.0-ios26.0\Syncfusion.Maui.ListView.dll</HintPath>
-      </Reference>
+        <Reference Include="Syncfusion.Maui.Core">
+            <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.core\32.1.20\lib\net10.0-android36.0\Syncfusion.Maui.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="Syncfusion.Maui.ListView">
+            <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.listview\32.1.21\lib\net10.0-ios26.0\Syncfusion.Maui.ListView.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Nodes.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+        <None Update="Nodes.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-      <MauiXaml Update="Component\BoxAnchorRightComponent.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
+        <MauiXaml Update="Component\BoxAnchorRightComponent.xaml">
+            <SubType>Designer</SubType>
+        </MauiXaml>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Component\BoxAnchorRightComponent.xaml.cs">
-        <DependentUpon>BoxAnchorRightComponent.xaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+        <Compile Update="Component\BoxAnchorRightComponent.xaml.cs">
+            <DependentUpon>BoxAnchorRightComponent.xaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
 </Project>

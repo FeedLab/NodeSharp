@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using NodeSharp.Client.Component;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
-using NodeSharp.NodeEngine.Model;
+using NodeSharp.Nodes.Common.Model;
 using Syncfusion.Maui.Core.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
 

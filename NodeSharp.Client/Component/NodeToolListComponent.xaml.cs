@@ -3,7 +3,6 @@ using CommunityToolkit.Maui.Storage;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
-using NodeSharp.NodeEngine.Model;
 using Syncfusion.Maui.ListView;
 
 namespace NodeSharp.Client.Component;

@@ -1,9 +1,7 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
-using NodeSharp.NodeEngine.Node;
+using NodeSharp.Nodes.Common;
 
 namespace NodeSharp.Client.ViewModel;
 
@@ -109,7 +107,7 @@ public partial class BoxNode : ObservableObject
         
         InputNodes.Clear();
 
-        var inputs = Node.Inputs;
+        var inputs = this.Node.Inputs;
         var verticalStep = (Height - fromVerticalMargin) / (inputs.Count + 1);
         var yPositionDelta = (fromVerticalMargin / 2) + (verticalStep / 2);
 
