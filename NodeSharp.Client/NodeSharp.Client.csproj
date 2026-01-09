@@ -91,6 +91,9 @@
       <Reference Include="Syncfusion.Maui.Core">
         <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.core\32.1.20\lib\net10.0-android36.0\Syncfusion.Maui.Core.dll</HintPath>
       </Reference>
+      <Reference Include="Syncfusion.Maui.ListView">
+        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.listview\32.1.21\lib\net10.0-ios26.0\Syncfusion.Maui.ListView.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
     <ItemGroup>

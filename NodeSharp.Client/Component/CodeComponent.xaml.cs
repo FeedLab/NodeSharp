@@ -20,5 +20,13 @@ public partial class CodeComponent : ContentView
         InitializeComponent();
 
         this.BindingContext = viewModel;
+
+        viewModel.LogMessages.CollectionChanged += (s, e) =>
+        {
+            if (viewModel.LogMessages.Count > 0)
+            {
+                LogList.ScrollTo(viewModel.LogMessages.Count - 1, ScrollToPosition.End, true);
+            }
+        };
     }
 }

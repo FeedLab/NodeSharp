@@ -44,7 +44,7 @@ public class RoslynHelper(string codeTemplate, string sourceCode)
         return compilation;
     }
 
-    public string GetDiagnostics()
+    public List<string> GetDiagnostics()
     {
         if (compilation is null)
         {
@@ -53,36 +53,35 @@ public class RoslynHelper(string codeTemplate, string sourceCode)
 
         HasCompilerError = false;
         HasCompilerWarning = false;
-        
+
         using var ms = new MemoryStream();
         var result = compilation.Emit(ms);
 
-        var sb = new StringBuilder();
+        var diagnostics = new List<string>();
         if (!result.Success)
         {
             // Diagnostics contain errors and warnings
             foreach (var diagnostic in result.Diagnostics
                          .Where(d => d.Severity == DiagnosticSeverity.Error))
             {
-                sb.AppendLine($"Error: {diagnostic.Id} - {diagnostic.GetMessage()}");
+                diagnostics.Add($"Error: {diagnostic.Id} - {diagnostic.GetMessage()}");
                 HasCompilerError = true;
             }
 
             foreach (var diagnostic in result.Diagnostics
                          .Where(d => d.Severity == DiagnosticSeverity.Warning))
             {
-                sb.AppendLine($"Warning: {diagnostic.Id} - {diagnostic.GetMessage()}");
+                diagnostics.Add($"Warning: {diagnostic.Id} - {diagnostic.GetMessage()}");
                 HasCompilerWarning = true;
             }
         }
         else
         {
-            sb.AppendLine("Compilation succeeded!");
+            diagnostics.Add("Compilation succeeded!");
         }
-        
-        return sb.ToString();
-    }
 
+        return diagnostics;
+    }
 
 
     public MethodInfo? GetExecutionMethod()
@@ -112,7 +111,7 @@ public class RoslynHelper(string codeTemplate, string sourceCode)
 
         return method;
     }
-    
+
     public bool HasCompilerWarning { get; set; }
 
     public bool HasCompilerError { get; set; }

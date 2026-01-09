@@ -2,16 +2,25 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                          xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:component="using:NodeSharp.Client.Component"
+             xmlns:listView="http://schemas.syncfusion.com/maui"
+             xmlns:converter="using:NodeSharp.Client.Converter"
 
              x:Class="NodeSharp.Client.Component.CodeComponent">
+    
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <converter:LogLevelToColorConverter x:Key="LogLevelToColorConverter" />
+        </ResourceDictionary>
+    </ContentView.Resources>
 
     <Grid
-        WidthRequest="700"
-        HeightRequest="500"
-        HorizontalOptions="Fill" 
-          VerticalOptions="Fill" 
-          Margin="8">
+        WidthRequest="900"
+        HeightRequest="900"
+        HorizontalOptions="Fill"
+        VerticalOptions="Fill"
+        Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -21,25 +30,65 @@
                FontAttributes="Bold"
                FontSize="Medium"
                HorizontalOptions="Center"
-               Margin="0,0,0,8"/>
-        <Editor Grid.Row="1"
-                x:Name="CodeEditor"
-                HorizontalOptions="Fill" VerticalOptions="Fill"
-                FontFamily="Courier New"
-                FontSize="14"
-                AutoSize="TextChanges"
-                Text="{Binding CodeText, Mode=TwoWay}"
-                BackgroundColor="LightGray"
-                TextColor="Black"
-                Margin="0"/>
+               Margin="0,0,0,8" />
         
-        <Grid Grid.Row="2" HorizontalOptions="End">
+        <Grid Grid.Row="1"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70*" />
+                <RowDefinition Height="30*" />
+            </Grid.RowDefinitions>
+
+            <Editor Grid.Row="0"
+                    x:Name="CodeEditor"
+                    HorizontalOptions="Fill" VerticalOptions="Fill"
+                    FontFamily="Courier New"
+                    FontSize="14"
+                    AutoSize="TextChanges"
+                    Text="{Binding CodeText, Mode=TwoWay}"
+                    BackgroundColor="LightGray"
+                    TextColor="Black"
+                    Margin="0" />
+
+            <listView:SfListView
+                Grid.Row="1"
+                ItemsSource="{Binding LogMessages}"
+                x:Name="LogList"
+                AutoFitMode="Height"
+                SelectionMode="None">
+                <listView:SfListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Orientation="Horizontal" Padding="4">
+                            <Label Text="{Binding Timestamp, StringFormat='[{0:HH:mm:ss}]'}"
+                                   VerticalOptions="Center"
+                                   TextColor="Gray"
+                                   FontFamily="Consolas" />
+                            <Label Text="{Binding Level}"
+                                   VerticalOptions="Center"
+                                   TextColor="{Binding Level, Converter={StaticResource LogLevelToColorConverter}}"
+                                   FontAttributes="Bold"
+                                   Margin="8,0,0,0" />
+                            <Label Text="{Binding Message}"
+                                   VerticalOptions="Center"
+                                   TextColor="Black"
+                                   FontFamily="Consolas"
+                                   Margin="8,0,0,0" />
+                        </StackLayout>
+                    </DataTemplate>
+                </listView:SfListView.ItemTemplate>
+            </listView:SfListView>
+
+        </Grid>
+
+
+        <Grid Grid.Row="2" HorizontalOptions="End" HeightRequest="64">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            
+
             <buttons:SfButton
                 Grid.Column="0"
                 Margin="8"
@@ -47,7 +96,7 @@
                 Background="DarkRed"
                 Command="{Binding CancelCommand}"
                 ToolTipProperties.Text="Cancel" />
-            
+
             <buttons:SfButton
                 Grid.Column="1"
                 Margin="8"

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using NodeSharp.NodeEngine.Helper;
 using NodeSharp.NodeEngine.Node;
 
@@ -14,16 +16,25 @@ namespace NodeSharp.Client.ViewModel
         "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
     [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
         "MVVMTK0034:Direct field reference to [ObservableProperty] backing field")]
-    public partial class CodeViewModel(IPopupService popupService) : ObservableObject, IQueryAttributable
+    [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.RelayCommandGenerator",
+        "MVVMTK0007:Invalid RelayCommand method signature")]
+    public partial class CodeViewModel(IPopupService popupService)
+        : ObservableObject, IQueryAttributable
     {
         [ObservableProperty] private NodeFunction? selectedNodeFunction;
         [ObservableProperty] private string codeText = string.Empty;
         [ObservableProperty] private bool isSaveEnabled;
         [ObservableProperty] private bool hasCompilerError;
+        [ObservableProperty] private bool hasBeenValidated;
         [ObservableProperty] private string? compilerOutput;
 
         private string codeTextOriginal = string.Empty;
+        [ObservableProperty] private ObservableCollection<LogEntry> logMessages = [];
 
+        public void AddLog(string message, string level = "Info")
+        {
+            LogMessages.Add(new LogEntry { Message = message, Level = level });
+        }
 
         [RelayCommand(CanExecute = nameof(CanSave))]
         async Task Save()
@@ -43,8 +54,9 @@ namespace NodeSharp.Client.ViewModel
         {
             if (selectedNodeFunction is not null)
             {
-                CompilerOutput = "";
+                // CompilerOutput = "";
                 HasCompilerError = false;
+                HasBeenValidated = false;
 
                 var roslynHelper = new RoslynHelper(FunctionData.MessageTemplate, CodeText);
                 var cSharpCompilation = roslynHelper.CompileScript();
@@ -52,8 +64,12 @@ namespace NodeSharp.Client.ViewModel
 
                 if (roslynHelper.HasCompilerError || roslynHelper.HasCompilerWarning)
                 {
-                    HasCompilerError = true;
-                    CompilerOutput = diagnostics;
+                    HasCompilerError = roslynHelper.HasCompilerError;
+                    // CompilerOutput = diagnostics;
+                    foreach (var diagnostic in diagnostics)
+                    {
+                        AddLog(diagnostic, "Error");
+                    }
                 }
             }
         }
@@ -68,6 +84,11 @@ namespace NodeSharp.Client.ViewModel
             }
 
             if (HasCompilerError)
+            {
+                IsSaveEnabled = false;
+            }
+
+            if (!HasBeenValidated)
             {
                 IsSaveEnabled = false;
             }
@@ -101,12 +122,16 @@ namespace NodeSharp.Client.ViewModel
 
             UpdateToolbarCommandStates();
         }
-        
+
         public bool HasChangedCode => CodeText != codeTextOriginal;
 
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
+            LogMessages.Clear();
+            codeTextOriginal = string.Empty;
+            HasBeenValidated = false;
+            HasCompilerError = false;
             SelectedNodeFunction = (NodeFunction)query[nameof(NodeFunction)];
 
             if (SelectedNodeFunction is not null)
@@ -115,6 +140,8 @@ namespace NodeSharp.Client.ViewModel
                 codeTextOriginal = SelectedNodeFunction.FunctionData.SourceCode;
 
                 UpdateToolbarCommandStates();
+
+                AddLog("System initialized...");
             }
         }
 
@@ -125,4 +152,12 @@ namespace NodeSharp.Client.ViewModel
             ValidateCommand.NotifyCanExecuteChanged();
         }
     }
+    
+    public class LogEntry
+    {
+        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public string Level { get; set; } = "Info"; // Info, Warning, Error
+        public string Message { get; set; } = string.Empty;
+    }
+
 }

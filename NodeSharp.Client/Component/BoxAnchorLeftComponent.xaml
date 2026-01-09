@@ -30,7 +30,7 @@
                     VerticalOptions="Fill"
                     IsClippedToBounds="False"
                     InputTransparent="False"
-                    BackgroundColor="BurlyWood">
+                    BackgroundColor="Transparent">
     </AbsoluteLayout>
 
 </ContentView>

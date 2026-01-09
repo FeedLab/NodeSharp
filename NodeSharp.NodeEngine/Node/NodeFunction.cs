@@ -163,7 +163,7 @@ public class FunctionData
     }
 
     /*START_USER_CODE*/
-    public FunctionData(string sourceCode = "msg.extraInfo = \"added at runtime\";")
+    public FunctionData(string sourceCode = "msg.extraInfo = \"added at runtime\";\n\rmsg.number = new ExpandoObject();\n\rmsg.number.data = 123;")
     {
         SourceCode = sourceCode;
         

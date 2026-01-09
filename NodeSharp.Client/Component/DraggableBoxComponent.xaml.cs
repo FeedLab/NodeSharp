@@ -250,8 +250,8 @@ public partial class DraggableBoxComponent : ContentView
         {
             var boxView = new BoxView
             {
-                WidthRequest = 6,  // Make it larger for easier interaction
-                HeightRequest = 6,
+                WidthRequest = 10,  // Make it larger for easier interaction
+                HeightRequest = 10,
                 Color = Colors.Black,
                 InputTransparent = false,  // Explicitly enable input
                 AnchorX = 0.5,
@@ -316,8 +316,8 @@ public partial class DraggableBoxComponent : ContentView
         {
             var boxView = new BoxView
             {
-                WidthRequest = 6,
-                HeightRequest = 6,
+                WidthRequest = 10,
+                HeightRequest = 10,
                 Color = Colors.Black,
                 InputTransparent = false,
                 AnchorX = 0.5,
