@@ -1,4 +1,7 @@
-﻿namespace NodeSharp.Nodes.Common.Extension;
+﻿using System;
+using System.Linq;
+
+namespace NodeSharp.Nodes.Common.Extension;
 
 public static class StringExtension
 {

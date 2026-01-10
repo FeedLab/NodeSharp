@@ -1,7 +1,15 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
+using CommunityToolkit.Maui;
+using Microsoft.Maui.Controls;
+using NodeSharp.Client.Services;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Model;
 
@@ -14,6 +22,8 @@ public abstract class BaseNode
     public event EventHandler<BaseNode>? OnEnterNode;
     public event EventHandler<BaseNode>? OnLeaveNode;
 
+    protected readonly IPopupService PopupService;
+    
     protected CancellationTokenSource Cts;
 
     [JsonIgnore] private BaseNodeList Nodes { get; }
@@ -26,6 +36,8 @@ public abstract class BaseNode
     public int Y { get; set; }
     public IList<Output> Outputs { get; }
     public IList<Input> Inputs { get; }
+    
+    public ContentView? NodeConfigurePopup { get; set; }
 
     protected BaseNode(
         BaseNodeList nodes,
@@ -39,6 +51,16 @@ public abstract class BaseNode
         Storage storage)
     {
         Cts = new CancellationTokenSource();
+        PopupService = AppService.GetRequiredService<IPopupService>();
+
+        if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeInformation))
+        {
+            NodeConfigurePopup = nodeInformation.NodeConfigurePopup;
+        }
+        else
+        {
+            throw new InvalidOperationException($"Node type not found: {name}");
+        }
         
         if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeType))
         {
@@ -82,6 +104,18 @@ public abstract class BaseNode
         List<Output> outputs,
         List<Input> inputs)
     {
+        var storage = AppService.GetRequiredService<Storage>();
+        PopupService = AppService.GetRequiredService<IPopupService>();
+        
+        if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeInformation))
+        {
+            NodeConfigurePopup = nodeInformation.NodeConfigurePopup;
+        }
+        else
+        {
+            throw new InvalidOperationException($"Node type not found: {name}");
+        }
+        
         Cts = new CancellationTokenSource();
         
         Nodes = nodes;
@@ -99,6 +133,10 @@ public abstract class BaseNode
     public void Abort()
     {
         Cts?.Cancel();
+    }
+
+    public virtual async Task DisplayNodeConfigurationPopup()
+    {
     }
     
     protected virtual void ExitNodeMessage(BaseNode baseNode, string level, string message, string entry)

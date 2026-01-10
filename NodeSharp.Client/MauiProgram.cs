@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using NodeSharp.Client.Component;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
 using Syncfusion.Maui.Core.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
@@ -40,7 +42,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<NodeToolListModel>();
         builder.Services.AddSingleton<DebugViewModel>();
         builder.Services.AddSingleton<DiagramViewModel>();
-        builder.Services.AddScoped<NodeInformationModel>();
         builder.Services.AddScoped<MainPageModel>();
         builder.Services.AddSingleton<NodeIo>();
         builder.Services.AddScoped<ToolBarViewModel>();
@@ -50,10 +51,25 @@ public static class MauiProgram
         
         builder.Services.AddTransientPopup<ErrorPopup, ErrorPopupViewModel>();
 
+        RegisterDynamicNodes(builder);
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
 
+
         return builder.Build();
+    }
+
+    private static void RegisterDynamicNodes(MauiAppBuilder builder)
+    {
+        var types = AssemblyHelper.FindImplementations<INodeSharp>(AppContext.BaseDirectory);
+
+        foreach (var type in types)
+        {
+            var instance = (INodeSharp)Activator.CreateInstance(type)!;
+
+            instance.Register(builder.Services);
+        }
     }
 }

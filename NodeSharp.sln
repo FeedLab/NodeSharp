@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeSharp.Nodes.Inject", "N
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeSharp.Nodes.Common", "NodeSharp.Nodes.Common\NodeSharp.Nodes.Common.csproj", "{E889584E-FF48-4510-92F8-76B06CCF95C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeSharp.Nodes.Random", "NodeSharp.Nodes.Random\NodeSharp.Nodes.Random.csproj", "{6BF585AB-1996-464C-9C6B-D7F12D5CBDBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,9 +40,14 @@ Global
 		{E889584E-FF48-4510-92F8-76B06CCF95C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E889584E-FF48-4510-92F8-76B06CCF95C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E889584E-FF48-4510-92F8-76B06CCF95C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF585AB-1996-464C-9C6B-D7F12D5CBDBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF585AB-1996-464C-9C6B-D7F12D5CBDBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF585AB-1996-464C-9C6B-D7F12D5CBDBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF585AB-1996-464C-9C6B-D7F12D5CBDBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FD5C58DA-C1F6-45FE-A260-3A4E6C60CC4C} = {897AB28B-58DD-45D3-B5DD-250B3F49F231}
 		{E889584E-FF48-4510-92F8-76B06CCF95C9} = {897AB28B-58DD-45D3-B5DD-250B3F49F231}
+		{6BF585AB-1996-464C-9C6B-D7F12D5CBDBC} = {897AB28B-58DD-45D3-B5DD-250B3F49F231}
 	EndGlobalSection
 EndGlobal

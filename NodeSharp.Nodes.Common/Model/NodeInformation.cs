@@ -1,10 +1,13 @@
 ﻿using System.Text;
+using Microsoft.Maui.Controls;
 
 namespace NodeSharp.Nodes.Common.Model;
 
-public class NodeInformation(string typeId, bool activateOnStart, bool isEnabled, string information, string symbol, int numberOfInputs, int numberOfOutputs)
+public class NodeInformation(string typeId, string runtimeType, bool activateOnStart, bool isEnabled, string information, string symbol, int numberOfInputs, int numberOfOutputs) : INodeInformation
 {
     public string TypeId { get; set; } = typeId;
+
+    public string RuntimeType { get; set; } = runtimeType;
     public bool ActivateOnStart { get; set; } = activateOnStart;
     public bool IsEnabled { get; set; } = isEnabled;
     public string? Information { get; set; } = information;
@@ -16,6 +19,8 @@ public class NodeInformation(string typeId, bool activateOnStart, bool isEnabled
     
     public bool HasInformationText => !string.IsNullOrWhiteSpace(Information);
 
+    public ContentView NodeConfigurePopup { get; set; }
+    
     public override string ToString()
     {
         var sb = new StringBuilder();

@@ -5,7 +5,7 @@ using NodeSharp.Nodes.Common.Model;
 namespace NodeSharp.Client.ViewModel;
 
 [Facet(typeof(NodeInformation))]
-public partial class NodeInformationModel : ObservableObject
+public partial class NodeInformationModelOld : ObservableObject
 {
     // [ObservableProperty] private string typeId;
     // [ObservableProperty] private string activateOnStart;

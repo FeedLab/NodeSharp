@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
@@ -18,13 +18,38 @@
 
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageReference Include="Facet" Version="5.2.0" />
-        <PackageReference Include="Facet.Extensions" Version="5.2.0" />
+        <PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
+        <PackageReference Include="Facet" Version="5.3.2" />
+        <PackageReference Include="Facet.Extensions" Version="5.3.2" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\NodeSharp.Nodes.Common\NodeSharp.Nodes.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="CodeComponent.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="CodeComponent.xaml.cs">
+        <DependentUpon>CodeComponent.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Syncfusion.Maui.Buttons">
+        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.buttons\32.1.21\lib\net10.0-maccatalyst26.0\Syncfusion.Maui.Buttons.dll</HintPath>
+      </Reference>
+      <Reference Include="Syncfusion.Maui.ListView">
+        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.listview\32.1.21\lib\net10.0-ios26.0\Syncfusion.Maui.ListView.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

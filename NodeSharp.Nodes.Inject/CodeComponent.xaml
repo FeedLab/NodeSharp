@@ -3,11 +3,10 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
-             xmlns:component="using:NodeSharp.Client.Component"
              xmlns:listView="http://schemas.syncfusion.com/maui"
              xmlns:converter="clr-namespace:NodeSharp.Nodes.Common.Converter;assembly=NodeSharp.Nodes.Common"
 
-             x:Class="NodeSharp.Client.Component.CodeComponent">
+             x:Class="NodeSharp.Nodes.Inject.CodeComponent">
     
     <ContentView.Resources>
         <ResourceDictionary>
@@ -32,55 +31,6 @@
                HorizontalOptions="Center"
                Margin="0,0,0,8" />
         
-        <Grid Grid.Row="1"
-              HorizontalOptions="Fill"
-              VerticalOptions="Fill">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="70*" />
-                <RowDefinition Height="30*" />
-            </Grid.RowDefinitions>
-
-            <Editor Grid.Row="0"
-                    x:Name="CodeEditor"
-                    HorizontalOptions="Fill" VerticalOptions="Fill"
-                    FontFamily="Courier New"
-                    FontSize="14"
-                    AutoSize="TextChanges"
-                    Text="{Binding CodeText, Mode=TwoWay}"
-                    BackgroundColor="LightGray"
-                    TextColor="Black"
-                    Margin="0" />
-
-            <listView:SfListView
-                Grid.Row="1"
-                ItemsSource="{Binding LogMessages}"
-                x:Name="LogList"
-                AutoFitMode="Height"
-                SelectionMode="None">
-                <listView:SfListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackLayout Orientation="Horizontal" Padding="4">
-                            <Label Text="{Binding Timestamp, StringFormat='[{0:HH:mm:ss}]'}"
-                                   VerticalOptions="Center"
-                                   TextColor="Gray"
-                                   FontFamily="Consolas" />
-                            <Label Text="{Binding Level}"
-                                   VerticalOptions="Center"
-                                   TextColor="{Binding Level, Converter={StaticResource LogLevelToColorConverter}}"
-                                   FontAttributes="Bold"
-                                   Margin="8,0,0,0" />
-                            <Label Text="{Binding Message}"
-                                   VerticalOptions="Center"
-                                   TextColor="Black"
-                                   FontFamily="Consolas"
-                                   Margin="8,0,0,0" />
-                        </StackLayout>
-                    </DataTemplate>
-                </listView:SfListView.ItemTemplate>
-            </listView:SfListView>
-
-        </Grid>
-
 
         <Grid Grid.Row="2" HorizontalOptions="End" HeightRequest="64">
             <Grid.ColumnDefinitions>

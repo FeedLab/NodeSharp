@@ -3,6 +3,7 @@ using CommunityToolkit.Maui.Storage;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
+using NodeSharp.Nodes.Common.Model;
 using Syncfusion.Maui.ListView;
 
 namespace NodeSharp.Client.Component;
@@ -172,7 +173,7 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
     private void OnDragStarting(object sender, DragStartingEventArgs e)
     {
         var border = (Element)sender;
-        var nodeInfo = (NodeInformationModel)border.BindingContext;
+        var nodeInfo = (INodeInformation)border.BindingContext;
 
         // Package the data so the DropGestureRecognizer can see it
         e.Data.Properties.Add("Data", nodeInfo);

@@ -8,6 +8,7 @@
              xmlns:toolkit="clr-namespace:Syncfusion.Maui.Toolkit;assembly=Syncfusion.Maui.Toolkit"
              xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
              xmlns:component="using:NodeSharp.Client.Component"
+             xmlns:model="using:NodeSharp.Nodes.Common.Model"
              x:Class="NodeSharp.Client.Component.NodeToolListComponent">
 
     <Border Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray" StrokeShape="RoundRectangle 1">
@@ -70,7 +71,7 @@
                 ItemSize="100"
                 ItemDragging="OnItemDragging">
                 <syncfusion:SfListView.ItemTemplate>
-                    <DataTemplate x:DataType="viewModel:NodeInformationModel">
+                    <DataTemplate x:DataType="model:INodeInformation">
                         <Border Margin="6, 3, 6, 3" Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray"
                                 StrokeShape="RoundRectangle 5">
                             <Border.GestureRecognizers>

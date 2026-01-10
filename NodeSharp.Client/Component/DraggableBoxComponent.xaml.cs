@@ -10,6 +10,7 @@ using NodeSharp.Client.Extension;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine.Node;
+using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 
 namespace NodeSharp.Client.Component;
@@ -367,12 +368,16 @@ public partial class DraggableBoxComponent : ContentView
                 throw new InvalidOperationException("OnDoubleTapped: BindingContext is not a BoxNode.");
             }
 
-            if (boxNode.Node is not NodeFunction nodeFunction)
+            if (boxNode.Node is NodeFunction nodeFunction)
             {
+                await DisplayPopup(nodeFunction);
                 return;
             }
-        
-            await DisplayPopup(nodeFunction);
+
+            if (boxNode.Node.NodeConfigurePopup is not null)
+            {
+                await boxNode.Node.DisplayNodeConfigurationPopup();
+            }
         }
         catch (Exception exception)
         {

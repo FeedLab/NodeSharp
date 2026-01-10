@@ -10,6 +10,7 @@ using Microsoft.Maui.Layouts;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
+using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.Client.Component;
 
@@ -262,7 +263,7 @@ public partial class DiagramViewComponent : ContentView
         // Get the dropped data (NodeInformationModel from ListView)
         var data = e.Data.Properties["Data"];
 
-        if (data is NodeInformationModel nodeInfo)
+        if (data is INodeInformation nodeInfo)
         {
             if (nodeInfo is null)
             {

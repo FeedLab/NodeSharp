@@ -22,12 +22,13 @@
         <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.0.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 
 
     <ItemGroup>
       <ProjectReference Include="..\NodeSharp.Nodes.Inject\NodeSharp.Nodes.Inject.csproj" />
+      <ProjectReference Include="..\NodeSharp.Nodes.Random\NodeSharp.Nodes.Random.csproj" />
     </ItemGroup>
 
 </Project>

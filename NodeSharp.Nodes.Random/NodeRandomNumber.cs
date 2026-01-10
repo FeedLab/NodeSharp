@@ -1,12 +1,13 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Random.ViewModel;
 
-namespace NodeSharp.NodeEngine.Node;
+namespace NodeSharp.Nodes.Random;
 
 public class NodeRandomNumber : BaseNode
 {
@@ -142,7 +143,7 @@ public class NodeRandomNumber : BaseNode
             throw new InvalidOperationException(
                 $"NodeRandomNumber '{Name}' has invalid range: Min ({RandomData.Min}) must be <= Max ({RandomData.Max}).");
         }
-        return Random.Shared.Next(RandomData.Min, RandomData.Max + 1);
+        return System.Random.Shared.Next(RandomData.Min, RandomData.Max + 1);
     }
     private int RandomNumberFromInputData(string parametersJsonString)
     {
@@ -180,7 +181,30 @@ public class NodeRandomNumber : BaseNode
             throw new InvalidOperationException(
                 $"NodeRandomNumber '{Name}' has invalid range: Min ({randomMin}) must be <= Max ({randomMax}).");
         }
-        return Random.Shared.Next(randomMin, randomMax + 1);
+        return System.Random.Shared.Next(randomMin, randomMax + 1);
+    }
+    
+    public override async Task DisplayNodeConfigurationPopup()
+    {
+        if (NodeConfigurePopup is null)
+        {
+            return;
+        }
+        
+        var queryAttributes = new Dictionary<string, object>
+        {
+            [nameof(NodeRandomNumber)] = this
+        };
+
+        var popupOptions = new PopupOptions
+        {
+            CanBeDismissedByTappingOutsideOfPopup = false
+        };
+
+        await PopupService.ShowPopupAsync<RandomConfigurePopupViewModel>(
+            Shell.Current,
+            options: popupOptions,
+            shellParameters: queryAttributes);
     }
 }
 

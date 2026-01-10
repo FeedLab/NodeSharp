@@ -3,10 +3,12 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Inject.ViewModel;
 
 namespace NodeSharp.Nodes.Inject;
 
@@ -297,6 +299,31 @@ public class NodeInject : BaseNode
         }
 
         return value;
+    }
+
+    public string NodeName { get; } = "Inject";
+
+    public override async Task DisplayNodeConfigurationPopup()
+    {
+        if (NodeConfigurePopup is null)
+        {
+            return;
+        }
+        
+        var queryAttributes = new Dictionary<string, object>
+        {
+            [nameof(NodeInject)] = this
+        };
+
+        var popupOptions = new PopupOptions
+        {
+            CanBeDismissedByTappingOutsideOfPopup = false
+        };
+
+        await PopupService.ShowPopupAsync<InjectViewModel>(
+            Shell.Current,
+            options: popupOptions,
+            shellParameters: queryAttributes);
     }
 }
 
