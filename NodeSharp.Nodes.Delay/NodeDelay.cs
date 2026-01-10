@@ -7,7 +7,7 @@ using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
 
-namespace NodeSharp.NodeEngine.Node;
+namespace NodeSharp.Nodes.Delay;
 
 public class NodeDelay : BaseNode
 {

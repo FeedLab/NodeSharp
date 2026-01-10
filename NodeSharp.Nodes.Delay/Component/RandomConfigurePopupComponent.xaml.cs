@@ -1,15 +1,14 @@
 ﻿using NodeSharp.Client.Services;
-using NodeSharp.Nodes.Random.ViewModel;
 
-namespace NodeSharp.Nodes.Random.Component;
+namespace NodeSharp.Nodes.Delay.Component;
 
-public partial class RandomConfigurePopupComponent : ContentView
+public partial class DelayConfigurePopupComponent : ContentView
 {
-    private RandomConfigurePopupViewModel viewModel;
+    private DelayConfigurePopupViewModel viewModel;
 
-    public RandomConfigurePopupComponent()
+    public DelayConfigurePopupComponent()
     {
-        viewModel = AppService.GetRequiredService<RandomConfigurePopupViewModel>();
+        viewModel = AppService.GetRequiredService<DelayConfigurePopupViewModel>();
 
 
         InitializeComponent();

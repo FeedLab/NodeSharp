@@ -1,4 +1,4 @@
-﻿namespace NodeSharp.Nodes.Debug;
+﻿namespace NodeSharp.Nodes.Debug.Platforms.iOS;
 
 // All the code in this file is only included on iOS.
 public class PlatformClass1

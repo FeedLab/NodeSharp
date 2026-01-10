@@ -1,19 +1,16 @@
 ﻿using NodeSharp.Client.Services;
-using NodeSharp.Nodes.Random.ViewModel;
 
-namespace NodeSharp.Nodes.Random.Component;
+namespace NodeSharp.Nodes.Debug.Component;
 
-public partial class RandomConfigurePopupComponent : ContentView
+public partial class DebugConfigurePopupComponent : ContentView
 {
-    private RandomConfigurePopupViewModel viewModel;
-
-    public RandomConfigurePopupComponent()
+    public DebugConfigurePopupComponent()
     {
-        viewModel = AppService.GetRequiredService<RandomConfigurePopupViewModel>();
+        var viewModel1 = AppService.GetRequiredService<DebugConfigurePopupViewModel>();
 
 
         InitializeComponent();
 
-        this.BindingContext = viewModel;
+        this.BindingContext = viewModel1;
     }
 }

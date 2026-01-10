@@ -1,13 +1,13 @@
 ﻿using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
-using NodeSharp.Nodes.Inject.ViewModel;
+using NodeSharp.Nodes.Delay.Component;
 
-namespace NodeSharp.Nodes.Inject;
+namespace NodeSharp.Nodes.Delay;
 
 public class Startup : INodeSharp
 {
     public void Register(IServiceCollection services)
     {
-        services.AddSingletonPopup<CodeComponent, InjectViewModel>();
+        services.AddSingletonPopup<DelayConfigurePopupComponent, DelayConfigurePopupViewModel>();
     }
 }

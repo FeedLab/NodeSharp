@@ -1,11 +1,9 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Model;
-using NodeSharp.Nodes.Inject;
 
-namespace NodeSharp.NodeEngine.Node;
+namespace NodeSharp.Nodes.Debug;
 
 public class NodeDebug : BaseNode
 {
@@ -50,7 +48,7 @@ public class NodeDebug : BaseNode
             base.RunFromInput(parentNode, parametersJsonString);
             OutputJsonMessage = parametersJsonString;
 
-            Debug.WriteLine($"{Name}: {parametersJsonString}");
+            System.Diagnostics.Debug.WriteLine($"{Name}: {parametersJsonString}");
 
             ExitNodeMessage(this, "Output", parametersJsonString, Name);
 

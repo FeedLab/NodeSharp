@@ -1,8 +1,6 @@
-﻿using CommunityToolkit.Maui;
-using NodeSharp.Nodes.Common;
-using NodeSharp.Nodes.Inject.ViewModel;
+﻿using NodeSharp.Nodes.Common;
 
-namespace NodeSharp.Nodes.Inject;
+namespace NodeSharp.Nodes.Debug;
 
 public class Startup : INodeSharp
 {
