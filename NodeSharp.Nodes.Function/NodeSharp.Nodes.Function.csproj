@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
@@ -16,7 +16,6 @@
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
     </PropertyGroup>
 
-
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
@@ -25,29 +24,17 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NodeSharp.Nodes.Common\NodeSharp.Nodes.Common.csproj" />
+        <ProjectReference Include="..\NodeSharp.Nodes.Common\NodeSharp.Nodes.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <MauiXaml Update="CodeComponent.xaml">
-        <SubType>Designer</SubType>
-      </MauiXaml>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="CodeComponent.xaml.cs">
-        <DependentUpon>CodeComponent.xaml</DependentUpon>
+      <Compile Update="Component\FunctionConfigurePopupComponent.xaml.cs">
         <SubType>Code</SubType>
       </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Syncfusion.Maui.Buttons">
-        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.buttons\32.1.21\lib\net10.0-maccatalyst26.0\Syncfusion.Maui.Buttons.dll</HintPath>
-      </Reference>
-      <Reference Include="Syncfusion.Maui.ListView">
-        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.listview\32.1.21\lib\net10.0-ios26.0\Syncfusion.Maui.ListView.dll</HintPath>
-      </Reference>
+      <Compile Update="Component\RandomConfigurePopupComponent.xaml.cs">
+        <DependentUpon>RandomConfigurePopupComponent.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 
 </Project>

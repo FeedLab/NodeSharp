@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:listView="http://schemas.syncfusion.com/maui"
+             xmlns:converter="clr-namespace:NodeSharp.Nodes.Common.Converter;assembly=NodeSharp.Nodes.Common"
+
+             x:Class="NodeSharp.Nodes.Function.Component.FunctionConfigurePopupComponent">
+    
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <converter:LogLevelToColorConverter x:Key="LogLevelToColorConverter" />
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <Grid
+        WidthRequest="900"
+        HeightRequest="900"
+        HorizontalOptions="Fill"
+        VerticalOptions="Fill"
+        Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Text="Code Editor"
+               FontAttributes="Bold"
+               FontSize="Medium"
+               HorizontalOptions="Center"
+               Margin="0,0,0,8" />
+        
+
+        <Grid Grid.Row="2" HorizontalOptions="End" HeightRequest="64">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <buttons:SfButton
+                Grid.Column="0"
+                Margin="8"
+                Text="Cancel"
+                Background="DarkRed"
+                Command="{Binding CancelCommand}"
+                ToolTipProperties.Text="Cancel" />
+
+            <buttons:SfButton
+                Grid.Column="1"
+                Margin="8"
+                Text="Save"
+                Background="DarkGreen"
+                Command="{Binding SaveCommand}"
+                IsEnabled="{Binding IsSaveEnabled}"
+                ToolTipProperties.Text="Save" />
+
+            <buttons:SfButton
+                Grid.Column="2"
+                Margin="8"
+                Text="Validate"
+                Background="DarkBlue"
+                Command="{Binding ValidateCommand}"
+                IsEnabled="{Binding IsSaveEnabled}"
+                ToolTipProperties.Text="Validate" />
+        </Grid>
+    </Grid>
+</ContentView>

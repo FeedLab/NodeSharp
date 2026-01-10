@@ -5,15 +5,13 @@ namespace NodeSharp.Nodes.Inject;
 
 public partial class CodeComponent : ContentView
 {
-    private InjectViewModel viewModel;
-
     public CodeComponent()
     {
-        viewModel = AppService.GetRequiredService<InjectViewModel>();
+        var viewModel1 = AppService.GetRequiredService<InjectViewModel>();
 
 
         InitializeComponent();
 
-        this.BindingContext = viewModel;
+        this.BindingContext = viewModel1;
     }
 }

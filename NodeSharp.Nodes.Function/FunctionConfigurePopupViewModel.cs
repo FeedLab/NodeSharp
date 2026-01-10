@@ -1,17 +1,20 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using NodeSharp.Nodes.Common.Helper;
 
-namespace NodeSharp.Nodes.Inject.ViewModel
+namespace NodeSharp.Nodes.Function
 {
-    public partial class InjectViewModel(IPopupService popupService)
-        : ObservableObject, IQueryAttributable
+    public partial class FunctionConfigurePopupViewModel : ObservableObject, IQueryAttributable
     {
-        [ObservableProperty] private NodeInject? selectedNode;
+        [ObservableProperty] private NodeFunction? selectedNode;
         [ObservableProperty] private bool isSaveEnabled;
+        private readonly IPopupService popupService;
+
+        /// <inheritdoc/>
+        public FunctionConfigurePopupViewModel(IPopupService popupService)
+        {
+            this.popupService = popupService;
+        }
 
         [RelayCommand(CanExecute = nameof(CanSave))]
         async Task Save()
@@ -37,7 +40,7 @@ namespace NodeSharp.Nodes.Inject.ViewModel
         
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            SelectedNode = (NodeInject)query[nameof(NodeInject)];
+            SelectedNode = (NodeFunction)query[nameof(NodeFunction)];
         }
     }
 }

@@ -19,7 +19,7 @@ public class NodeInformation(string typeId, string runtimeType, bool activateOnS
     
     public bool HasInformationText => !string.IsNullOrWhiteSpace(Information);
 
-    public ContentView NodeConfigurePopup { get; set; }
+    public ContentView? NodeConfigurePopup { get; }
     
     public override string ToString()
     {

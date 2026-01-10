@@ -6,7 +6,7 @@ using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
 
-namespace NodeSharp.NodeEngine.Node;
+namespace NodeSharp.Nodes.Function;
 
 public class NodeFunction : BaseNode
 {
@@ -64,20 +64,13 @@ public class NodeFunction : BaseNode
             inputs
         )
     {
-        try
+        if (!nodeElement.TryGetProperty("FunctionData", out var functionProp) ||
+            functionProp.ValueKind != JsonValueKind.Object)
         {
-            if (!nodeElement.TryGetProperty("FunctionData", out var functionProp) ||
-                functionProp.ValueKind != JsonValueKind.Object)
-            {
-                throw new InvalidOperationException("FunctionData object not found or invalid");
-            }
+            throw new InvalidOperationException("FunctionData object not found or invalid");
+        }
 
-            FunctionData = new FunctionData(functionProp);
-        }
-        catch (System.Exception e)
-        {
-            //   throw new NodeParseException(this, nameof(functionData), e);
-        }
+        FunctionData = new FunctionData(functionProp);
     }
 
     public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
@@ -140,7 +133,7 @@ public class FunctionData
         roslynHelper.CompileScript();
         method = roslynHelper.GetExecutionMethod();
     }
-    
+
     public FunctionData(JsonElement element)
     {
         var existsSourceCode = element.TryGetProperty("SourceCode", out var sourceProp);
@@ -159,10 +152,12 @@ public class FunctionData
     }
 
     /*START_USER_CODE*/
-    public FunctionData(string sourceCode = "msg.extraInfo = \"added at runtime\";\n\rmsg.number = new ExpandoObject();\n\rmsg.number.data = 123;")
+    public FunctionData(
+        string sourceCode =
+            "msg.extraInfo = \"added at runtime\";\n\rmsg.number = new ExpandoObject();\n\rmsg.number.data = 123;")
     {
         SourceCode = sourceCode;
-        
+
         Task.Run(CompileScript);
     }
 }

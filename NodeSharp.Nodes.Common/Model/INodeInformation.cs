@@ -14,5 +14,5 @@ public interface INodeInformation
     int NumberOfOutputs { get; set; }
     bool HasInformationText { get; }
     
-    ContentView NodeConfigurePopup { get; }
+    ContentView? NodeConfigurePopup { get; }
 }
