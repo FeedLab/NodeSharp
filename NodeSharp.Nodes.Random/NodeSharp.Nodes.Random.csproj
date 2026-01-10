@@ -22,9 +22,8 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
-        <PackageReference Include="Facet" Version="5.3.2" />
-        <PackageReference Include="Facet.Extensions" Version="5.3.2" />
-    </ItemGroup>
+		<PackageReference Include="Syncfusion.Maui.Buttons" Version="32.1.22" />
+	</ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\NodeSharp.Nodes.Common\NodeSharp.Nodes.Common.csproj" />

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
 using NodeSharp.Client.Extension;
 using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
-using NodeSharp.NodeEngine.Node;
-using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 
 namespace NodeSharp.Client.Component;
@@ -368,11 +363,11 @@ public partial class DraggableBoxComponent : ContentView
                 throw new InvalidOperationException("OnDoubleTapped: BindingContext is not a BoxNode.");
             }
 
-            if (boxNode.Node is NodeFunction nodeFunction)
-            {
-                await DisplayPopup(nodeFunction);
-                return;
-            }
+            // if (boxNode.Node is NodeFunction nodeFunction)
+            // {
+            //     await DisplayPopup(nodeFunction);
+            //     return;
+            // }
 
             if (boxNode.Node.NodeConfigurePopup is not null)
             {
@@ -385,31 +380,31 @@ public partial class DraggableBoxComponent : ContentView
         }
     }   
     
-    public async Task DisplayPopup(NodeFunction nodeFunction)
-    {
-        var queryAttributes = new Dictionary<string, object>
-        {
-            [nameof(NodeFunction)] = nodeFunction
-        };
-
-        var popupOptions = new PopupOptions
-        {
-            CanBeDismissedByTappingOutsideOfPopup = false
-        };
-
-        await popupService.ShowPopupAsync<CodeViewModel>(
-            Shell.Current,
-            options: popupOptions,
-            shellParameters: queryAttributes);
-        
-        var codeViewModel = AppService.GetRequiredService<CodeViewModel>();
-
-        if (codeViewModel.HasChangedCode)
-        {
-            nodeFunction.FunctionData.CompileScript();
-        }
-        
-    }
+    // public async Task DisplayPopup(NodeFunction nodeFunction)
+    // {
+    //     var queryAttributes = new Dictionary<string, object>
+    //     {
+    //         [nameof(NodeFunction)] = nodeFunction
+    //     };
+    //
+    //     var popupOptions = new PopupOptions
+    //     {
+    //         CanBeDismissedByTappingOutsideOfPopup = false
+    //     };
+    //
+    //     await popupService.ShowPopupAsync<CodeViewModel>(
+    //         Shell.Current,
+    //         options: popupOptions,
+    //         shellParameters: queryAttributes);
+    //     
+    //     var codeViewModel = AppService.GetRequiredService<CodeViewModel>();
+    //
+    //     if (codeViewModel.HasChangedCode)
+    //     {
+    //         nodeFunction.FunctionData.CompileScript();
+    //     }
+    //     
+    // }
 }
 
 public class NodeDraggingStatus

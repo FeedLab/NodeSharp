@@ -3,9 +3,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
-             xmlns:listView="http://schemas.syncfusion.com/maui"
              xmlns:converter="clr-namespace:NodeSharp.Nodes.Common.Converter;assembly=NodeSharp.Nodes.Common"
-
              x:Class="NodeSharp.Nodes.Inject.CodeComponent">
     
     <ContentView.Resources>

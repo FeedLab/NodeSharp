@@ -1,9 +1,11 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace NodeSharp.Nodes.Delay
 {
+    [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
     public partial class DelayConfigurePopupViewModel : ObservableObject, IQueryAttributable
     {
         [ObservableProperty] private NodeDelay? selectedNode;

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Logging;
-using NodeSharp.NodeEngine.Node;
 using NodeSharp.Nodes.Common.Helper;
+using NodeSharp.Nodes.Function;
 
 namespace NodeSharp.Client.ViewModel
 {
