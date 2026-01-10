@@ -1,4 +1,4 @@
-﻿using NodeSharp.Client.Services;
+﻿using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Function.Component;
 

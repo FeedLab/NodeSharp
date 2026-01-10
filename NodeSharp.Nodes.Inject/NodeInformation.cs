@@ -20,8 +20,8 @@ public class NodeInformation : INodeInformation
     }
 
 
-    public NodeInformation() : this("Inject", "NodeInject", true, true,
-        "cybersecurity, where attackers inject malicious code into applications", "\ue713", 0, 1, new CodeComponent())
+    public NodeInformation() : this("NodeInject", "NodeInject", true, true,
+        "cybersecurity, where attackers inject malicious code into applications", "\ue713", 0, 1, new InjectConfigurePopupComponent())
     {
     }
 

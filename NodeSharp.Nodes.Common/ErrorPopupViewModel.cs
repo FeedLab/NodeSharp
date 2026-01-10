@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 
-namespace NodeSharp.Client.ViewModel;
+namespace NodeSharp.Nodes.Common;
 
 
 public partial class ErrorPopupViewModel : ObservableObject, IQueryAttributable

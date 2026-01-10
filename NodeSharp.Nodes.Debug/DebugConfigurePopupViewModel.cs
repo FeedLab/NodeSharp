@@ -4,17 +4,10 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace NodeSharp.Nodes.Debug
 {
-    public partial class DebugConfigurePopupViewModel : ObservableObject, IQueryAttributable
+    public partial class DebugConfigurePopupViewModel(IPopupService popupService) : ObservableObject, IQueryAttributable
     {
         [ObservableProperty] private NodeDebug? selectedNode;
         [ObservableProperty] private bool isSaveEnabled;
-        private readonly IPopupService popupService;
-
-        /// <inheritdoc/>
-        public DebugConfigurePopupViewModel(IPopupService popupService)
-        {
-            this.popupService = popupService;
-        }
 
         [RelayCommand(CanExecute = nameof(CanSave))]
         async Task Save()

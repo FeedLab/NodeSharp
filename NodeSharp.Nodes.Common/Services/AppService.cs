@@ -1,8 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Maui;
-
-namespace NodeSharp.Client.Services
+﻿namespace NodeSharp.Nodes.Common.Services
 {
     public static class AppService
     {

@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using CommunityToolkit.Maui.Storage;
-using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Common.Services;
 using Syncfusion.Maui.ListView;
 
 namespace NodeSharp.Client.Component;

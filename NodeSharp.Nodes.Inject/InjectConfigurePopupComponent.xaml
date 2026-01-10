@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
              xmlns:converter="clr-namespace:NodeSharp.Nodes.Common.Converter;assembly=NodeSharp.Nodes.Common"
-             x:Class="NodeSharp.Nodes.Inject.CodeComponent">
+             x:Class="NodeSharp.Nodes.Inject.InjectConfigurePopupComponent">
     
     <ContentView.Resources>
         <ResourceDictionary>
@@ -14,7 +14,7 @@
 
     <Grid
         WidthRequest="900"
-        HeightRequest="900"
+        HeightRequest="700"
         HorizontalOptions="Fill"
         VerticalOptions="Fill"
         Margin="8">
@@ -23,7 +23,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Text="Code Editor"
+        <Label Text="Inject Node Configuration"
                FontAttributes="Bold"
                FontSize="Medium"
                HorizontalOptions="Center"
@@ -53,15 +53,6 @@
                 Command="{Binding SaveCommand}"
                 IsEnabled="{Binding IsSaveEnabled}"
                 ToolTipProperties.Text="Save" />
-
-            <buttons:SfButton
-                Grid.Column="2"
-                Margin="8"
-                Text="Validate"
-                Background="DarkBlue"
-                Command="{Binding ValidateCommand}"
-                IsEnabled="{Binding IsSaveEnabled}"
-                ToolTipProperties.Text="Validate" />
         </Grid>
     </Grid>
 </ContentView>

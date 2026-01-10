@@ -1,11 +1,11 @@
-﻿using NodeSharp.Client.Services;
+﻿using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Inject.ViewModel;
 
 namespace NodeSharp.Nodes.Inject;
 
-public partial class CodeComponent : ContentView
+public partial class InjectConfigurePopupComponent : ContentView
 {
-    public CodeComponent()
+    public InjectConfigurePopupComponent()
     {
         var viewModel1 = AppService.GetRequiredService<InjectViewModel>();
 

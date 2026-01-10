@@ -14,8 +14,8 @@
     </ContentView.Resources>
 
     <Grid
-        WidthRequest="900"
-        HeightRequest="900"
+        WidthRequest="700"
+        HeightRequest="400"
         HorizontalOptions="Fill"
         VerticalOptions="Fill"
         Margin="8">
@@ -24,12 +24,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Text="Code Editor"
-               FontAttributes="Bold"
-               FontSize="Medium"
-               HorizontalOptions="Center"
-               Margin="0,0,0,8" />
-        
+       
 
         <Grid Grid.Row="2" HorizontalOptions="End" HeightRequest="64">
             <Grid.ColumnDefinitions>
@@ -54,15 +49,6 @@
                 Command="{Binding SaveCommand}"
                 IsEnabled="{Binding IsSaveEnabled}"
                 ToolTipProperties.Text="Save" />
-
-            <buttons:SfButton
-                Grid.Column="2"
-                Margin="8"
-                Text="Validate"
-                Background="DarkBlue"
-                Command="{Binding ValidateCommand}"
-                IsEnabled="{Binding IsSaveEnabled}"
-                ToolTipProperties.Text="Validate" />
         </Grid>
     </Grid>
 </ContentView>

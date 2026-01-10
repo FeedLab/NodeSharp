@@ -30,13 +30,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <MauiXaml Update="CodeComponent.xaml">
+      <MauiXaml Update="InjectConfigurePopupComponent.xaml">
         <SubType>Designer</SubType>
       </MauiXaml>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="CodeComponent.xaml.cs">
+      <Compile Update="InjectConfigurePopupComponent.xaml.cs">
         <DependentUpon>CodeComponent.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>

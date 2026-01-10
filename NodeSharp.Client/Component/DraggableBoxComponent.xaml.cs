@@ -3,10 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
-using NodeSharp.Client.Extension;
-using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Client.Component;
 

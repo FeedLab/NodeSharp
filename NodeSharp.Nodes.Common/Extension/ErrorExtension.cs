@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Maui;
-using NodeSharp.Client.Services;
-using NodeSharp.Client.ViewModel;
+using NodeSharp.Nodes.Common.Services;
 
-namespace NodeSharp.Client.Extension;
+namespace NodeSharp.Nodes.Common.Extension;
 
 public static class ErrorExtension
 {
@@ -12,7 +11,7 @@ public static class ErrorExtension
     {
     }
 
-    public static async Task ShowPopupAsync(this Exception exception, string label = "Error")
+    public static async Task ShowPopupAsync(this System.Exception exception, string label = "Error")
     {
         var queryAttributes = new Dictionary<string, object>
         {

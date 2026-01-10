@@ -1,4 +1,4 @@
-﻿using NodeSharp.Client.Services;
+﻿using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Random.ViewModel;
 
 namespace NodeSharp.Nodes.Random.Component;

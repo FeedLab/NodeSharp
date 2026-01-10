@@ -9,9 +9,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Maui;
 using Microsoft.Maui.Controls;
-using NodeSharp.Client.Services;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Common;
 

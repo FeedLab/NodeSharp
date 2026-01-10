@@ -1,7 +1,4 @@
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Layouts;
-
-namespace NodeSharp.Client.Extension;
+namespace NodeSharp.Nodes.Common.Extension;
 
 public static class VisualElementExtensions
 {
