@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:syncfusion="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+             xmlns:viewModel="clr-namespace:NodeSharp.Nodes.Inject.ViewModel"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             x:Class="NodeSharp.Nodes.Inject.Component.NodeInjectParameterComponent">
+
+    <syncfusion:SfDataGrid
+        ItemsSource="{Binding Items}"
+        AutoGenerateColumnsMode="None"
+        AllowEditing="True"
+        EditTapAction="OnTap"
+        SelectionMode="Single"
+        VerticalOptions="Fill">
+
+        <syncfusion:SfDataGrid.Columns>
+            <!-- Column 0: Name (Text Input) -->
+            <syncfusion:DataGridTextColumn
+                MappingName="Name"
+                HeaderText="Name"
+                AllowEditing="True"
+                Width="150" />
+
+            <!-- Column 1: Source (ComboBox with 3 items) -->
+            <syncfusion:DataGridComboBoxColumn
+                MappingName="Source"
+                HeaderText="Source"
+                AllowEditing="True"
+                ShowClearButton="False"
+                Width="150"
+                ItemsSource="{Binding SourceOptions}" />
+
+            <!-- Column 2: Type (ComboBox - read-only when not editable) -->
+            <syncfusion:DataGridComboBoxColumn
+                MappingName="Type"
+                HeaderText="Type"
+                AllowEditing="True"
+                ShowClearButton="False"
+                Width="150"
+                ItemsSource="{Binding TypeOptions}" />
+
+            <!-- Column 3: Value (Template for per-row visibility) -->
+            <syncfusion:DataGridTemplateColumn
+                MappingName="Value"
+                HeaderText="Value"
+                AllowEditing="True"
+                Width="150">
+                <syncfusion:DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding Value}"
+                               VerticalOptions="Center"
+                               Margin="8,0"
+                               IsVisible="{Binding IsValueVisible}" />
+                    </DataTemplate>
+                </syncfusion:DataGridTemplateColumn.CellTemplate>
+                <syncfusion:DataGridTemplateColumn.EditTemplate>
+                    <DataTemplate>
+                        <Entry Text="{Binding Value, Mode=TwoWay}"
+                               VerticalOptions="Center"
+                               IsVisible="{Binding IsValueVisible}"
+                               IsEnabled="{Binding IsValueVisible}" />
+                    </DataTemplate>
+                </syncfusion:DataGridTemplateColumn.EditTemplate>
+            </syncfusion:DataGridTemplateColumn>
+        </syncfusion:SfDataGrid.Columns>
+    </syncfusion:SfDataGrid>
+</ContentView>

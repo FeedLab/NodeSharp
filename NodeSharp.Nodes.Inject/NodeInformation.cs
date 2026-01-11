@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Inject.Component;
 
 namespace NodeSharp.Nodes.Inject;
 

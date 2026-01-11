@@ -10,12 +10,19 @@ namespace NodeSharp.Nodes.Inject.ViewModel
         [ObservableProperty] private bool isSaveEnabled;
         [ObservableProperty] private bool allowNull;
         [ObservableProperty] private decimal delayValue;
+        [ObservableProperty] private string timeScaleDelay;
+        [ObservableProperty] private string timeScaleInterval;
+        
+        
         private readonly IPopupService popupService;
 
         /// <inheritdoc/>
         public InjectViewModel(IPopupService popupService)
         {
             this.popupService = popupService;
+
+            TimeScaleDelay = "None";
+            TimeScaleInterval = "None";
         }
 
         [RelayCommand(CanExecute = nameof(CanSave))]

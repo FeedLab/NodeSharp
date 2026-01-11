@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:syncfusion="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             xmlns:converter="clr-namespace:NodeSharp.Nodes.Common.Converter;assembly=NodeSharp.Nodes.Common"
+             xmlns:components="clr-namespace:NodeSharp.Nodes.Common.Components;assembly=NodeSharp.Nodes.Common"
+             xmlns:component="clr-namespace:NodeSharp.Nodes.Inject.Component"
+             x:Class="NodeSharp.Nodes.Inject.Component.InjectConfigurePopupComponent">
+
+    <Grid
+        HorizontalOptions="Fill"
+        VerticalOptions="Fill"
+        Padding="0"
+        RowSpacing="16"
+        Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label Text="Inject Node Configuration"
+               FontAttributes="Bold"
+               FontSize="Medium"
+               HorizontalOptions="Center"
+               Margin="0,0,0,0" />
+
+        <Grid
+            Grid.Row="1"
+            RowSpacing="24"
+            VerticalOptions="Start"
+            HorizontalOptions="Start">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <components:LabeledBorder
+                Grid.Row="1"
+                LabelText="A flow may have a delay before activation"
+                Stroke="Gray"
+                StrokeThickness="1"
+                BackgroundColor="Transparent"
+                LabelForeground="Black"
+                CornerRadius="8">
+                <components:LabeledBorder.InnerContent>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="240" />
+                            <ColumnDefinition Width="240" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <core:SfTextInputLayout
+                            Grid.Row="0"
+                            Margin="4,6,4,6"
+                            Hint="Delay length"
+                            HelperText="Enter a numeric value for delay"
+                            ContainerType="Outlined">
+
+                            <syncfusion:SfNumericEntry
+                                VerticalOptions="Start"
+                                HorizontalOptions="Start"
+                                CustomFormat="#0"
+                                BackgroundColor="Transparent"
+                                ValueChangeMode="OnKeyFocus"
+                                ShowBorder="False"
+                                Minimum="0"
+                                Maximum="9999"
+                                AllowNull="{Binding AllowNull}" FontSize="16"
+                                Value="{Binding DelayValue,Mode=TwoWay}" />
+                        </core:SfTextInputLayout>
+
+                        <core:SfTextInputLayout Grid.Column="1"
+                                                Margin="4,6,4,6"
+                                                Hint="Time scale"
+                                                HelperText="Enter time scale for the delay"
+
+                                                ContainerType="Outlined">
+                            <editors:SfComboBox
+                                IsClearButtonVisible="false"
+                                IsEditable="False"
+                                SelectedItem="{Binding TimeScaleDelay}">
+                                <editors:SfComboBox.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>None</x:String>
+                                        <x:String>Millisecond</x:String>
+                                        <x:String>Second</x:String>
+                                        <x:String>Minute</x:String>
+                                        <x:String>Hour</x:String>
+                                        <x:String>Day</x:String>
+                                        <x:String>Month</x:String>
+                                        <x:String>Year</x:String>
+                                    </x:Array>
+                                </editors:SfComboBox.ItemsSource>
+                            </editors:SfComboBox>
+                        </core:SfTextInputLayout>
+
+                    </Grid>
+                </components:LabeledBorder.InnerContent>
+            </components:LabeledBorder>
+
+            <components:LabeledBorder
+                Grid.Row="2"
+                LabelText="A flow can be configured to run in intervals"
+                Stroke="Gray"
+                StrokeThickness="1"
+                BackgroundColor="Transparent"
+                LabelForeground="Black"
+                CornerRadius="8">
+                <components:LabeledBorder.InnerContent>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="240" />
+                            <ColumnDefinition Width="240" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <core:SfTextInputLayout
+                            Grid.Row="0"
+                            Margin="4,6,4,6"
+                            Hint="Interval length"
+                            HelperText="Enter a numeric value for intervals"
+                            ContainerType="Outlined">
+
+                            <syncfusion:SfNumericEntry
+                                VerticalOptions="Start"
+                                HorizontalOptions="Start"
+                                CustomFormat="#0"
+                                BackgroundColor="Transparent"
+                                ValueChangeMode="OnKeyFocus"
+                                ShowBorder="False"
+                                Minimum="0"
+                                Maximum="9999"
+                                AllowNull="{Binding AllowNull}" FontSize="16"
+                                Value="{Binding DelayValue,Mode=TwoWay}" />
+                        </core:SfTextInputLayout>
+
+                        <core:SfTextInputLayout Grid.Column="1"
+                                                Margin="4,6,4,6"
+                                                Hint="Time scale"
+                                                HelperText="Enter time scale for the intervals"
+
+                                                ContainerType="Outlined">
+                            <editors:SfComboBox
+                                IsClearButtonVisible="false"
+                                SelectedItem="{Binding TimeScaleInterval}">
+                                <editors:SfComboBox.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>None</x:String>
+                                        <x:String>Millisecond</x:String>
+                                        <x:String>Second</x:String>
+                                        <x:String>Minute</x:String>
+                                        <x:String>Hour</x:String>
+                                        <x:String>Day</x:String>
+                                        <x:String>Month</x:String>
+                                        <x:String>Year</x:String>
+                                    </x:Array>
+                                </editors:SfComboBox.ItemsSource>
+                            </editors:SfComboBox>
+                        </core:SfTextInputLayout>
+
+                    </Grid>
+                </components:LabeledBorder.InnerContent>
+            </components:LabeledBorder>
+
+            <components:LabeledBorder
+                Grid.Row="3"
+                LabelText="Specify parameters you want to send out from injection node"
+                Stroke="Gray"
+                StrokeThickness="1"
+                BackgroundColor="Transparent"
+                LabelForeground="Black"
+                CornerRadius="8">
+                <components:LabeledBorder.InnerContent>
+                    <component:NodeInjectParameterComponent Margin="8"/>
+                </components:LabeledBorder.InnerContent>
+            </components:LabeledBorder>
+        </Grid>
+
+
+        <Grid Grid.Row="2" HorizontalOptions="End" HeightRequest="64">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <buttons:SfButton
+                Grid.Column="0"
+                Margin="8"
+                Text="Cancel"
+                Background="DarkRed"
+                Command="{Binding CancelCommand}"
+                ToolTipProperties.Text="Cancel" />
+
+            <buttons:SfButton
+                Grid.Column="1"
+                Margin="8"
+                Text="Save"
+                Background="DarkGreen"
+                Command="{Binding SaveCommand}"
+                IsEnabled="{Binding IsSaveEnabled}"
+                ToolTipProperties.Text="Save" />
+        </Grid>
+    </Grid>
+</ContentView>
