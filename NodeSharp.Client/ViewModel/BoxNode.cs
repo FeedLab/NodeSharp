@@ -129,7 +129,7 @@ public partial class BoxNode : ObservableObject
         var outputs = Node.Outputs;
         var availableHeight = Height - verticalMargin;
         var verticalStep = availableHeight / (outputs.Count + 1);
-        var yPositionDelta = (verticalMargin / 2);
+        // var yPositionDelta = (verticalMargin / 2);
         var index = 1;
         foreach (var output in outputs)
         {

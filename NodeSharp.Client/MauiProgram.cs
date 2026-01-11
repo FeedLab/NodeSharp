@@ -7,6 +7,7 @@ using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Common.ViewModels;
 using Syncfusion.Maui.Core.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
 

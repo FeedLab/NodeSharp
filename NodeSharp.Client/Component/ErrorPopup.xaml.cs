@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Maui;
-using NodeSharp.Client.ViewModel;
+﻿using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Services;
+using NodeSharp.Nodes.Common.ViewModels;
 
 namespace NodeSharp.Client.Component;
 

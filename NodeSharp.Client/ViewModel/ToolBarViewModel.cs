@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.ViewModels;
 
 namespace NodeSharp.Client.ViewModel;
 
@@ -71,7 +72,7 @@ public partial class ToolBarViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            throw; // TODO handle exception
+           throw new Exception("Save: error during save process.", exception);
         }
     }
 

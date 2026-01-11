@@ -19,10 +19,10 @@ public partial class DraggableBoxComponent : ContentView
     private readonly CurvedLineDrawable curvedLineDrawable;
     private readonly IPopupService popupService;
 
-    public static readonly BindableProperty XProperty =
+    public new static readonly BindableProperty XProperty =
         BindableProperty.Create(nameof(X), typeof(double), typeof(DraggableBoxComponent), 0.0);
 
-    public static readonly BindableProperty YProperty =
+    public new static readonly BindableProperty YProperty =
         BindableProperty.Create(nameof(Y), typeof(double), typeof(DraggableBoxComponent), 0.0);
 
     public static readonly BindableProperty TextProperty =
@@ -34,13 +34,13 @@ public partial class DraggableBoxComponent : ContentView
     public static readonly BindableProperty IsHoveredProperty =
         BindableProperty.Create(nameof(IsHovered), typeof(bool), typeof(DraggableBoxComponent), false);
 
-    public double X
+    public new double X
     {
         get => (double)GetValue(XProperty);
         set => SetValue(XProperty, value);
     }
 
-    public double Y
+    public new double Y
     {
         get => (double)GetValue(YProperty);
         set => SetValue(YProperty, value);

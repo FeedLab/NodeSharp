@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace ManualNodeDisplayTest;
+﻿namespace ManualNodeDisplayTest;
 
 public partial class App : Application
 {
@@ -14,10 +12,18 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        return new Window(new AppShell()
+        //return new Window(new AppShell()
+        //{
+        //    WidthRequest = 1600,
+        //    HeightRequest = 800,
+        //});
+
+        var window = new Window(new AppShell())
         {
-            WidthRequest = 1600,
-            HeightRequest = 800,
-        });
+            Width = 800,
+            Height = 1024
+        };
+
+        return window;
     }
 }

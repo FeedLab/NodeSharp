@@ -1,17 +1,22 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using NodeSharp.Nodes.Common.Helper;
 
 namespace NodeSharp.Nodes.Inject.ViewModel
 {
-    public partial class InjectViewModel(IPopupService popupService)
-        : ObservableObject, IQueryAttributable
+    public partial class InjectViewModel : ObservableObject, IQueryAttributable
     {
         [ObservableProperty] private NodeInject? selectedNode;
         [ObservableProperty] private bool isSaveEnabled;
+        [ObservableProperty] private bool allowNull;
+        [ObservableProperty] private decimal delayValue;
+        private readonly IPopupService popupService;
+
+        /// <inheritdoc/>
+        public InjectViewModel(IPopupService popupService)
+        {
+            this.popupService = popupService;
+        }
 
         [RelayCommand(CanExecute = nameof(CanSave))]
         async Task Save()

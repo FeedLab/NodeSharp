@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Facet.Extensions;
 using Microsoft.Extensions.Logging;
 using NodeSharp.Nodes.Common.Model;
 

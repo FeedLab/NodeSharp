@@ -10,23 +10,23 @@ namespace NodeSharp.Nodes.Debug
         [ObservableProperty] private bool isSaveEnabled;
 
         [RelayCommand(CanExecute = nameof(CanSave))]
-        async Task Save()
+        private async Task Save()
         {
             await popupService.ClosePopupAsync(Shell.Current);
         }
 
         [RelayCommand(CanExecute = nameof(CanCancel))]
-        async Task Cancel()
+        private async Task Cancel()
         {
             await popupService.ClosePopupAsync(Shell.Current);
         }
 
-        bool CanSave()
+        private bool CanSave()
         {
             return false;
         }
 
-        bool CanCancel()
+        private bool CanCancel()
         {
             return true;
         }

@@ -1,8 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
@@ -121,62 +118,56 @@ public class NodeIo(Storage storage)
     }
 
 
-    public T? FindNodeFromId<T>(string id) where T : BaseNode => nodes.OfType<T>().SingleOrDefault(x => x.Id == id);
+    // public T? FindNodeFromId<T>(string id) where T : BaseNode => nodes.OfType<T>().SingleOrDefault(x => x.Id == id);
 
     void ParseNodesFromJson(JsonElement jsonElement)
     {
         foreach (var nodeElement in jsonElement.EnumerateArray())
         {
-            try
+            var id = GetProperty(nodeElement, "Id").GetString()!;
+            var typeId = GetProperty(nodeElement, "TypeId").GetString()!;
+            var name = GetProperty(nodeElement, "Name").GetString()!;
+            var xPosition = TryGetProperty(nodeElement, "X", out var xProp) &&
+                            xProp.ValueKind == JsonValueKind.Number
+                ? xProp.GetInt32()
+                : 100;
+
+            var yPosition = TryGetProperty(nodeElement, "Y", out var yProp) &&
+                            yProp.ValueKind == JsonValueKind.Number
+                ? yProp.GetInt32()
+                : 100;
+
+            var isEnabled = ReadBool(nodeElement, preferredPropertyName: "IsEnabled",
+                fallbackPropertyName: "Enabled");
+            var activateOnStart = TryGetProperty(nodeElement, "ActivateOnStart", out var activateOnStartProp) &&
+                                  activateOnStartProp.ValueKind == JsonValueKind.True;
+
+            var outputs = ParseOutputs(GetProperty(nodeElement, "Outputs"));
+            var inputs = ParseInputs(GetProperty(nodeElement, "Inputs"));
+
+
+            BaseNode node = typeId switch
             {
-                var id = GetProperty(nodeElement, "Id").GetString()!;
-                var typeId = GetProperty(nodeElement, "TypeId").GetString()!;
-                var name = GetProperty(nodeElement, "Name").GetString()!;
-                var xPosition = TryGetProperty(nodeElement, "X", out var xProp) &&
-                                xProp.ValueKind == JsonValueKind.Number
-                    ? xProp.GetInt32()
-                    : 100;
+                "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, true, xPosition,
+                    yPosition, outputs, inputs,
+                    nodeElement),
+                "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
+                    outputs, inputs,
+                    nodeElement),
+                "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart,
+                    xPosition, yPosition, outputs,
+                    inputs, nodeElement),
+                "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
+                    outputs, inputs,
+                    nodeElement),
+                "Function" => new NodeFunction(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition,
+                    yPosition,
+                    outputs, inputs,
+                    nodeElement),
+                _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
+            };
 
-                var yPosition = TryGetProperty(nodeElement, "Y", out var yProp) &&
-                                yProp.ValueKind == JsonValueKind.Number
-                    ? yProp.GetInt32()
-                    : 100;
-
-                var isEnabled = ReadBool(nodeElement, preferredPropertyName: "IsEnabled",
-                    fallbackPropertyName: "Enabled");
-                var activateOnStart = TryGetProperty(nodeElement, "ActivateOnStart", out var activateOnStartProp) &&
-                                      activateOnStartProp.ValueKind == JsonValueKind.True;
-
-                var outputs = ParseOutputs(GetProperty(nodeElement, "Outputs"));
-                var inputs = ParseInputs(GetProperty(nodeElement, "Inputs"));
-
-
-                BaseNode node = typeId switch
-                {
-                    "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, true, xPosition,
-                        yPosition, outputs, inputs,
-                        nodeElement),
-                    "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
-                        outputs, inputs,
-                        nodeElement),
-                    "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart,
-                        xPosition, yPosition, outputs,
-                        inputs, nodeElement),
-                    "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
-                        outputs, inputs,
-                        nodeElement),
-                    "Function" => new NodeFunction(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
-                        outputs, inputs,
-                        nodeElement),
-                    _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
-                };
-
-                nodes.Add(node);
-            }
-            catch (System.Exception e)
-            {
-                throw;
-            }
+            nodes.Add(node);
         }
 
         static bool ReadBool(JsonElement element, string preferredPropertyName, string fallbackPropertyName)
@@ -298,5 +289,3 @@ public class NodeIo(Storage storage)
         IsFlowRunning = false;
     }
 }
-
-

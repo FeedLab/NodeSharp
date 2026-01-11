@@ -15,11 +15,11 @@ public static class ErrorExtension
     {
         var queryAttributes = new Dictionary<string, object>
         {
-            [nameof(ErrorPopupViewModel.ErrorMessage)] = exception.Message,
-            [nameof(ErrorPopupViewModel.Label)] = label
+            [nameof(ViewModels.ErrorPopupViewModel.ErrorMessage)] = exception.Message,
+            [nameof(ViewModels.ErrorPopupViewModel.Label)] = label
         };
 
-        await PopupService.ShowPopupAsync<ErrorPopupViewModel>(
+        await PopupService.ShowPopupAsync<ViewModels.ErrorPopupViewModel>(
             Shell.Current,
             options: null,
             queryAttributes);

@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-
-namespace NodeSharp.Nodes.Common.Model;
+﻿namespace NodeSharp.Nodes.Common.Model;
 
 public interface INodeInformation
 {
