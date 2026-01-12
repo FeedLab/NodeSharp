@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using NodeSharp.Nodes.Common.Model;
-using NodeSharp.Nodes.Debug.Component;
+using NodeSharp.Nodes.Function.Component;
 
-namespace NodeSharp.Nodes.Debug;
+namespace NodeSharp.Nodes.Function;
 
 public class NodeInformation : INodeInformation
 {
@@ -21,8 +21,8 @@ public class NodeInformation : INodeInformation
     }
 
 
-    public NodeInformation() : this("Debug", "NodeDebug", false, true,
-        "cybersecurity, where attackers inject malicious code into applications", "\ue710", 0, 1, new DebugConfigurePopupComponent())
+    public NodeInformation() : this("Function", "NodeFunction", true, true,
+        "cybersecurity, where attackers inject malicious code into applications", "\ue710", 0, 1, new FunctionConfigurePopupComponent())
     {
     }
 

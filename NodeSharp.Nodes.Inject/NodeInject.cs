@@ -320,7 +320,7 @@ public class NodeInject : BaseNode
             CanBeDismissedByTappingOutsideOfPopup = false
         };
 
-        await PopupService.ShowPopupAsync<InjectViewModel>(
+        await PopupService.ShowPopupAsync<InjectConfigurePopupViewModel>(
             Shell.Current,
             options: popupOptions,
             shellParameters: queryAttributes);

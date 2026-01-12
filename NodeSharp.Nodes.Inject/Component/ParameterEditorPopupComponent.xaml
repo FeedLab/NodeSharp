@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:tabview="clr-namespace:Syncfusion.Maui.TabView;assembly=Syncfusion.Maui.TabView"
+             x:Class="NodeSharp.Nodes.Inject.Component.ParameterEditorPopupComponent">
+    
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <!-- Style for the main TabView container -->
+            <!-- <Style TargetType="tabview:SfTabView"> -->
+            <!--     <Setter Property="IndicatorPlacement" Value="Bottom" /> -->
+            <!--     <Setter Property="IndicatorBackground" Value="Green" /> -->
+            <!--     <Setter Property="IndicatorStrokeThickness" Value="3" /> -->
+            <!--     <Setter Property="ItemsAlignment" Value="Center" /> -->
+            <!--     <Setter Property="TabBarBackground" Value="#F5F5F5" /> -->
+            <!-- </Style> -->
+
+            <!-- Style for individual Tab Items -->
+            <!-- <Style TargetType="tabview:SfTabItem"> -->
+            <!--     <Setter Property="FontSize" Value="14" /> -->
+            <!--     <Setter Property="FontAttributes" Value="Bold" /> -->
+            <!--     <Setter Property="TextColor" Value="Gray" /> -->
+            <!--     <Setter Property="HeightRequest" Value="50" /> -->
+            <!-- </Style> -->
+            
+            <Style TargetType="tabview:SfTabItem">
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup>
+                            <VisualState x:Name="Selected" >
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                                    <Setter Property="FontAttributes" Value="Bold" />
+                                    <Setter Property="FontSize" Value="16" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+                                    <Setter Property="FontAttributes" Value="Italic" />
+                                    <Setter Property="FontSize" Value="14" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+
+            </Style>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    
+    <Grid
+        HorizontalOptions="Fill"
+        VerticalOptions="Fill"
+        Padding="16"
+        RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Name Input Field -->
+        <core:SfTextInputLayout
+            Grid.Row="0"
+            Hint="Name"
+            HelperText="Required field"
+            ContainerType="Outlined"
+            IsHintAlwaysFloated="True">
+            <Entry
+                Text="{Binding Name, Mode=TwoWay}"
+                FontSize="16"
+                Placeholder="Enter name..." />
+        </core:SfTextInputLayout>
+
+        <!-- TabView with Sources -->
+        <tabview:SfTabView
+            Grid.Row="1"
+            ContentTransitionDuration ="1000"
+            TabBarPlacement="Top"
+            IndicatorPlacement="Top"
+            IndicatorBackground="Green"
+            IndicatorStrokeThickness="4">
+
+            <!-- Primitive Tab -->
+            <tabview:SfTabItem 
+                Header="Primitive"
+                FontSize="24"
+                FontAttributes="Bold">
+                <tabview:SfTabItem.Content>
+                    <Grid
+                        Padding="16"
+                        RowSpacing="16"
+                        VerticalOptions="Start">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Type ComboBox -->
+                        <core:SfTextInputLayout
+                            Grid.Row="0"
+                            Hint="Type"
+                            HelperText="Select data type"
+                            ContainerType="Outlined">
+                            <editors:SfComboBox
+                                IsClearButtonVisible="False"
+                                IsEditable="False"
+                                SelectedItem="{Binding PrimitiveType, Mode=TwoWay}">
+                                <editors:SfComboBox.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>String</x:String>
+                                        <x:String>Number</x:String>
+                                        <x:String>Boolean</x:String>
+                                    </x:Array>
+                                </editors:SfComboBox.ItemsSource>
+                            </editors:SfComboBox>
+                        </core:SfTextInputLayout>
+
+                        <!-- Value Input Field -->
+                        <core:SfTextInputLayout
+                            Grid.Row="1"
+                            Hint="Value"
+                            HelperText="Enter value"
+                            ContainerType="Outlined"
+                            IsHintAlwaysFloated="True">
+                            <Entry
+                                Text="{Binding PrimitiveValue, Mode=TwoWay}"
+                                FontSize="16"
+                                Placeholder="Enter value..." />
+                        </core:SfTextInputLayout>
+                    </Grid>
+                </tabview:SfTabItem.Content>
+            </tabview:SfTabItem>
+
+            <!-- Environment Tab -->
+            <tabview:SfTabItem Header="Environment">
+                <tabview:SfTabItem.Content>
+                    <Grid
+                        Padding="16"
+                        VerticalOptions="Start">
+                        <Label
+                            Text="Environment configuration"
+                            FontSize="14"
+                            TextColor="Gray"
+                            VerticalOptions="Start" />
+                    </Grid>
+                </tabview:SfTabItem.Content>
+            </tabview:SfTabItem>
+
+            <!-- Timestamp Tab -->
+            <tabview:SfTabItem Header="Timestamp">
+                <tabview:SfTabItem.Content>
+                    <Grid
+                        Padding="16"
+                        VerticalOptions="Start">
+                        <Label
+                            Text="Timestamp will be generated automatically"
+                            FontSize="14"
+                            TextColor="Gray"
+                            VerticalOptions="Start" />
+                    </Grid>
+                </tabview:SfTabItem.Content>
+            </tabview:SfTabItem>
+
+        </tabview:SfTabView>
+
+        <!-- OK and Cancel Buttons -->
+        <Grid Grid.Row="2" HorizontalOptions="End">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <buttons:SfButton
+                Grid.Column="0"
+                Margin="8,0"
+                Text="Cancel"
+                WidthRequest="100"
+                Background="Gray"
+                Command="{Binding CancelCommand}"
+                ToolTipProperties.Text="Cancel" />
+
+            <buttons:SfButton
+                Grid.Column="1"
+                Margin="0"
+                Text="OK"
+                WidthRequest="100"
+                Background="Green"
+                Command="{Binding OkCommand}"
+                IsEnabled="{Binding IsNameValid}"
+                ToolTipProperties.Text="Save changes" />
+        </Grid>
+    </Grid>
+</ContentView>

@@ -9,8 +9,9 @@ public class Startup : INodeSharp
 {
     public void Register(IServiceCollection services)
     {
-        services.AddSingletonPopup<InjectConfigurePopupComponent, InjectViewModel>();
-        services.AddSingleton<InjectViewModel>();
+        services.AddSingletonPopup<ParameterEditorPopupComponent, ParameterEditorPopupViewModel>();
+        services.AddSingletonPopup<InjectConfigurePopupComponent, InjectConfigurePopupViewModel>();
+        services.AddSingleton<InjectConfigurePopupViewModel>();
         services.AddSingleton<NodeInjectParameterViewModel>();
     }
 }

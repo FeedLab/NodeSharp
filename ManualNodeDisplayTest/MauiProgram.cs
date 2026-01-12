@@ -21,10 +21,19 @@ public static class MauiProgram
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
+                fonts.AddFont("MauiMaterialAssets.ttf", "MaterialAssets");
+                fonts.AddFont("Font Awesome 6 Free-Solid-900.otf", "FontSolid");
+                fonts.AddFont("MauiSampleFontIcon.ttf", "MauiSampleFontIcon");
+                fonts.AddFont("AccordionFontIcons.ttf", "AccordionFontIcons");
+                fonts.AddFont("Roboto-Medium.ttf", "Roboto-Medium");
+                fonts.AddFont("Roboto-Regular.ttf", "Roboto-Regular");
+                fonts.AddFont("TimesNewRoman.ttf", "TimesNewRoman");
+                fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
+                fonts.AddFont("MaterialSymbolsOutlined-Regular.ttf", "MaterialSymbols");
             });
         
-        builder.Services.AddSingletonPopup<InjectConfigurePopupComponent, InjectViewModel>();
+        builder.Services.AddSingletonPopup<InjectConfigurePopupComponent, InjectConfigurePopupViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

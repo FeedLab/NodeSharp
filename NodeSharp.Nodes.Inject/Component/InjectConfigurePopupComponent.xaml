@@ -11,6 +11,16 @@
              xmlns:component="clr-namespace:NodeSharp.Nodes.Inject.Component"
              x:Class="NodeSharp.Nodes.Inject.Component.InjectConfigurePopupComponent">
 
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Shadow x:Key="DefaultShadow"
+                    Brush="{StaticResource Black}"
+                    Offset="2,2"
+                    Radius="4"
+                    Opacity="0.3" />
+        </ResourceDictionary>
+    </ContentView.Resources>
+
     <Grid
         HorizontalOptions="Fill"
         VerticalOptions="Fill"
@@ -32,11 +42,10 @@
         <Grid
             Grid.Row="1"
             RowSpacing="24"
-            VerticalOptions="Start"
-            HorizontalOptions="Start">
+            VerticalOptions="Fill"
+            HorizontalOptions="Fill">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -45,14 +54,15 @@
 
             <components:LabeledBorder
                 Grid.Row="1"
-                LabelText="A flow may have a delay before activation"
+                LabelText="Inject node may have a delay before activation"
                 Stroke="Gray"
                 StrokeThickness="1"
                 BackgroundColor="Transparent"
                 LabelForeground="Black"
-                CornerRadius="8">
+                CornerRadius="8"
+                >
                 <components:LabeledBorder.InnerContent>
-                    <Grid>
+                    <Grid Shadow="{StaticResource DefaultShadow}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="240" />
                             <ColumnDefinition Width="240" />
@@ -110,14 +120,15 @@
 
             <components:LabeledBorder
                 Grid.Row="2"
-                LabelText="A flow can be configured to run in intervals"
+                LabelText="Inject node can be configured to run in intervals"
                 Stroke="Gray"
                 StrokeThickness="1"
                 BackgroundColor="Transparent"
                 LabelForeground="Black"
-                CornerRadius="8">
+                CornerRadius="8"
+                >
                 <components:LabeledBorder.InnerContent>
-                    <Grid>
+                    <Grid Shadow="{StaticResource DefaultShadow}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="240" />
                             <ColumnDefinition Width="240" />
@@ -141,7 +152,7 @@
                                 Minimum="0"
                                 Maximum="9999"
                                 AllowNull="{Binding AllowNull}" FontSize="16"
-                                Value="{Binding DelayValue,Mode=TwoWay}" />
+                                Value="{Binding IntervalValue,Mode=TwoWay}" />
                         </core:SfTextInputLayout>
 
                         <core:SfTextInputLayout Grid.Column="1"
@@ -179,15 +190,19 @@
                 StrokeThickness="1"
                 BackgroundColor="Transparent"
                 LabelForeground="Black"
-                CornerRadius="8">
+                CornerRadius="8"
+                >
                 <components:LabeledBorder.InnerContent>
-                    <component:NodeInjectParameterComponent Margin="8"/>
+                    <component:NodeInjectParameterComponent Margin="8, 16" Shadow="{StaticResource DefaultShadow}"/>
                 </components:LabeledBorder.InnerContent>
             </components:LabeledBorder>
         </Grid>
 
 
-        <Grid Grid.Row="2" HorizontalOptions="End" HeightRequest="64">
+        <Grid Grid.Row="2" 
+              Shadow="{StaticResource DefaultShadow}"
+              HorizontalOptions="End" 
+              HeightRequest="64">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />

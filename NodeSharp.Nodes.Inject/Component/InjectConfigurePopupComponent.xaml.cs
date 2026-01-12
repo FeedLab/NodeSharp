@@ -7,7 +7,7 @@ public partial class InjectConfigurePopupComponent : ContentView
 {
     public InjectConfigurePopupComponent()
     {
-        var viewModel = AppService.GetRequiredService<InjectViewModel>();
+        var viewModel = AppService.GetRequiredService<InjectConfigurePopupViewModel>();
 
 
         InitializeComponent();

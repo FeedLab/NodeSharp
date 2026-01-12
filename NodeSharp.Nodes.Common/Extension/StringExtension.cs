@@ -15,6 +15,10 @@ public static class StringExtension
         return delayMilliseconds;
     }
 
+    // public static string ToTitleCase(this string input)
+    // {
+    // }
+
     public static string ToTitleCase(this string input)
     {
         if (string.IsNullOrEmpty(input))

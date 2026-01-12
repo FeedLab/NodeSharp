@@ -5,12 +5,19 @@ namespace NodeSharp.Nodes.Inject.Component;
 
 public partial class NodeInjectParameterComponent : ContentView
 {
+    private NodeInjectParameterViewModel _viewModel;
+
     public NodeInjectParameterComponent()
     {
-        var viewModel = AppService.GetRequiredService<NodeInjectParameterViewModel>();
-    
+        _viewModel = AppService.GetRequiredService<NodeInjectParameterViewModel>();
+
         InitializeComponent();
-        
-        BindingContext = viewModel;
+
+        BindingContext = _viewModel;
+
+        DataGrid.SelectionChanged += (s, e) =>
+        {
+            _viewModel.SelectedItem = DataGrid.SelectedRow as ParameterItem;
+        };
     }
 }
