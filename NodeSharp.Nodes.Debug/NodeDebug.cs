@@ -19,7 +19,6 @@ public class NodeDebug : BaseNode
         Storage storage)
         : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage)
     {
-        OutputJsonMessage = "";
     }
 
     public NodeDebug(
@@ -36,7 +35,6 @@ public class NodeDebug : BaseNode
         JsonElement nodeElement)
         : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs)
     {
-        OutputJsonMessage = "";
     }
 
     public override Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
@@ -46,8 +44,9 @@ public class NodeDebug : BaseNode
             EnterNode(this);
 
             base.RunFromInput(parentNode, parametersJsonString);
-            OutputJsonMessage = parametersJsonString;
 
+            SendToConnectedChildrenAsync(parametersJsonString);
+            
             System.Diagnostics.Debug.WriteLine($"{Name}: {parametersJsonString}");
 
             ExitNodeMessage(this, "Output", parametersJsonString, Name);
@@ -59,6 +58,4 @@ public class NodeDebug : BaseNode
             LeaveNode(this);
         }
     }
-
-    [JsonIgnore] public string OutputJsonMessage { get; set; }
 }

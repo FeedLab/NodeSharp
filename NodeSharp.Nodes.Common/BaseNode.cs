@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
 
@@ -168,8 +170,15 @@ public abstract class BaseNode
         return Task.FromResult(parametersJsonString);
     }
 
+    protected Task SendToConnectedChildrenAsync(JsonNode jsonNode)
+    {
+        return SendToConnectedChildrenAsync(jsonNode.ToJsonString());
+    }
+
     protected Task SendToConnectedChildrenAsync(string parametersJsonString)
     {
+        OutputMessage = parametersJsonString.ToPrettyJson();
+        
         Task.Run(() =>
         {
             var tasks = new List<Task>();
@@ -193,6 +202,8 @@ public abstract class BaseNode
 
         return Task.CompletedTask;
     }
+
+    public string OutputMessage { get; set; }
 
     public void ValidateInputAndOutput()
     {

@@ -130,7 +130,11 @@ public class NodeRandomNumber : BaseNode
                 throw new InvalidOperationException(
                     $"NodeRandomNumber '{Name}' received invalid JSON from parent '{parentNode.Name}'.", ex);
             }
-            await SendToConnectedChildrenAsync(updatedJsonString);
+            
+            var jsonNode = JsonNode.Parse(updatedJsonString) ?? "";
+
+            await SendToConnectedChildrenAsync(jsonNode);
+            
             return updatedJsonString;
         }
         finally

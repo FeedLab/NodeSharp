@@ -1,12 +1,17 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
 using NodeSharp.Client.ViewModel;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Services;
+using NodeSharp.Nodes.Common.ViewModels;
 
 namespace NodeSharp.Client.Component;
 
@@ -393,15 +398,42 @@ public partial class DraggableBoxComponent : ContentView
     //         Shell.Current,
     //         options: popupOptions,
     //         shellParameters: queryAttributes);
-    //     
+    //
     //     var codeViewModel = AppService.GetRequiredService<CodeViewModel>();
     //
     //     if (codeViewModel.HasChangedCode)
     //     {
     //         nodeFunction.FunctionData.CompileScript();
     //     }
-    //     
+    //
     // }
+
+    private async void OnPointerEntered(object? sender, PointerEventArgs e)
+    {
+        if (BindingContext is BoxNode boxNode)
+        {
+            var queryAttributes = new Dictionary<string, object>
+            {
+                [nameof(BaseNode)] = boxNode.Node
+            };
+            
+            var popupOptions = new PopupOptions
+            {
+                CanBeDismissedByTappingOutsideOfPopup = true,
+                PageOverlayColor = Colors.Transparent
+            };
+
+            await popupService.ShowPopupAsync<LastOutputMessageTooltipViewModel>(
+                Shell.Current,
+                options: popupOptions,
+                queryAttributes);
+        }
+    }
+
+    private async void OnPointerExited(object? sender, PointerEventArgs e)
+    {
+     //   await popupService.ClosePopupAsync(Shell.Current, true);
+    }
 }
 
 public class NodeDraggingStatus

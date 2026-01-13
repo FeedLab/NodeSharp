@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
@@ -126,66 +127,70 @@ public class NodeInject : BaseNode
 
     public override Task Run()
     {
-            EnterNode(this);
+        EnterNode(this);
 
-            try
+        try
+        {
+            if (!ActivateOnStart)
             {
-                if (!ActivateOnStart)
+                return Task.CompletedTask;
+            }
+
+
+            var _ = Task.Run(async () =>
+            {
+                if (ActivateAfter.Value > 0)
                 {
-                    return Task.CompletedTask;
+                    Debug.WriteLine(
+                        $"Inject: Delay is enabled. Waiting {ActivateAfter.ActivateAfterMilliseconds} milliseconds before execute.");
+
+                    var activateAfterMs = ActivateAfter.Type.ConvertTimeToMilliseconds(ActivateAfter.Value);
+                    await Task.Delay(activateAfterMs);
                 }
-                
-                
-                var _ =Task.Run(async () =>
+
+                if (Repeat.IsEnabled)
                 {
-                    if (ActivateAfter.Value > 0)
-                    {
-                        Debug.WriteLine($"Inject: Delay is enabled. Waiting {ActivateAfter.ActivateAfterMilliseconds} milliseconds before execute.");
-                        
-                        var activateAfterMs =  ActivateAfter.Type.ConvertTimeToMilliseconds(ActivateAfter.Value);
-                        await Task.Delay(activateAfterMs);
-                    }
-                    
-                    if (Repeat.IsEnabled)
-                    {
-                        Debug.WriteLine("Inject: Starting repeating");
+                    Debug.WriteLine("Inject: Starting repeating");
 
-                        var repeatMs =  Repeat.Type.ConvertTimeToMilliseconds(Repeat.Value);
-                        var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(repeatMs));
+                    var repeatMs = Repeat.Type.ConvertTimeToMilliseconds(Repeat.Value);
+                    var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(repeatMs));
 
-                        try
-                        {
-                            do
-                            {
-                                await base.Run();
-                                var parametersJsonString = await BuildParametersJson(Parameters);
-                                await SendToConnectedChildrenAsync(parametersJsonString);
-                            } while (await timer.WaitForNextTickAsync(Cts.Token));
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            Debug.WriteLine("Inject timer cancelled.");
-                        }
-                        finally
-                        {
-                            timer?.Dispose();
-                        }
-                    }
-                    else
+                    try
                     {
-                        Debug.WriteLine("Inject: Starting once.");
-                        await base.Run();
-                        var parametersJsonString = await BuildParametersJson(Parameters);
-                        await SendToConnectedChildrenAsync(parametersJsonString);
+                        do
+                        {
+                            await base.Run();
+                            var parametersJsonString = await BuildParametersJson(Parameters);
+                            await SendToConnectedChildrenAsync(parametersJsonString);
+                        } while (await timer.WaitForNextTickAsync(Cts.Token));
                     }
-                });
-            }
-            finally
-            {
-                LeaveNode(this);
-            }
+                    catch (OperationCanceledException)
+                    {
+                        Debug.WriteLine("Inject timer cancelled.");
+                    }
+                    finally
+                    {
+                        timer?.Dispose();
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("Inject: Starting once.");
+                    await base.Run();
+                    var parametersJsonString = await BuildParametersJson(Parameters);
 
-            return Task.CompletedTask;
+                    var jsonNode = JsonNode.Parse(parametersJsonString) ?? "";
+
+                    await SendToConnectedChildrenAsync(jsonNode);
+                }
+            });
+        }
+        finally
+        {
+            LeaveNode(this);
+        }
+
+        return Task.CompletedTask;
     }
 
 
@@ -262,30 +267,24 @@ public class NodeInject : BaseNode
                 sb.Append($"\"{parameter.Name}\": \"{parameter.Value}\"");
                 break;
 
-            // case "number":
-            //     if (!decimal.TryParse(parameter.Value, NumberStyles.Number, CultureInfo.InvariantCulture,
-            //             out var number))
-            //     {
-            //         throw new InvalidOperationException(
-            //             $"Parameter '{name}' has invalid number value '{parameter.Value}'. Expected InvariantCulture numeric format.");
-            //     }
-            //
-            //     sb.Append($"\"{parameter.Name}\": {number.ToString(CultureInfo.InvariantCulture)}");
-            //     break;
-
             case "number":
                 if (!decimal.TryParse(parameter.Value, NumberStyles.Number, CultureInfo.InvariantCulture,
                         out var number))
                 {
                     var errorMessage =
                         $"Parameter '{name}' has invalid number value '{parameter.Value}'. Expected InvariantCulture numeric format.";
-                    
+
                     sb.Append($"\"{parameter.Name}\": {0.ToString(CultureInfo.InvariantCulture)}");
-                    
+
                     await FileLogger.Error(errorMessage);
                 }
+                else
+                {
+                    sb.Append($"\"{parameter.Name}\": {number.ToString(CultureInfo.InvariantCulture)}");
+                }
+
                 break;
-                
+
             case "boolean":
                 if (!bool.TryParse(parameter.Value, out var boolean))
                 {
@@ -329,10 +328,11 @@ public class NodeInject : BaseNode
 
         if (configurationPopupViewModel is null)
         {
-            Debug.WriteLine("InjectConfigurePopupViewModel is null. That means NO configuration popup will be shown. This should be not happen. Remove DisplayNodeConfigurationPopup for the node");
+            Debug.WriteLine(
+                "InjectConfigurePopupViewModel is null. That means NO configuration popup will be shown. This should be not happen. Remove DisplayNodeConfigurationPopup for the node");
             return;
         }
-        
+
         var queryAttributes = new Dictionary<string, object>
         {
             [nameof(NodeInject)] = this
@@ -369,7 +369,7 @@ public class ActivateAfter
 public class Repeat
 {
     public string Type { get; }
- 
+
     public int Value { get; }
 
     public bool IsEnabled { get; }
@@ -381,10 +381,9 @@ public class Repeat
         Type = type;
         Value = value;
         IsEnabled = isEnabled;
-        
+
         RepeatAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
     }
-
 }
 
 public class Parameter

@@ -5,6 +5,7 @@ using NodeSharp.Client.Component;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.ViewModels;
@@ -47,8 +48,10 @@ public static class MauiProgram
         builder.Services.AddScoped<ToolBarViewModel>();
         builder.Services.AddSingleton<CurvedLineDrawable>();
         builder.Services.AddSingleton<LineConnectionManager>();
+        builder.Services.AddSingleton<BoxNodeBodyViewModel>();
         builder.Services.AddSingletonPopup<CodeComponent, CodeViewModel>();
-
+        builder.Services.AddSingletonPopup<LastOutputMessageTooltipComponent, LastOutputMessageTooltipViewModel>();
+        
         builder.Services.AddTransientPopup<ErrorPopup, ErrorPopupViewModel>();
 
         var storage = new Storage();
