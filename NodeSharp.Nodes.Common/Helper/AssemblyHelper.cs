@@ -12,8 +12,14 @@ public class AssemblyHelper
         foreach (var dll in dlls)
         {
             Assembly asm;
-            try { asm = Assembly.LoadFrom(dll); }
-            catch { continue; }
+            try
+            {
+                asm = Assembly.LoadFrom(dll);
+            }
+            catch
+            {
+                continue;
+            }
 
             foreach (var type in asm.GetTypes())
             {
@@ -21,5 +27,50 @@ public class AssemblyHelper
                     yield return type;
             }
         }
+    }
+
+    public static IEnumerable<Type> FindImplementations<TInterface>(IEnumerable<Type> types)
+    {
+        var interfaceType = typeof(TInterface);
+
+        foreach (var type in types)
+        {
+            if (interfaceType.IsAssignableFrom(type) && type.IsClass && !type.IsAbstract)
+                yield return type;
+        }
+    }
+
+    public static IEnumerable<TInterface> FindImplementationsAndCreateInstance<TInterface>(IEnumerable<Type> types)
+    {
+        var interfaceType = typeof(TInterface);
+
+        foreach (var type in types)
+        {
+            if (interfaceType.IsAssignableFrom(type) && type.IsClass && !type.IsAbstract)
+            {
+                var instance = Activator.CreateInstance(type);
+                if (instance != null)
+                    yield return (TInterface)instance;
+            }
+        }
+    }
+
+    public static TInterface FindImplementationsAndCreateInstance<TInterface>(Assembly assembly)
+    {
+        var interfaceType = typeof(TInterface);
+
+        var types = assembly.GetTypes();
+
+        foreach (var type in types)
+        {
+            if (interfaceType.IsAssignableFrom(type) && type.IsClass && !type.IsAbstract)
+            {
+                var instance = Activator.CreateInstance(type);
+                if (instance != null)
+                    return (TInterface)instance;
+            }
+        }
+
+        throw new ArgumentException("Type does not implement the interface or is not a class");
     }
 }

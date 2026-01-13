@@ -7,7 +7,7 @@ namespace NodeSharp.Nodes.Inject;
 public class NodeInformation : INodeInformation
 {
     private NodeInformation(string typeId, string runtimeType, bool activateOnStart, bool isEnabled, string information, string symbol,
-        int numberOfInputs, int numberOfOutputs, ContentView nodeConfigurePopup)
+        int numberOfInputs, int numberOfOutputs)//, ContentView nodeConfigurePopup)
     {
         TypeId = typeId;
         RuntimeType = runtimeType;
@@ -17,12 +17,12 @@ public class NodeInformation : INodeInformation
         Symbol = symbol;
         NumberOfInputs = numberOfInputs;
         NumberOfOutputs = numberOfOutputs;
-        NodeConfigurePopup = nodeConfigurePopup;
+        // NodeConfigurePopup = nodeConfigurePopup;
     }
 
 
     public NodeInformation() : this("Inject", "NodeInject", true, true,
-        "cybersecurity, where attackers inject malicious code into applications", "\ue713", 0, 1, new InjectConfigurePopupComponent())
+        "cybersecurity, where attackers inject malicious code into applications", "\ue713", 0, 1)//, new InjectConfigurePopupComponent())
     {
     }
 
@@ -39,7 +39,7 @@ public class NodeInformation : INodeInformation
 
     public bool HasInformationText => !string.IsNullOrWhiteSpace(Information);
 
-    public ContentView NodeConfigurePopup { get; set; }
+    // public ContentView NodeConfigurePopup { get; set; }
 
     public override string ToString()
     {

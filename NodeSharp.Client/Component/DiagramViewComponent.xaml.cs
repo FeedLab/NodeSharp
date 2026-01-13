@@ -190,7 +190,7 @@ public partial class DiagramViewComponent : ContentView
     }
 
 #if WINDOWS
-    void OnHandlerChanged(object sender, EventArgs e)
+    void OnHandlerChanged(object? sender, EventArgs e)
     {
         if (this.Handler?.PlatformView is Microsoft.UI.Xaml.FrameworkElement nativeView)
         {
@@ -238,7 +238,7 @@ public partial class DiagramViewComponent : ContentView
         e.AcceptedOperation = DataPackageOperation.Copy;
     }
 
-    private void OnPointerMoved(object sender, PointerEventArgs e)
+    private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
         if (lineConnectionManager.IsDragging)
         {

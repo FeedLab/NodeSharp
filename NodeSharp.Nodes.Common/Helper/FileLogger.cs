@@ -1,14 +1,11 @@
 ﻿using System.Collections.Specialized;
 using System.Text;
-using NodeSharp.NodeEngine;
-using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Services;
 
-namespace NodeSharp.Client;
+namespace NodeSharp.Nodes.Common.Helper;
 
 public static class FileLogger
 {
-    private static readonly NodeIo nodeIo;
     private static readonly string LogPath = Path.Combine(FileSystem.AppDataDirectory, "app_log.txt");
 
     private static readonly
@@ -17,12 +14,14 @@ public static class FileLogger
 
     private static readonly StringBuilder MemoryLog = new();
 
-    // Subscription: Event that others can subscribe to
     static FileLogger()
     {
-        nodeIo = AppService.GetRequiredService<NodeIo>();
+    }
 
-        nodeIo.Nodes.CollectionChanged += async (s, e) =>
+    // Subscription: Event that others can subscribe to
+    public static void LogNodeSubscription(BaseNodeList nodes)
+    {
+        nodes.CollectionChanged += async (s, e) =>
         {
             switch (e.Action)
             {
@@ -41,7 +40,7 @@ public static class FileLogger
                                         {
                                             await Log($"{tuple.level}: {tuple.baseNode.Name}", tuple.message);
                                         }
-                                        catch (Exception ex)
+                                        catch (System.Exception ex)
                                         {
                                             // Log the exception to a fallback location
                                             System.Diagnostics.Debug.WriteLine($"Logging failed: {ex.Message}");

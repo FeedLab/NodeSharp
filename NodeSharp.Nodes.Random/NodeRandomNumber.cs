@@ -1,10 +1,12 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Random.ViewModel;
 
 namespace NodeSharp.Nodes.Random;
@@ -186,8 +188,11 @@ public class NodeRandomNumber : BaseNode
     
     public override async Task DisplayNodeConfigurationPopup()
     {
-        if (NodeConfigurePopup is null)
+        var configurationPopupViewModel = AppService.GetService<RandomConfigurePopupViewModel>();
+
+        if (configurationPopupViewModel is null)
         {
+            Debug.WriteLine("RandomConfigurePopupViewModel is null. That means NO configuration popup will be shown. This should be not happen. Remove DisplayNodeConfigurationPopup for the node");
             return;
         }
         

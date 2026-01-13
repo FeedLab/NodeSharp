@@ -120,10 +120,10 @@ public partial class DraggableBoxComponent : ContentView
             if (boxNode is not null && sender is DraggableBoxComponent element)
             {
                 var bounds = AbsoluteLayout.GetLayoutBounds(element);
-                
+
                 var canvasSurface = this.Parent;
                 var position = view.GetAbsolutePosition("CanvasSurface");
-                
+
                 boxNode.Width = view.Width;
                 boxNode.Height = view.Height;
             }
@@ -192,7 +192,7 @@ public partial class DraggableBoxComponent : ContentView
 
                     WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
                     lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
-                    
+
                     // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
 
                     break;
@@ -204,13 +204,13 @@ public partial class DraggableBoxComponent : ContentView
         }
     }
 
-    private void OnBindingContextChanged(object sender, EventArgs e)
+    private void OnBindingContextChanged(object? sender, EventArgs e)
     {
         if (BindingContext is BoxNode boxNode)
         {
             UpdateInputAnchors(boxNode);
             UpdateOutputAnchors(boxNode);
-        
+
             boxNode.PropertyChanged += (s, args) =>
             {
                 if (args.PropertyName == nameof(BoxNode.Height))
@@ -243,13 +243,13 @@ public partial class DraggableBoxComponent : ContentView
         {
             var boxView = new BoxView
             {
-                WidthRequest = 10,  // Make it larger for easier interaction
+                WidthRequest = 10, // Make it larger for easier interaction
                 HeightRequest = 10,
                 Color = Colors.Black,
-                InputTransparent = false,  // Explicitly enable input
+                InputTransparent = false, // Explicitly enable input
                 AnchorX = 0.5,
                 AnchorY = 0.5,
-                ZIndex = 1000  // Ensure it's on top
+                ZIndex = 1000 // Ensure it's on top
             };
 
             var pointerGesture = new PointerGestureRecognizer();
@@ -275,9 +275,9 @@ public partial class DraggableBoxComponent : ContentView
             {
                 Debug.WriteLine("🔵 POINTER RELEASED - Clearing drag state and redrawing");
                 lineConnectionManager.EndDragging(anchor);
-                
+
                 lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
-                
+
                 WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
                 WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
             };
@@ -315,7 +315,7 @@ public partial class DraggableBoxComponent : ContentView
                 InputTransparent = false,
                 AnchorX = 0.5,
                 AnchorY = 0.5,
-                ZIndex = 1000  // Ensure it's on top
+                ZIndex = 1000 // Ensure it's on top
             };
 
             var pointerGesture = new PointerGestureRecognizer();
@@ -351,7 +351,7 @@ public partial class DraggableBoxComponent : ContentView
             absoluteLayout.Children.Add(boxView);
         }
     }
-    
+
     private async void OnDoubleTapped(object sender, TappedEventArgs e)
     {
         try
@@ -369,17 +369,14 @@ public partial class DraggableBoxComponent : ContentView
             //     return;
             // }
 
-            if (boxNode.Node.NodeConfigurePopup is not null)
-            {
-                await boxNode.Node.DisplayNodeConfigurationPopup();
-            }
+            await boxNode.Node.DisplayNodeConfigurationPopup();
         }
         catch (Exception exception)
         {
             throw new NodeException("OnDoubleTapped: An error occurred.", exception);
         }
-    }   
-    
+    }
+
     // public async Task DisplayPopup(NodeFunction nodeFunction)
     // {
     //     var queryAttributes = new Dictionary<string, object>

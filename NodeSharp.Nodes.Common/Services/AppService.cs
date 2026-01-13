@@ -33,6 +33,14 @@
         public static TService GetRequiredService<TService>() where TService : notnull =>
             Current is null ? throw new InvalidOperationException("Platform Application cannot be null.") : Current.GetRequiredService<TService>();
 
+        /// <summary>
+        /// Get service of type <typeparamref name="TService"/> from the System.IServiceProvider.
+        /// </summary>
+        /// <typeparam name="TService">The type of service object to get.</typeparam>
+        /// <returns>A service object of type <typeparamref name="TService"/> -or- raises an <see cref="InvalidOperationException"/> if there is no such service.</returns>
+        public static TService GetRequiredKeyedService<TService>(string key) where TService : notnull =>
+            Current is null ? throw new InvalidOperationException("Platform Application cannot be null.") : Current.GetRequiredKeyedService<TService>(key);
+        
         public static IServiceProvider? Current =>
             IPlatformApplication.Current?.Services;
     }

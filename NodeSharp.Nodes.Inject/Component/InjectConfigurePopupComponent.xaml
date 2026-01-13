@@ -9,7 +9,8 @@
              xmlns:converter="clr-namespace:NodeSharp.Nodes.Common.Converter;assembly=NodeSharp.Nodes.Common"
              xmlns:components="clr-namespace:NodeSharp.Nodes.Common.Components;assembly=NodeSharp.Nodes.Common"
              xmlns:component="clr-namespace:NodeSharp.Nodes.Inject.Component"
-             x:Class="NodeSharp.Nodes.Inject.Component.InjectConfigurePopupComponent">
+             x:Class="NodeSharp.Nodes.Inject.Component.InjectConfigurePopupComponent"
+             WidthRequest="900">
 
     <ContentView.Resources>
         <ResourceDictionary>

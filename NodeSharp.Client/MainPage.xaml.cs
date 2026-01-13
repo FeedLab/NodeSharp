@@ -1,4 +1,5 @@
 ﻿using NodeSharp.Client.ViewModel;
+using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Client;
@@ -12,7 +13,10 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         viewModel = AppService.GetRequiredService<MainPageModel>();
+        var storage = AppService.GetRequiredService<Storage>();
         
+        storage.Initialize();
+
         InitializeComponent();
         
         this.BindingContext = viewModel;

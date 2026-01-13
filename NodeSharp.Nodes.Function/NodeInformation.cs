@@ -7,7 +7,7 @@ namespace NodeSharp.Nodes.Function;
 public class NodeInformation : INodeInformation
 {
     private NodeInformation(string typeId, string runtimeType, bool activateOnStart, bool isEnabled, string information, string symbol,
-        int numberOfInputs, int numberOfOutputs, ContentView nodeConfigurePopup)
+        int numberOfInputs, int numberOfOutputs)
     {
         TypeId = typeId;
         RuntimeType = runtimeType;
@@ -17,12 +17,11 @@ public class NodeInformation : INodeInformation
         Symbol = symbol;
         NumberOfInputs = numberOfInputs;
         NumberOfOutputs = numberOfOutputs;
-        NodeConfigurePopup = nodeConfigurePopup;
     }
 
 
     public NodeInformation() : this("Function", "NodeFunction", true, true,
-        "cybersecurity, where attackers inject malicious code into applications", "\ue710", 0, 1, new FunctionConfigurePopupComponent())
+        "cybersecurity, where attackers inject malicious code into applications", "\ue710", 0, 1)
     {
     }
 
@@ -38,8 +37,6 @@ public class NodeInformation : INodeInformation
     public int NumberOfOutputs { get; set; }
 
     public bool HasInformationText => !string.IsNullOrWhiteSpace(Information);
-
-    public ContentView NodeConfigurePopup { get; set; }
 
     public override string ToString()
     {

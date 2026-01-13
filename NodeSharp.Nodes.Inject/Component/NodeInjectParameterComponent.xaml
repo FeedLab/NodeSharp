@@ -42,11 +42,34 @@
                                x:Name="DataGrid"
                                ItemsSource="{Binding Items}"
                                AutoGenerateColumnsMode="None"
+                               ColumnWidthMode="LastColumnFill"
                                AllowEditing="True"
                                EditTapAction="OnTap"
                                SelectionMode="Single"
-                               Background="GhostWhite"
+                               NavigationMode="Row"
+                               HeaderRowHeight="42"
+                               RowHeight="32"
+                               GridLinesVisibility="Horizontal"
+                               CellDoubleTapped="DataGrid_OnCellDoubleTapped"
+                               LiveDataUpdateMode="AllowDataShaping"
+                               Background="White"
                                VerticalOptions="Fill">
+
+            <!-- Modern styling -->
+            <syncfusion:SfDataGrid.DefaultStyle>
+                <syncfusion:DataGridStyle 
+                    HeaderRowBackground="#F3F4F6"
+                    HeaderRowTextColor="#374151"
+                    HeaderRowFontSize="13"
+                    HeaderRowFontAttributes="Bold"
+                    RowBackground="White"
+                    RowTextColor="#111827"
+                    GridLineColor="#E5E7EB"
+                    SelectionBackground="#EFF6FF"
+                    SelectedRowTextColor="#2563EB"
+                    CurrentCellBorderColor="Transparent"
+                    CurrentCellBorderWidth="0"/>
+            </syncfusion:SfDataGrid.DefaultStyle>
 
             <syncfusion:SfDataGrid.Columns>
                 <!-- Column 0: Name (Text Input) -->
@@ -79,7 +102,7 @@
                     MappingName="Value"
                     HeaderText="Value"
                     AllowEditing="True"
-                    Width="150">
+                    >
                     <syncfusion:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Label Text="{Binding Value}"

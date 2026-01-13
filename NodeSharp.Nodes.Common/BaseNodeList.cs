@@ -1,9 +1,15 @@
 ﻿using System.Collections.ObjectModel;
+using NodeSharp.Nodes.Common.Helper;
 
 namespace NodeSharp.Nodes.Common;
 
 public class BaseNodeList : ObservableCollection<BaseNode>
 {
+    public BaseNodeList()
+    {
+        FileLogger.LogNodeSubscription(this);
+    }
+
     public Dictionary<string, BaseNode> ToDictionary()
     {
         return this.ToDictionary(n => n.Id);

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using NodeSharp.Nodes.Common.Extension;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using CommunityToolkit.Maui.Core;
 
 namespace NodeSharp.Nodes.Inject.ViewModel;
 
@@ -12,6 +13,20 @@ public partial class NodeInjectParameterViewModel : ObservableObject
     private readonly IPopupService popupService;
 
     [ObservableProperty] private ParameterItem? selectedItem;
+
+    [RelayCommand]
+    private async Task RowDoubleClick(ParameterItem item)
+    {
+        var index = Items.IndexOf(item);
+        var isPopupOk = await DisplayParameterEditPopup(item);
+        
+    if (isPopupOk && index >= 0 && index < Items.Count)
+        {
+            
+            Items.RemoveAt(index);
+            Items.Insert(index, item);
+        }
+    }
 
     public ObservableCollection<ParameterItem> Items { get; set; } = [];
     public List<string> SourceOptions { get; set; }
@@ -60,7 +75,12 @@ public partial class NodeInjectParameterViewModel : ObservableObject
         var parameterItem = new ParameterItem
             { Name = "<Change this>", Source = "Primitive", Type = "String", Value = "<Change this>" };
 
-        await DisplayParameterEditPopup(parameterItem);
+        var isPopupOk = await DisplayParameterEditPopup(parameterItem);
+
+        if (isPopupOk)
+        {
+            Items.Add(parameterItem);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanRemove))]
@@ -69,12 +89,13 @@ public partial class NodeInjectParameterViewModel : ObservableObject
         if (SelectedItem != null)
         {
             Items.Remove(SelectedItem);
+            SelectedItem = null;
         }
     }
 
     private bool CanRemove() => SelectedItem != null;
 
-    public async Task DisplayParameterEditPopup(ParameterItem item)
+    public async Task<bool> DisplayParameterEditPopup(ParameterItem item)
     {
         var queryAttributes = new Dictionary<string, object>
         {
@@ -86,14 +107,18 @@ public partial class NodeInjectParameterViewModel : ObservableObject
             CanBeDismissedByTappingOutsideOfPopup = false
         };
 
-        await popupService.ShowPopupAsync<ParameterEditorPopupViewModel>(
+        var popupResult = await popupService.ShowPopupAsync<ParameterEditorPopupViewModel, bool>(
             Shell.Current,
             options: popupOptions,
             shellParameters: queryAttributes);
+
+        return popupResult.Result;
     }
 
     public void InitializeFromNode(NodeInject nodeInject)
     {
+        Items.Clear();
+
         AddParameters(nodeInject.Parameters);
 
         RemoveCommand.NotifyCanExecuteChanged();
@@ -102,13 +127,13 @@ public partial class NodeInjectParameterViewModel : ObservableObject
 
     private void AddParameters(List<Parameter> parameters)
     {
-        Items.Clear();
 
         foreach (var nodeInject in parameters)
         {
             Items.Add(new ParameterItem
             {
-                Name = nodeInject.Name, Source = nodeInject.Source.ToTitleCase(), Type = nodeInject.Type.ToTitleCase(), Value = nodeInject.Value
+                Name = nodeInject.Name, Source = nodeInject.Source.ToTitleCase(), Type = nodeInject.Type.ToTitleCase(),
+                Value = nodeInject.Value
             });
         }
     }
@@ -148,5 +173,33 @@ public partial class ParameterItem : ObservableObject
             default:
                 throw new Exception($"Invalid source: {newValue}");
         }
+    }
+
+    public ParameterItem Copy()
+    {
+        return new ParameterItem()
+        {
+            Name = this.Name,
+            Source = this.Source,
+            Type = this.Type,
+            Value = this.Value,
+
+            IsTypeEditable = this.IsTypeEditable,
+            IsValueVisible = this.IsValueVisible
+        };
+    }
+
+    public void Past(ParameterItem item)
+    {
+        Name = item.Name;
+        Source = item.Source;
+        Type = item.Type;
+        Value = item.Value;
+
+        IsTypeEditable = item.IsTypeEditable;
+        IsValueVisible = item.IsValueVisible;
+        
+        OnPropertyChanged(string.Empty); // Notify all properties changed
+        
     }
 }

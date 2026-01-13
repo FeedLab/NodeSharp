@@ -37,6 +37,8 @@ namespace NodeSharp.Nodes.Inject.ViewModel
                 throw new InvalidOperationException("SelectedNode cannot be null when saving inject parameters.");
             }
             
+            SelectedNode.Parameters.Clear();
+            
             foreach (var item in injectConfigurePopupViewModel.Items)
             {
                 SelectedNode.Parameters.Add(new Parameter(item.Name, item.Type, item.Source, item.Value));

@@ -39,7 +39,6 @@ public static class MauiProgram
                 fonts.AddFont("MaterialSymbolsOutlined-Regular.ttf", "MaterialSymbols");
             });
         
-        builder.Services.AddSingleton<Storage>();
         builder.Services.AddSingleton<NodeToolListModel>();
         builder.Services.AddSingleton<DebugViewModel>();
         builder.Services.AddSingleton<DiagramViewModel>();
@@ -49,28 +48,38 @@ public static class MauiProgram
         builder.Services.AddSingleton<CurvedLineDrawable>();
         builder.Services.AddSingleton<LineConnectionManager>();
         builder.Services.AddSingletonPopup<CodeComponent, CodeViewModel>();
-        
+
         builder.Services.AddTransientPopup<ErrorPopup, ErrorPopupViewModel>();
 
-        RegisterDynamicNodes(builder);
+        var storage = new Storage();
+        RegisterDynamicNodes(builder.Services, storage);
+
+        builder.Services.AddSingleton(storage);
+
+
 
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
 
+        var app = builder.Build();
 
-        return builder.Build();
+        
+        return app;
     }
 
-    private static void RegisterDynamicNodes(MauiAppBuilder builder)
+    private static void RegisterDynamicNodes(IServiceCollection serviceCollection, Storage storage)
     {
+
         var types = AssemblyHelper.FindImplementations<INodeSharp>(AppContext.BaseDirectory);
 
         foreach (var type in types)
         {
-            var instance = (INodeSharp)Activator.CreateInstance(type)!;
 
-            instance.Register(builder.Services);
+            var instance = (INodeSharp)Activator.CreateInstance(type)!;
+            instance.Register(serviceCollection);
+
+            storage.GetNodeInformation().AddType(instance);
         }
     }
 }

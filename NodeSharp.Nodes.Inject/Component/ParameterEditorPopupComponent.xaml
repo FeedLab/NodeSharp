@@ -6,7 +6,8 @@
              xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
              xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
              xmlns:tabview="clr-namespace:Syncfusion.Maui.TabView;assembly=Syncfusion.Maui.TabView"
-             x:Class="NodeSharp.Nodes.Inject.Component.ParameterEditorPopupComponent">
+             x:Class="NodeSharp.Nodes.Inject.Component.ParameterEditorPopupComponent"
+             WidthRequest="300">
     
     <ContentView.Resources>
         <ResourceDictionary>
@@ -68,13 +69,13 @@
         <core:SfTextInputLayout
             Grid.Row="0"
             Hint="Name"
-            HelperText="Required field"
+            HelperText="Ex. Monday"
             ContainerType="Outlined"
             IsHintAlwaysFloated="True">
             <Entry
                 Text="{Binding Name, Mode=TwoWay}"
                 FontSize="16"
-                Placeholder="Enter name..." />
+                Placeholder="Enter name of parameter" />
         </core:SfTextInputLayout>
 
         <!-- TabView with Sources -->
@@ -84,7 +85,8 @@
             TabBarPlacement="Top"
             IndicatorPlacement="Top"
             IndicatorBackground="Green"
-            IndicatorStrokeThickness="4">
+            IndicatorStrokeThickness="4"
+            SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
 
             <!-- Primitive Tab -->
             <tabview:SfTabItem 

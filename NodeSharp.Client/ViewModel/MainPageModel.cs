@@ -18,11 +18,10 @@ public class MainPageModel
 
     public void Init()
     {
-        nodeToolListModel.Init();
-        
-        // Task.Run(async () =>
+        // Task.Run(() =>
         // {
-        //     await diagramViewModelModel.Init();
+        //     nodeToolListModel.Init();
+        //     return Task.CompletedTask;
         // });
 
     }

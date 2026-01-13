@@ -7,7 +7,9 @@ using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Inject.ViewModel;
 
 namespace NodeSharp.Nodes.Inject;
@@ -156,7 +158,7 @@ public class NodeInject : BaseNode
                             do
                             {
                                 await base.Run();
-                                var parametersJsonString = BuildParametersJson(Parameters);
+                                var parametersJsonString = await BuildParametersJson(Parameters);
                                 await SendToConnectedChildrenAsync(parametersJsonString);
                             } while (await timer.WaitForNextTickAsync(Cts.Token));
                         }
@@ -173,7 +175,7 @@ public class NodeInject : BaseNode
                     {
                         Debug.WriteLine("Inject: Starting once.");
                         await base.Run();
-                        var parametersJsonString = BuildParametersJson(Parameters);
+                        var parametersJsonString = await BuildParametersJson(Parameters);
                         await SendToConnectedChildrenAsync(parametersJsonString);
                     }
                 });
@@ -187,7 +189,7 @@ public class NodeInject : BaseNode
     }
 
 
-    private static string BuildParametersJson(IList<Parameter> parameters)
+    private static async Task<string> BuildParametersJson(IList<Parameter> parameters)
     {
         var sb = new StringBuilder();
         sb.Append("{\"Parameters\": [");
@@ -202,21 +204,26 @@ public class NodeInject : BaseNode
 
             if (parameter.Source.Equals("primitive", StringComparison.OrdinalIgnoreCase))
             {
-                AppendParameterJson(sb, parameter);
+                await AppendParameterJson(sb, parameter);
+            }
+            else if (parameter.Source.Equals("timestamp", StringComparison.OrdinalIgnoreCase))
+            {
+                var param = new Parameter(parameter.Name, "number", "timestamp", DateTime.Now.Ticks.ToString());
+                await AppendParameterJson(sb, param);
             }
             else if (parameter.Source.Equals("environment", StringComparison.OrdinalIgnoreCase))
             {
-                var envValue = GetRequiredEnvironmentVariable(parameter.Value);
+                var envValue = GetRequiredEnvironmentVariable(parameter.Value) ?? "";
 
                 if (IsNumeric(envValue))
                 {
                     var param = new Parameter(parameter.Name, "number", "primitive", envValue);
-                    AppendParameterJson(sb, param);
+                    await AppendParameterJson(sb, param);
                 }
                 else
                 {
                     var param = new Parameter(parameter.Name, "string", "primitive", envValue);
-                    AppendParameterJson(sb, param);
+                    await AppendParameterJson(sb, param);
                 }
             }
             else
@@ -240,7 +247,7 @@ public class NodeInject : BaseNode
             out _);
     }
 
-    private static void AppendParameterJson(StringBuilder sb, Parameter parameter)
+    private static async Task AppendParameterJson(StringBuilder sb, Parameter parameter)
     {
         var name = parameter.Name;
         var type = parameter.Type.Trim().ToLowerInvariant();
@@ -255,17 +262,30 @@ public class NodeInject : BaseNode
                 sb.Append($"\"{parameter.Name}\": \"{parameter.Value}\"");
                 break;
 
+            // case "number":
+            //     if (!decimal.TryParse(parameter.Value, NumberStyles.Number, CultureInfo.InvariantCulture,
+            //             out var number))
+            //     {
+            //         throw new InvalidOperationException(
+            //             $"Parameter '{name}' has invalid number value '{parameter.Value}'. Expected InvariantCulture numeric format.");
+            //     }
+            //
+            //     sb.Append($"\"{parameter.Name}\": {number.ToString(CultureInfo.InvariantCulture)}");
+            //     break;
+
             case "number":
                 if (!decimal.TryParse(parameter.Value, NumberStyles.Number, CultureInfo.InvariantCulture,
                         out var number))
                 {
-                    throw new InvalidOperationException(
-                        $"Parameter '{name}' has invalid number value '{parameter.Value}'. Expected InvariantCulture numeric format.");
+                    var errorMessage =
+                        $"Parameter '{name}' has invalid number value '{parameter.Value}'. Expected InvariantCulture numeric format.";
+                    
+                    sb.Append($"\"{parameter.Name}\": {0.ToString(CultureInfo.InvariantCulture)}");
+                    
+                    await FileLogger.Error(errorMessage);
                 }
-
-                sb.Append($"\"{parameter.Name}\": {number.ToString(CultureInfo.InvariantCulture)}");
                 break;
-
+                
             case "boolean":
                 if (!bool.TryParse(parameter.Value, out var boolean))
                 {
@@ -292,11 +312,11 @@ public class NodeInject : BaseNode
     {
         var value = Environment.GetEnvironmentVariable(variableName);
 
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new InvalidOperationException(
-                $"Required environment variable '{variableName}' is not set (or is empty).");
-        }
+        // if (string.IsNullOrWhiteSpace(value))
+        // {
+        //     throw new InvalidOperationException(
+        //         $"Required environment variable '{variableName}' is not set (or is empty).");
+        // }
 
         return value;
     }
@@ -305,8 +325,11 @@ public class NodeInject : BaseNode
 
     public override async Task DisplayNodeConfigurationPopup()
     {
-        if (NodeConfigurePopup is null)
+        var configurationPopupViewModel = AppService.GetService<InjectConfigurePopupViewModel>();
+
+        if (configurationPopupViewModel is null)
         {
+            Debug.WriteLine("InjectConfigurePopupViewModel is null. That means NO configuration popup will be shown. This should be not happen. Remove DisplayNodeConfigurationPopup for the node");
             return;
         }
         

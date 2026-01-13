@@ -9,7 +9,6 @@ using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Common;
 
-
 public abstract class BaseNode
 {
     public event EventHandler<(BaseNode baseNode, string level, string message, string entry)>? OnExitNodeMessage;
@@ -17,7 +16,7 @@ public abstract class BaseNode
     public event EventHandler<BaseNode>? OnLeaveNode;
 
     protected readonly IPopupService PopupService;
-    
+
     protected CancellationTokenSource Cts;
 
     [JsonIgnore] private BaseNodeList Nodes { get; }
@@ -30,8 +29,6 @@ public abstract class BaseNode
     public int Y { get; set; }
     public IList<Output> Outputs { get; }
     public IList<Input> Inputs { get; }
-    
-    public ContentView? NodeConfigurePopup { get; set; }
 
     protected BaseNode(
         BaseNodeList nodes,
@@ -47,26 +44,26 @@ public abstract class BaseNode
         Cts = new CancellationTokenSource();
         PopupService = AppService.GetRequiredService<IPopupService>();
 
-        if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeInformation))
-        {
-            NodeConfigurePopup = nodeInformation.NodeConfigurePopup;
-        }
-        else
-        {
-            throw new InvalidOperationException($"Node type not found: {name}");
-        }
-        
-        if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeType))
+        // if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
+        // {
+        //     NodeConfigurePopup = nodeSharp..NodeConfigurePopup;
+        // }
+        // else
+        // {
+        //     throw new InvalidOperationException($"Node type not found: {name}");
+        // }
+
+        if (storage.GetNodeInformation().TryGetInformation(typeId, out var nodeType))
         {
             Inputs = new List<Input>();
             Outputs = new List<Output>();
 
-            for(var input = 0 ; input < nodeType.NumberOfInputs ; input++)
+            for (var input = 0; input < nodeType!.NumberOfInputs; input++)
             {
                 Inputs.Add(new Input("Input 1", new List<string>()));
             }
-            
-            for(var output = 0 ; output < nodeType.NumberOfOutputs ; output++)
+
+            for (var output = 0; output < nodeType.NumberOfOutputs; output++)
             {
                 Outputs.Add(new Output("Output 1", new List<string>()));
             }
@@ -100,18 +97,18 @@ public abstract class BaseNode
     {
         var storage = AppService.GetRequiredService<Storage>();
         PopupService = AppService.GetRequiredService<IPopupService>();
-        
-        if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeInformation))
-        {
-            NodeConfigurePopup = nodeInformation.NodeConfigurePopup;
-        }
-        else
-        {
-            throw new InvalidOperationException($"Node type not found: {name}");
-        }
-        
+
+        // if (storage.GetNodeInformation().TryGetInformation(typeId, out var nodeInformation))
+        // {
+        //     NodeConfigurePopup = nodeInformation.NodeConfigurePopup;
+        // }
+        // else
+        // {
+        //     throw new InvalidOperationException($"Node type not found: {name}");
+        // }
+
         Cts = new CancellationTokenSource();
-        
+
         Nodes = nodes;
         Id = id;
         TypeId = typeId;
@@ -123,7 +120,7 @@ public abstract class BaseNode
         Outputs = outputs;
         Inputs = inputs;
     }
-    
+
     public void Abort()
     {
         Cts?.Cancel();
@@ -131,18 +128,19 @@ public abstract class BaseNode
 
     public virtual async Task DisplayNodeConfigurationPopup()
     {
+        Debug.WriteLine("Node configuration popup not implemented for this node type");
     }
-    
+
     protected virtual void ExitNodeMessage(BaseNode baseNode, string level, string message, string entry)
     {
         OnExitNodeMessage?.Invoke(this, (baseNode, level, message, entry));
     }
-    
+
     protected virtual void EnterNode(BaseNode node)
     {
         OnEnterNode?.Invoke(this, node);
     }
-    
+
     protected virtual void LeaveNode(BaseNode node)
     {
         OnLeaveNode?.Invoke(this, node);
@@ -158,14 +156,14 @@ public abstract class BaseNode
         Cts = new CancellationTokenSource();
 
         Debug.WriteLine($"BaseNode {FormatNode()} has been activated during start of node");
-        
+
         return Task.CompletedTask;
     }
 
     public virtual Task<string> RunFromInput(BaseNode parent, string parametersJsonString)
     {
         Cts = new CancellationTokenSource();
-        
+
         Debug.WriteLine($"Node {FormatNode()} has been activated by parent node {parent.FormatNode()}");
         return Task.FromResult(parametersJsonString);
     }
@@ -192,7 +190,7 @@ public abstract class BaseNode
 
             return Task.FromResult(Task.WhenAll(tasks));
         });
-        
+
         return Task.CompletedTask;
     }
 
@@ -280,7 +278,7 @@ public abstract class BaseNode
             throw new InvalidOperationException(errors.ToString().Trim());
         }
     }
-    
+
     protected static JsonElement GetProperty(JsonElement nodeElement, string propertyName)
     {
         try
@@ -307,7 +305,6 @@ public abstract class BaseNode
 
     private string FormatNode() => $"{Name}:{TypeId}";
 }
-
 
 public class Input(string name, IList<string> connectsToParentNodeId)
 {
