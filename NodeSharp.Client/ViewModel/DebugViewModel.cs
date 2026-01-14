@@ -96,12 +96,16 @@ public partial class DebugViewModel : ObservableObject
 [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class DebugData : ObservableObject
 {
+    private static int colorIndex = 0;
+    
     [ObservableProperty]
     private string message;
     [ObservableProperty]
     private string level;
     [ObservableProperty]
-    private string entry; 
+    private string entry;
+    [ObservableProperty]
+    private Color backgroundColor;
 
     [ObservableProperty]
     private List<string> messages = ["qwerty", "asdfgh", "zxcvbn"];
@@ -111,6 +115,9 @@ public partial class DebugData : ObservableObject
         Message = message;
         Level = level;
         Entry = entry;
+        
+        BackgroundColor = colorIndex % 2 == 0 ? Colors.White : Colors.LightGray;
+        colorIndex++;
         
         messages.Insert(0, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss:}: {message}");
     }

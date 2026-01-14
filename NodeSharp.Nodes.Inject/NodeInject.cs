@@ -45,7 +45,7 @@ public class NodeInject : BaseNode
     {
         Repeat = new Repeat("Second", 10, false);
         ActivateAfter = new ActivateAfter("Second", 1);
-        Parameters = new List<Parameter>();
+        Parameters = [new Parameter("Timestamp", "Number", "Timestamp", "")];
     }
 
     public NodeInject(

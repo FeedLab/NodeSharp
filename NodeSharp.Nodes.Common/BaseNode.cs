@@ -19,11 +19,18 @@ public abstract class BaseNode
 
     protected readonly IPopupService PopupService;
 
+    [JsonIgnore]
     public INodeInformation TypeInformation { get; set; }
 
+    [JsonIgnore]
+    public string OutputMessage { get; set; }
+
+    [JsonIgnore]
     protected CancellationTokenSource Cts;
 
-    [JsonIgnore] private BaseNodeList Nodes { get; }
+    [JsonIgnore] 
+    private BaseNodeList Nodes { get; }
+    
     public string Id { get; }
     public string TypeId { get; }
     public string Name { get; }
@@ -223,7 +230,6 @@ public abstract class BaseNode
         return Task.CompletedTask;
     }
 
-    public string OutputMessage { get; set; }
 
     public void ValidateInputAndOutput()
     {

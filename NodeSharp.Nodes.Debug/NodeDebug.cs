@@ -49,7 +49,7 @@ public class NodeDebug : BaseNode
             
             System.Diagnostics.Debug.WriteLine($"{Name}: {parametersJsonString}");
 
-            ExitNodeMessage(this, "Output", parametersJsonString, Name);
+            ExitNodeMessage(this, "Output", OutputMessage, Name);
 
             return Task.FromResult(parametersJsonString);
         }

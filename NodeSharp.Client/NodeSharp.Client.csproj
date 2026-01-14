@@ -86,6 +86,7 @@
     <ItemGroup>
         <ProjectReference Include="..\NodeSharp.NodeEngine\NodeSharp.NodeEngine.csproj" />
         <ProjectReference Include="..\NodeSharp.Nodes.Common\NodeSharp.Nodes.Common.csproj" />
+        <ProjectReference Include="..\NodeSharp.Nodes.KS0212\NodeSharp.Nodes.KS0212.csproj" />
     </ItemGroup>
 
     <ItemGroup>
