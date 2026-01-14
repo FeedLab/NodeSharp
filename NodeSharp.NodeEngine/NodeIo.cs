@@ -8,6 +8,7 @@ using NodeSharp.Nodes.Debug;
 using NodeSharp.Nodes.Delay;
 using NodeSharp.Nodes.Function;
 using NodeSharp.Nodes.Inject;
+using NodeSharp.Nodes.KS0212;
 using NodeSharp.Nodes.Random;
 
 namespace NodeSharp.NodeEngine;
@@ -164,6 +165,9 @@ public class NodeIo(Storage storage)
                     yPosition,
                     outputs, inputs,
                     nodeElement),
+                "KS0212" => new NodeKs0212(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
+                    outputs, inputs,
+                    nodeElement),
                 _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
             };
 
@@ -273,6 +277,8 @@ public class NodeIo(Storage storage)
                 new DelayPayload()),
             "Function" => new NodeFunction(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition,
                 yPosition, storage, new FunctionData()),
+            "KS0212" => new NodeKs0212(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
+                storage),
             _ => throw new InvalidOperationException($"Unknown node type: {nodeTypeName}")
         };
 

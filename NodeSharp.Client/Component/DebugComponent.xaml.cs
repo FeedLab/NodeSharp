@@ -30,10 +30,9 @@ public partial class DebugComponent : ContentView
 
                     if (CollectionViewDebug.ItemsSource != null && messages.Count > 0)
                     {
-                        CollectionViewDebug.ScrollTo(
-                            index: messages.Count - 1,
-                            position: ScrollToPosition.End,
-                            animate: true);
+                        var lastItem = messages[^1];
+
+                        CollectionViewDebug.ScrollTo(lastItem, ScrollToPosition.End, true);
                     }
                 }
                 catch (Exception ex)
@@ -43,4 +42,5 @@ public partial class DebugComponent : ContentView
             });
         };
     }
+
 }

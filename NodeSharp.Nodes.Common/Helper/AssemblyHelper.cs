@@ -9,6 +9,8 @@ public class AssemblyHelper
         var dlls = Directory.GetFiles(folder, "*.dll", SearchOption.AllDirectories);
         var interfaceType = typeof(TInterface);
 
+        var names = dlls.Select(Path.GetFileName).Where(filename => filename.StartsWith("NodeSharp.Nodes")).ToList();
+        
         foreach (var dll in dlls)
         {
             Assembly asm;
