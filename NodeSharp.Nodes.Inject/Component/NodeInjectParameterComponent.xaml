@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:syncfusion="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+             xmlns:viewModel="clr-namespace:NodeSharp.Nodes.Inject.ViewModel"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             x:Class="NodeSharp.Nodes.Inject.Component.NodeInjectParameterComponent">
+
+    <ContentView.Resources>
+        <Style TargetType="buttons:SfButton" x:Key="IconButtonStyle">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="EnableRippleEffect" Value="True" />
+            <Setter Property="ShowIcon" Value="True" />
+            <Setter Property="ImageSize" Value="26" />
+            <Setter Property="ImageAlignment" Value="Default" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="Stroke" Value="DarkRed" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+
+        <Style x:Key="IconButtonWithOpacityStyle" TargetType="buttons:SfButton" BasedOn="{StaticResource IconButtonStyle}">
+            <Style.Triggers>
+                <Trigger TargetType="buttons:SfButton" Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Icon resources -->
+        <FontImageSource x:Key="AddIcon" FontFamily="MaterialAssets" Glyph="&#xe77d;" Color="White" />
+        <FontImageSource x:Key="RemoveIcon" FontFamily="MaterialAssets" Glyph="&#xe70e;" Color="White" />
+    </ContentView.Resources>
+    
+    <Grid RowDefinitions="*, Auto">
+        <syncfusion:SfDataGrid Grid.Row="0"
+                               x:Name="DataGrid"
+                               ItemsSource="{Binding Items}"
+                               AutoGenerateColumnsMode="None"
+                               ColumnWidthMode="LastColumnFill"
+                               AllowEditing="True"
+                               EditTapAction="OnTap"
+                               SelectionMode="Single"
+                               NavigationMode="Row"
+                               HeaderRowHeight="42"
+                               RowHeight="32"
+                               GridLinesVisibility="Horizontal"
+                               CellDoubleTapped="DataGrid_OnCellDoubleTapped"
+                               LiveDataUpdateMode="AllowDataShaping"
+                               Background="White"
+                               VerticalOptions="Fill">
+
+            <!-- Modern styling -->
+            <syncfusion:SfDataGrid.DefaultStyle>
+                <syncfusion:DataGridStyle 
+                    HeaderRowBackground="#F3F4F6"
+                    HeaderRowTextColor="#374151"
+                    HeaderRowFontSize="13"
+                    HeaderRowFontAttributes="Bold"
+                    RowBackground="White"
+                    RowTextColor="#111827"
+                    GridLineColor="#E5E7EB"
+                    SelectionBackground="#EFF6FF"
+                    SelectedRowTextColor="#2563EB"
+                    CurrentCellBorderColor="Transparent"
+                    CurrentCellBorderWidth="0"/>
+            </syncfusion:SfDataGrid.DefaultStyle>
+
+            <syncfusion:SfDataGrid.Columns>
+                <!-- Column 0: Name (Text Input) -->
+                <syncfusion:DataGridTextColumn
+                    MappingName="Name"
+                    HeaderText="Name"
+                    AllowEditing="True"
+                    Width="150" />
+
+                <!-- Column 1: Source (ComboBox with 3 items) -->
+                <syncfusion:DataGridComboBoxColumn
+                    MappingName="Source"
+                    HeaderText="Source"
+                    AllowEditing="True"
+                    ShowClearButton="False"
+                    Width="150"
+                    ItemsSource="{Binding SourceOptions}" />
+
+                <!-- Column 2: Type (ComboBox - read-only when not editable) -->
+                <syncfusion:DataGridComboBoxColumn
+                    MappingName="Type"
+                    HeaderText="Type"
+                    AllowEditing="True"
+                    ShowClearButton="False"
+                    Width="150"
+                    ItemsSource="{Binding TypeOptions}" />
+
+                <!-- Column 3: Value (Template for per-row visibility) -->
+                <syncfusion:DataGridTemplateColumn
+                    MappingName="Value"
+                    HeaderText="Value"
+                    AllowEditing="True"
+                    >
+                    <syncfusion:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Label Text="{Binding Value}"
+                                   VerticalOptions="Center"
+                                   Margin="8,0"
+                                   IsVisible="{Binding IsValueVisible}" />
+                        </DataTemplate>
+                    </syncfusion:DataGridTemplateColumn.CellTemplate>
+                    <syncfusion:DataGridTemplateColumn.EditTemplate>
+                        <DataTemplate>
+                            <Entry Text="{Binding Value, Mode=TwoWay}"
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding IsValueVisible}"
+                                   IsEnabled="{Binding IsValueVisible}" />
+                        </DataTemplate>
+                    </syncfusion:DataGridTemplateColumn.EditTemplate>
+                </syncfusion:DataGridTemplateColumn>
+            </syncfusion:SfDataGrid.Columns>
+        </syncfusion:SfDataGrid>
+
+        <HorizontalStackLayout Grid.Row="1" Spacing="4" HeightRequest="50" Margin="0,24,0,0">
+
+            <buttons:SfButton
+                FontSize="14"
+                Text="Primitive"
+                Background="DarkGreen"                         
+            Style="{StaticResource IconButtonWithOpacityStyle}"
+            Command="{Binding AddCommand}"
+            ImageSource="{StaticResource AddIcon}"
+            ToolTipProperties.Text="Add Primitive" />
+
+        <buttons:SfButton
+                FontSize="14"
+                Text="Timestamp"
+                Background="DarkGreen"                         
+            Style="{StaticResource IconButtonWithOpacityStyle}"
+            Command="{Binding AddCommand}"
+            ImageSource="{StaticResource AddIcon}"
+            ToolTipProperties.Text="Add Timestamp" />
+
+            <buttons:SfButton
+                FontSize="14"
+                Text="Environment"
+                Background="DarkGreen"                         
+            Style="{StaticResource IconButtonWithOpacityStyle}"
+            Command="{Binding AddCommand}"
+            ImageSource="{StaticResource AddIcon}"
+            ToolTipProperties.Text="Add from environment variable" />
+
+            <buttons:SfButton
+                FontSize="14"
+                Text="Remove"
+                Background="DarkRed"
+            Style="{StaticResource IconButtonWithOpacityStyle}"
+            Command="{Binding RemoveCommand}"
+            ImageSource="{StaticResource RemoveIcon}"
+            ToolTipProperties.Text="Remove selected parameter" />
+
+        </HorizontalStackLayout>
+    </Grid>
+</ContentView>

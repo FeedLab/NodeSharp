@@ -1,5 +1,5 @@
-﻿using NodeSharp.Client.Services;
-using NodeSharp.Client.ViewModel;
+﻿using NodeSharp.Client.ViewModel;
+using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Client.Component;
 

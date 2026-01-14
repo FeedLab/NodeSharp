@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             x:Class="ManualNodeDisplayTest.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            >
+            
+            <buttons:SfButton
+                Margin="8"
+                WidthRequest="100"
+                Text="Inject"
+                Background="DarkBlue"
+                Clicked="Inject_OnClicked"
+                ToolTipProperties.Text="Node Inject" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

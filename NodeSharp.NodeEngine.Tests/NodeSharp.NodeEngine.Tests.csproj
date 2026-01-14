@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector" Version="6.0.4"/>
+        <PackageReference Include="FluentAssertions" Version="8.8.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageReference Include="xunit" Version="2.9.3"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NodeSharp.NodeEngine\NodeSharp.NodeEngine.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Nodes\Debug\NodeDebug_Tests.cs">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Compile>
+      <Compile Update="Nodes\Delay\NodeDelay_Tests.cs">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Nodes\Debug\Files\Debug_Basic.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Nodes\Delay\Files\Delay_Basic.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Nodes\Delay\Files\Delay_FromInputJson.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Nodes\Delay\Files\Delay_FromInputJson_2.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Nodes\Injection\Files\Inject_Basic.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>

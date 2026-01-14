@@ -1,6 +1,4 @@
 ﻿using NodeSharp.Client.ViewModel;
-using NodeSharp.NodeEngine;
-using NodeSharp.NodeEngine.Model;
 
 namespace NodeSharp.Client;
 
@@ -19,7 +17,7 @@ public class LineConnection
     }
 }
 
-public class LineConnectionManager(NodeIo nodeIo)
+public class LineConnectionManager()
 {
     public IList<LineConnection> Connections { get; set; } = [];
     // private IList<(Point Start, Point End)> Connections { get; set; } = [];

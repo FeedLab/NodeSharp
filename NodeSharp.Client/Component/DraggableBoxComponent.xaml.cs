@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
-using NodeSharp.Client.Extension;
-using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
-using NodeSharp.NodeEngine.Exception;
-using NodeSharp.NodeEngine.Node;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Components;
+using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.Services;
+using NodeSharp.Nodes.Common.ViewModels;
 
 namespace NodeSharp.Client.Component;
 
@@ -26,10 +24,10 @@ public partial class DraggableBoxComponent : ContentView
     private readonly CurvedLineDrawable curvedLineDrawable;
     private readonly IPopupService popupService;
 
-    public static readonly BindableProperty XProperty =
+    public new static readonly BindableProperty XProperty =
         BindableProperty.Create(nameof(X), typeof(double), typeof(DraggableBoxComponent), 0.0);
 
-    public static readonly BindableProperty YProperty =
+    public new static readonly BindableProperty YProperty =
         BindableProperty.Create(nameof(Y), typeof(double), typeof(DraggableBoxComponent), 0.0);
 
     public static readonly BindableProperty TextProperty =
@@ -41,13 +39,13 @@ public partial class DraggableBoxComponent : ContentView
     public static readonly BindableProperty IsHoveredProperty =
         BindableProperty.Create(nameof(IsHovered), typeof(bool), typeof(DraggableBoxComponent), false);
 
-    public double X
+    public new double X
     {
         get => (double)GetValue(XProperty);
         set => SetValue(XProperty, value);
     }
 
-    public double Y
+    public new double Y
     {
         get => (double)GetValue(YProperty);
         set => SetValue(YProperty, value);
@@ -127,10 +125,10 @@ public partial class DraggableBoxComponent : ContentView
             if (boxNode is not null && sender is DraggableBoxComponent element)
             {
                 var bounds = AbsoluteLayout.GetLayoutBounds(element);
-                
+
                 var canvasSurface = this.Parent;
                 var position = view.GetAbsolutePosition("CanvasSurface");
-                
+
                 boxNode.Width = view.Width;
                 boxNode.Height = view.Height;
             }
@@ -199,7 +197,7 @@ public partial class DraggableBoxComponent : ContentView
 
                     WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
                     lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
-                    
+
                     // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
 
                     break;
@@ -211,13 +209,13 @@ public partial class DraggableBoxComponent : ContentView
         }
     }
 
-    private void OnBindingContextChanged(object sender, EventArgs e)
+    private void OnBindingContextChanged(object? sender, EventArgs e)
     {
         if (BindingContext is BoxNode boxNode)
         {
             UpdateInputAnchors(boxNode);
             UpdateOutputAnchors(boxNode);
-        
+
             boxNode.PropertyChanged += (s, args) =>
             {
                 if (args.PropertyName == nameof(BoxNode.Height))
@@ -250,13 +248,13 @@ public partial class DraggableBoxComponent : ContentView
         {
             var boxView = new BoxView
             {
-                WidthRequest = 10,  // Make it larger for easier interaction
+                WidthRequest = 10, // Make it larger for easier interaction
                 HeightRequest = 10,
                 Color = Colors.Black,
-                InputTransparent = false,  // Explicitly enable input
+                InputTransparent = false, // Explicitly enable input
                 AnchorX = 0.5,
                 AnchorY = 0.5,
-                ZIndex = 1000  // Ensure it's on top
+                ZIndex = 1000 // Ensure it's on top
             };
 
             var pointerGesture = new PointerGestureRecognizer();
@@ -282,9 +280,9 @@ public partial class DraggableBoxComponent : ContentView
             {
                 Debug.WriteLine("🔵 POINTER RELEASED - Clearing drag state and redrawing");
                 lineConnectionManager.EndDragging(anchor);
-                
+
                 lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
-                
+
                 WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
                 WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
             };
@@ -322,7 +320,7 @@ public partial class DraggableBoxComponent : ContentView
                 InputTransparent = false,
                 AnchorX = 0.5,
                 AnchorY = 0.5,
-                ZIndex = 1000  // Ensure it's on top
+                ZIndex = 1000 // Ensure it's on top
             };
 
             var pointerGesture = new PointerGestureRecognizer();
@@ -358,7 +356,7 @@ public partial class DraggableBoxComponent : ContentView
             absoluteLayout.Children.Add(boxView);
         }
     }
-    
+
     private async void OnDoubleTapped(object sender, TappedEventArgs e)
     {
         try
@@ -370,43 +368,71 @@ public partial class DraggableBoxComponent : ContentView
                 throw new InvalidOperationException("OnDoubleTapped: BindingContext is not a BoxNode.");
             }
 
-            if (boxNode.Node is not NodeFunction nodeFunction)
-            {
-                return;
-            }
-        
-            await DisplayPopup(nodeFunction);
+            // if (boxNode.Node is NodeFunction nodeFunction)
+            // {
+            //     await DisplayPopup(nodeFunction);
+            //     return;
+            // }
+
+            await boxNode.Node.DisplayNodeConfigurationPopup();
         }
         catch (Exception exception)
         {
             throw new NodeException("OnDoubleTapped: An error occurred.", exception);
         }
-    }   
-    
-    public async Task DisplayPopup(NodeFunction nodeFunction)
+    }
+
+    // public async Task DisplayPopup(NodeFunction nodeFunction)
+    // {
+    //     var queryAttributes = new Dictionary<string, object>
+    //     {
+    //         [nameof(NodeFunction)] = nodeFunction
+    //     };
+    //
+    //     var popupOptions = new PopupOptions
+    //     {
+    //         CanBeDismissedByTappingOutsideOfPopup = false
+    //     };
+    //
+    //     await popupService.ShowPopupAsync<CodeViewModel>(
+    //         Shell.Current,
+    //         options: popupOptions,
+    //         shellParameters: queryAttributes);
+    //
+    //     var codeViewModel = AppService.GetRequiredService<CodeViewModel>();
+    //
+    //     if (codeViewModel.HasChangedCode)
+    //     {
+    //         nodeFunction.FunctionData.CompileScript();
+    //     }
+    //
+    // }
+
+    private async void OnPointerEntered(object? sender, PointerEventArgs e)
     {
-        var queryAttributes = new Dictionary<string, object>
+        if (BindingContext is BoxNode boxNode)
         {
-            [nameof(NodeFunction)] = nodeFunction
-        };
+            var queryAttributes = new Dictionary<string, object>
+            {
+                [nameof(BaseNode)] = boxNode.Node
+            };
+            
+            var popupOptions = new PopupOptions
+            {
+                CanBeDismissedByTappingOutsideOfPopup = true,
+                PageOverlayColor = Colors.Transparent
+            };
 
-        var popupOptions = new PopupOptions
-        {
-            CanBeDismissedByTappingOutsideOfPopup = false
-        };
-
-        await popupService.ShowPopupAsync<CodeViewModel>(
-            Shell.Current,
-            options: popupOptions,
-            shellParameters: queryAttributes);
-        
-        var codeViewModel = AppService.GetRequiredService<CodeViewModel>();
-
-        if (codeViewModel.HasChangedCode)
-        {
-            nodeFunction.FunctionData.CompileScript();
+            await popupService.ShowPopupAsync<LastOutputMessageTooltipViewModel>(
+                Shell.Current,
+                options: popupOptions,
+                queryAttributes);
         }
-        
+    }
+
+    private async void OnPointerExited(object? sender, PointerEventArgs e)
+    {
+     //   await popupService.ClosePopupAsync(Shell.Current, true);
     }
 }
 

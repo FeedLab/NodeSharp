@@ -1,10 +1,5 @@
-﻿using NodeSharp.Client.Services;
-using NodeSharp.Client.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NodeSharp.Client.ViewModel;
+using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Client.Component;
 

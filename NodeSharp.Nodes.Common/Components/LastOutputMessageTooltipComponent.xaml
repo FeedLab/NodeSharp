@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NodeSharp.Nodes.Common.Components.LastOutputMessageTooltipComponent"
+             MaximumHeightRequest="400"
+             MinimumHeightRequest="100"
+             MaximumWidthRequest="400"
+             MinimumWidthRequest="100">
+
+    <ContentView.Resources>
+        <OnPlatform x:Key="MonospaceFontFamily" x:TypeArguments="x:String">
+            <On Platform="Android" Value="monospace" />
+            <On Platform="iOS" Value="Menlo" />
+            <On Platform="MacCatalyst" Value="Menlo" />
+            <On Platform="WinUI" Value="Consolas" />
+        </OnPlatform>
+    </ContentView.Resources>
+
+    <Grid BackgroundColor="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <HorizontalStackLayout
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+            <HorizontalStackLayout.Shadow>
+                <Shadow Brush="Black" Offset="2,2" Radius="10" Opacity="0.3" />
+            </HorizontalStackLayout.Shadow>
+            <Label
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                FontSize="16"
+                Text="{Binding Label}" />
+            <Label
+                Margin="6,0,0,0"
+                HorizontalOptions="Start"
+                VerticalOptions="Center"
+                FontSize="16"
+                TextColor="#2C3E50"
+                FontAttributes="Bold"
+                Text="{Binding BaseNode.Name}" />
+        </HorizontalStackLayout>
+
+        <ScrollView
+            Grid.Row="1"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            Margin="4"
+            BackgroundColor="#F8F9FA">
+
+            <Label
+                Margin="4"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill"
+                FontSize="12"
+                TextColor="#212529"
+                FontFamily="{StaticResource MonospaceFontFamily}"
+                Text="{Binding BaseNode.OutputMessage}">
+                <Label.Shadow>
+                    <Shadow Brush="Black" Offset="2,2" Radius="10" Opacity="0.3" />
+                </Label.Shadow>
+            </Label>
+        </ScrollView>
+    </Grid>
+</ContentView>

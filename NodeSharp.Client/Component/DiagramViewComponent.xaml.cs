@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Layouts;
-using NodeSharp.Client.Services;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
+using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Client.Component;
 
@@ -23,14 +17,14 @@ public partial class DiagramViewComponent : ContentView
     private NodeDraggingStatus DraggingStatus { get; set; } = new();
     private AnchorDraggingStatus AnchorDragging { get; set; } = new();
 
-    double startX = 0;
-    double startY = 0;
-    double panX, panY;
-    double scale = 1.0;
+    private double startX = 0;
+    private double startY = 0;
+    private double panX, panY;
+    private double scale = 1.0;
 
-    double viewportWidth, viewportHeight;
-    double canvasWidth = 3000; // virtual size
-    double canvasHeight = 2000;
+    private double viewportWidth, viewportHeight;
+    private const double CanvasWidth = 3000; // virtual size
+    private const double CanvasHeight = 2000;
 
     public DiagramViewComponent()
     {
@@ -113,8 +107,8 @@ public partial class DiagramViewComponent : ContentView
     void ClampPan()
     {
         // Calculate based on the virtual canvas size vs the actual visible area (viewportWidth/Height)
-        var scaledCanvasWidth = canvasWidth * scale;
-        var scaledCanvasHeight = canvasHeight * scale;
+        var scaledCanvasWidth = CanvasWidth * scale;
+        var scaledCanvasHeight = CanvasHeight * scale;
 
         // Prevent panning too far right (keeping canvas edge at viewport edge)
         double minX = viewportWidth - scaledCanvasWidth;
@@ -196,7 +190,7 @@ public partial class DiagramViewComponent : ContentView
     }
 
 #if WINDOWS
-    void OnHandlerChanged(object sender, EventArgs e)
+    void OnHandlerChanged(object? sender, EventArgs e)
     {
         if (this.Handler?.PlatformView is Microsoft.UI.Xaml.FrameworkElement nativeView)
         {
@@ -244,7 +238,7 @@ public partial class DiagramViewComponent : ContentView
         e.AcceptedOperation = DataPackageOperation.Copy;
     }
 
-    private void OnPointerMoved(object sender, PointerEventArgs e)
+    private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
         if (lineConnectionManager.IsDragging)
         {
@@ -262,7 +256,7 @@ public partial class DiagramViewComponent : ContentView
         // Get the dropped data (NodeInformationModel from ListView)
         var data = e.Data.Properties["Data"];
 
-        if (data is NodeInformationModel nodeInfo)
+        if (data is INodeInformation nodeInfo)
         {
             if (nodeInfo is null)
             {

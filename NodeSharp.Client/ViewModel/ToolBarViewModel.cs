@@ -5,14 +5,15 @@ using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using NodeSharp.Client.Component;
-using NodeSharp.Client.Extension;
 using NodeSharp.NodeEngine;
-using NodeSharp.NodeEngine.Exception;
+using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.ViewModels;
 
 namespace NodeSharp.Client.ViewModel;
 
 [SuppressMessage("Usage", "CsWinRT1030:Project does not enable unsafe blocks")]
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class ToolBarViewModel : ObservableObject
 {
     [ObservableProperty] private bool isSaveEnabled = false;
@@ -71,7 +72,7 @@ public partial class ToolBarViewModel : ObservableObject
         }
         catch (Exception exception)
         {
-            throw; // TODO handle exception
+           throw new Exception("Save: error during save process.", exception);
         }
     }
 
