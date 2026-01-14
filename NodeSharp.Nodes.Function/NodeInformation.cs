@@ -4,49 +4,25 @@ using NodeSharp.Nodes.Function.Component;
 
 namespace NodeSharp.Nodes.Function;
 
-public class NodeInformation : INodeInformation
-{
-    private NodeInformation(string typeId, string runtimeType, bool activateOnStart, bool isEnabled, string information, string symbol,
-        int numberOfInputs, int numberOfOutputs)
+    public class NodePresentationInformation : INodePresentationInformation
     {
-        TypeId = typeId;
-        RuntimeType = runtimeType;
-        ActivateOnStart = activateOnStart;
-        IsEnabled = isEnabled;
-        Information = information;
-        Symbol = symbol;
-        NumberOfInputs = numberOfInputs;
-        NumberOfOutputs = numberOfOutputs;
+        public string OverviewText { get; init; } = "The Inject node can initiate a flow with a specific payload value";
+        public string FontFamilyName { get; init; } = "FontSolid";
+        public string Symbol { get; init; } = "\uf669";
     }
 
-
-    public NodeInformation() : this("Function", "NodeFunction", true, true,
-        "cybersecurity, where attackers inject malicious code into applications", "\ue710", 0, 1)
+    public class NodeInformation : INodeInformation
     {
+        private const string DefaultTypeId = "Function";
+        private const string DefaultRuntimeType = "NodeFunction";
+
+        public string TypeId => DefaultTypeId;
+        public string RuntimeType => DefaultRuntimeType;
+        public bool ActivateOnStart => false;
+        public bool IsEnabled => true;
+        public int NumberOfInputs => 1;
+        public int NumberOfOutputs => 1;
+
+        public bool HasOverviewText => !string.IsNullOrWhiteSpace(PresentationInformation.OverviewText);
+        public INodePresentationInformation PresentationInformation { get; init; } = new NodePresentationInformation();
     }
-
-    public string TypeId { get; set; }
-    public string RuntimeType { get; set; }
-    public bool ActivateOnStart { get; set; }
-    public bool IsEnabled { get; set; }
-    public string? Information { get; set; }
-    public string? Symbol { get; set; }
-
-    public int NumberOfInputs { get; set; }
-
-    public int NumberOfOutputs { get; set; }
-
-    public bool HasInformationText => !string.IsNullOrWhiteSpace(Information);
-
-    public override string ToString()
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine($"{nameof(TypeId)}: {TypeId}");
-        sb.AppendLine($"{nameof(ActivateOnStart)}: {ActivateOnStart}");
-        sb.AppendLine($"{nameof(IsEnabled)}: {IsEnabled}");
-        sb.AppendLine($"{nameof(Information)}: {Information}");
-        sb.AppendLine($"{nameof(Symbol)}: {Symbol}");
-        sb.AppendLine($"{nameof(HasInformationText)}: {HasInformationText}");
-        return sb.ToString();
-    }
-}

@@ -70,7 +70,7 @@
                 <syncfusion:SfListView.ItemTemplate>
                     <DataTemplate x:DataType="model:INodeInformation">
                         <Border Margin="6, 3, 6, 3" Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray"
-                                StrokeShape="RoundRectangle 5">
+                                StrokeShape="RoundRectangle 5" x:DataType="model:INodeInformation">
                             <Border.GestureRecognizers>
                                 <DragGestureRecognizer DragStarting="OnDragStarting" />
                             </Border.GestureRecognizers>
@@ -78,7 +78,9 @@
                                 <Shadow Radius="10" Opacity="0.5" Brush="Black" Offset="10,10" />
                             </Border.Shadow>
 
-                            <Grid Padding="4">
+                            <Grid
+                                Margin="8"
+                                Padding="4">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="0.4*" />
                                     <RowDefinition Height="0.6*" />
@@ -90,11 +92,13 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
 
-                                    <Label Grid.Column="0" Text="{Binding Symbol}"
+                                    <Label Grid.Column="0" 
+                                           Margin="4"
+                                           Text="{Binding PresentationInformation.Symbol}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center"
-                                           FontFamily="MaterialAssets"
-                                           FontSize="24"
+                                           FontFamily="{Binding PresentationInformation.FontFamilyName}"
+                                           FontSize="18"
                                            TextColor="Black">
                                         <Label.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="OnSearchClicked" />
@@ -106,10 +110,13 @@
                                            FontAttributes="None" TextColor="Coral" FontSize="21" />
                                 </Grid>
 
-                                <Label Grid.Row="1" Text="{Binding Information}"
+                                <Label Grid.Row="1"
+                                       Grid.Column="0"
+                                       Text="{Binding PresentationInformation.OverviewText}"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="4"
-                                       HorizontalOptions="Center"
+                                       HorizontalOptions="Fill"
+                                       VerticalOptions="Fill"
                                        FontAttributes="None" TextColor="Teal" FontSize="11" />
 
                             </Grid>

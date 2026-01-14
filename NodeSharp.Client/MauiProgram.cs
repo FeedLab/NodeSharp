@@ -30,7 +30,7 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-SemiBold.ttf", "OpenSansSemiBold");
                 fonts.AddFont("MauiMaterialAssets.ttf", "MaterialAssets");
-                fonts.AddFont("Font Awesome 6 Free-Solid-900.otf", "FontSolid");
+                fonts.AddFont("Font Awesome 7 Free-Solid-900.otf", "FontSolid");
                 fonts.AddFont("MauiSampleFontIcon.ttf", "MauiSampleFontIcon");
                 fonts.AddFont("AccordionFontIcons.ttf", "AccordionFontIcons");
                 fonts.AddFont("Roboto-Medium.ttf", "Roboto-Medium");

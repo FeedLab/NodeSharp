@@ -49,7 +49,7 @@ public partial class App : Application
         var window = new Window(new AppShell())
         {
             Width = 1600,
-            Height = 1200
+            Height = 900
         };
 
         return window;

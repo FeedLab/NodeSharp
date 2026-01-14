@@ -19,6 +19,8 @@ public abstract class BaseNode
 
     protected readonly IPopupService PopupService;
 
+    public INodeInformation TypeInformation { get; set; }
+
     protected CancellationTokenSource Cts;
 
     [JsonIgnore] private BaseNodeList Nodes { get; }
@@ -46,6 +48,14 @@ public abstract class BaseNode
         Cts = new CancellationTokenSource();
         PopupService = AppService.GetRequiredService<IPopupService>();
 
+        if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
+        {
+            TypeInformation = nodeSharp.NodeInformation;
+        }
+        else
+        {
+            throw new InvalidOperationException($"Node type not found: {name}");
+        }
         // if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
         // {
         //     NodeConfigurePopup = nodeSharp..NodeConfigurePopup;
@@ -85,6 +95,7 @@ public abstract class BaseNode
         Y = yPosition;
     }
 
+
     protected BaseNode(
         BaseNodeList nodes,
         string id,
@@ -109,6 +120,15 @@ public abstract class BaseNode
         //     throw new InvalidOperationException($"Node type not found: {name}");
         // }
 
+        if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
+        {
+            TypeInformation = nodeSharp.NodeInformation;
+        }
+        else
+        {
+            throw new InvalidOperationException($"Node type not found: {name}");
+        }
+        
         Cts = new CancellationTokenSource();
 
         Nodes = nodes;

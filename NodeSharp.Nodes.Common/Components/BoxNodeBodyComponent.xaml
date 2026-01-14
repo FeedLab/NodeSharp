@@ -3,49 +3,77 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NodeSharp.Nodes.Common.Components.BoxNodeBodyComponent"
-             WidthRequest="150">
-    
-                    <Grid Margin="4">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+             MinimumWidthRequest="100">
 
-                    <Label Grid.Row="0" Text="{Binding Name}"
-                           LineBreakMode="NoWrap"
-                           HorizontalOptions="Center"
-                           FontAttributes="None" TextColor="DarkRed" FontSize="12" >
-                        <Label.Triggers>
-                            <DataTrigger TargetType="Label" Binding="{Binding HasFocus}" Value="True">
-                                <Setter Property="Scale" Value="1.05" />
-                                <Setter Property="Shadow">
-                                    <Setter.Value>
-                                        <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" />
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Label.Triggers>
-                        <!-- <Label.Triggers> -->
-                        <!--     <DataTrigger TargetType="Label" Binding="{Binding IsHovered, Source={x:Reference Root}}" Value="True"> -->
-                        <!--         <Setter Property="Scale" Value="1.05" /> -->
-                        <!--         <Setter Property="Shadow"> -->
-                        <!--             <Setter.Value> -->
-                        <!--                 <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" /> -->
-                        <!--             </Setter.Value> -->
-                        <!--         </Setter> -->
-                        <!--     </DataTrigger> -->
-                        <!-- </Label.Triggers> -->
-                    </Label>
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-                    <Label Grid.Row="1" Text="{Binding TypeId}"
-                           LineBreakMode="NoWrap"
-                           HorizontalOptions="Center"
-                           FontAttributes="None" TextColor="DarkGreen" FontSize="14">
-                        <Label.GestureRecognizers>
-                            <PointerGestureRecognizer PointerEntered="OnPointerEntered" PointerExited="OnPointerExited" />
-                        </Label.GestureRecognizers>
-                    </Label>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-                </Grid>
+        <Label
+            Grid.Column="0"
+            Grid.Row="0"
+            Text="{Binding TypeInformation.PresentationInformation.Symbol}"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            FontFamily="{Binding TypeInformation.PresentationInformation.FontFamilyName}"
+            FontSize="18"
+            TextColor="Black">
+            <!-- <Label.GestureRecognizers> -->
+            <!--     <TapGestureRecognizer Tapped="OnSearchClicked" /> -->
+            <!-- </Label.GestureRecognizers> -->
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="PointerGestureRecognizer_OnPointerPressed" />
+            </Label.GestureRecognizers>
+
+        </Label>
+
+        <Label
+            Grid.Column="1"
+            Grid.Row="0"
+            Text="{Binding Name}"
+            LineBreakMode="NoWrap"
+            HorizontalOptions="Center"
+            FontAttributes="None" TextColor="DarkRed" FontSize="12">
+            <Label.Triggers>
+                <DataTrigger TargetType="Label" Binding="{Binding HasFocus}" Value="True">
+                    <Setter Property="Scale" Value="1.05" />
+                    <Setter Property="Shadow">
+                        <Setter.Value>
+                            <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Label.Triggers>
+            <!-- <Label.Triggers> -->
+            <!--     <DataTrigger TargetType="Label" Binding="{Binding IsHovered, Source={x:Reference Root}}" Value="True"> -->
+            <!--         <Setter Property="Scale" Value="1.05" /> -->
+            <!--         <Setter Property="Shadow"> -->
+            <!--             <Setter.Value> -->
+            <!--                 <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" /> -->
+            <!--             </Setter.Value> -->
+            <!--         </Setter> -->
+            <!--     </DataTrigger> -->
+            <!-- </Label.Triggers> -->
+        </Label>
+
+        <Label Grid.Column="1"
+               Grid.Row="1"
+               Text="{Binding TypeId}"
+               LineBreakMode="NoWrap"
+               HorizontalOptions="Center"
+               FontAttributes="None" TextColor="DarkGreen" FontSize="14">
+            <!-- <Label.GestureRecognizers> -->
+            <!--     <PointerGestureRecognizer PointerEntered="OnPointerEntered" PointerExited="OnPointerExited" /> -->
+            <!-- </Label.GestureRecognizers> -->
+        </Label>
+
+    </Grid>
 
 </ContentView>

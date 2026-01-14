@@ -6,11 +6,11 @@ public partial class FunctionConfigurePopupComponent : ContentView
 {
     public FunctionConfigurePopupComponent()
     {
-        var viewModel1 = AppService.GetRequiredService<FunctionConfigurePopupViewModel>();
+        var viewModel = AppService.GetRequiredService<FunctionConfigurePopupViewModel>();
 
 
         InitializeComponent();
 
-        this.BindingContext = viewModel1;
+        this.BindingContext = viewModel;
     }
 }

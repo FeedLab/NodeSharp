@@ -1,10 +1,14 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Mvvm.ComponentModel;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Function;
 
@@ -94,13 +98,36 @@ public class NodeFunction : BaseNode
             LeaveNode(this);
         }
     }
+
+    public override async Task DisplayNodeConfigurationPopup()
+    {
+        var queryAttributes = new Dictionary<string, object>
+        {
+            [nameof(NodeFunction)] = this
+        };
+
+        var popupOptions = new PopupOptions
+        {
+            CanBeDismissedByTappingOutsideOfPopup = false
+        };
+
+        await PopupService.ShowPopupAsync<FunctionConfigurePopupViewModel>(
+            Shell.Current,
+            options: popupOptions,
+            shellParameters: queryAttributes);
+    }
 }
 
-public class FunctionData
+public partial class FunctionData : ObservableObject
 {
     private MethodInfo? method;
 
-    public string SourceCode { get; set; }
+    [ObservableProperty] private string sourceCode;
+
+    partial void OnSourceCodeChanged(string value)
+    {
+        Task.Run(CompileScript);
+    }
 
     public (bool Success, string? Output, System.Exception? Error) ExecuteScript(string json)
     {

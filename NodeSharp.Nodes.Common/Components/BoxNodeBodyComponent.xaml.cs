@@ -25,7 +25,7 @@ public partial class BoxNodeBodyComponent : ContentView
         
     }
     
-    private async void OnPointerEntered(object? sender, PointerEventArgs e)
+    private async void PointerGestureRecognizer_OnPointerPressed(object? sender, TappedEventArgs tappedEventArgs)
     {
         if (BindingContext is BaseNode baseNode)
         {
@@ -45,10 +45,5 @@ public partial class BoxNodeBodyComponent : ContentView
                 options: popupOptions,
                 queryAttributes);
         }
-    }
-
-    private void OnPointerExited(object? sender, PointerEventArgs e)
-    {
-        // It's likely you might need this one too if you're doing hover effects!
     }
 }

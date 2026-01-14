@@ -39,7 +39,7 @@
             AbsoluteLayout.LayoutFlags="PositionProportional">
 
 
-            <Grid Margin="0">
+            <Grid Margin="6">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
@@ -60,7 +60,8 @@
 
                 </Grid>
 
-                <components:BoxNodeBodyComponent Grid.Column="1" BindingContext="{Binding Node}">
+                <components:BoxNodeBodyComponent
+                    Grid.Column="1" BindingContext="{Binding Node}">
                 </components:BoxNodeBodyComponent>
             </Grid>
         </Border>

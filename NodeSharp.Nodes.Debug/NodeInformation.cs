@@ -4,49 +4,25 @@ using NodeSharp.Nodes.Debug.Component;
 
 namespace NodeSharp.Nodes.Debug;
 
-public class NodeInformation : INodeInformation
-{
-    private NodeInformation(string typeId, string runtimeType, bool activateOnStart, bool isEnabled, string information, string symbol,
-        int numberOfInputs, int numberOfOutputs)
+    public class NodePresentationInformation : INodePresentationInformation
     {
-        TypeId = typeId;
-        RuntimeType = runtimeType;
-        ActivateOnStart = activateOnStart;
-        IsEnabled = isEnabled;
-        Information = information;
-        Symbol = symbol;
-        NumberOfInputs = numberOfInputs;
-        NumberOfOutputs = numberOfOutputs;
+        public string OverviewText { get; init; } = "Displays selected message properties in the debug sidebar";
+        public string FontFamilyName { get; init; } = "FontSolid";
+        public string Symbol { get; init; } = "\uf717";
     }
 
-
-    public NodeInformation() : this("Debug", "NodeDebug", false, true,
-        "cybersecurity, where attackers inject malicious code into applications", "\ue710", 0, 1)
+    public class NodeInformation : INodeInformation
     {
+        private const string DefaultTypeId = "Debug";
+        private const string DefaultRuntimeType = "NodeDebug";
+
+        public string TypeId => DefaultTypeId;
+        public string RuntimeType => DefaultRuntimeType;
+        public bool ActivateOnStart => false;
+        public bool IsEnabled => true;
+        public int NumberOfInputs => 1;
+        public int NumberOfOutputs => 0;
+
+        public bool HasOverviewText => !string.IsNullOrWhiteSpace(PresentationInformation.OverviewText);
+        public INodePresentationInformation PresentationInformation { get; init; } = new NodePresentationInformation();
     }
-
-    public string TypeId { get; set; }
-    public string RuntimeType { get; set; }
-    public bool ActivateOnStart { get; set; }
-    public bool IsEnabled { get; set; }
-    public string? Information { get; set; }
-    public string? Symbol { get; set; }
-
-    public int NumberOfInputs { get; set; }
-
-    public int NumberOfOutputs { get; set; }
-
-    public bool HasInformationText => !string.IsNullOrWhiteSpace(Information);
-
-    public override string ToString()
-    {
-        var sb = new StringBuilder();
-        sb.AppendLine($"{nameof(TypeId)}: {TypeId}");
-        sb.AppendLine($"{nameof(ActivateOnStart)}: {ActivateOnStart}");
-        sb.AppendLine($"{nameof(IsEnabled)}: {IsEnabled}");
-        sb.AppendLine($"{nameof(Information)}: {Information}");
-        sb.AppendLine($"{nameof(Symbol)}: {Symbol}");
-        sb.AppendLine($"{nameof(HasInformationText)}: {HasInformationText}");
-        return sb.ToString();
-    }
-}

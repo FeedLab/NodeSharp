@@ -3,10 +3,14 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:listView="http://schemas.syncfusion.com/maui"
              xmlns:converter="clr-namespace:NodeSharp.Nodes.Common.Converter;assembly=NodeSharp.Nodes.Common"
+             xmlns:function="clr-namespace:NodeSharp.Nodes.Function"
+             xmlns:smarttexteditor="clr-namespace:Syncfusion.Maui.SmartComponents;assembly=Syncfusion.Maui.SmartComponents"
+             x:Class="NodeSharp.Nodes.Function.Component.FunctionConfigurePopupComponent"
+             WidthRequest="900"
+             MinimumHeightRequest="600">
 
-             x:Class="NodeSharp.Nodes.Function.Component.FunctionConfigurePopupComponent">
-    
     <ContentView.Resources>
         <ResourceDictionary>
             <converter:LogLevelToColorConverter x:Key="LogLevelToColorConverter" />
@@ -14,24 +18,81 @@
     </ContentView.Resources>
 
     <Grid
-        WidthRequest="900"
-        HeightRequest="900"
         HorizontalOptions="Fill"
         VerticalOptions="Fill"
-        Margin="8">
+        Padding="8"
+        RowSpacing="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Text="Code Editor"
+        <Label Text="Roslyn Code Editor"
                FontAttributes="Bold"
                FontSize="Medium"
                HorizontalOptions="Center"
                Margin="0,0,0,8" />
-        
 
-        <Grid Grid.Row="2" HorizontalOptions="End" HeightRequest="64">
+        <Grid Grid.Row="1"
+              HorizontalOptions="Fill"
+              VerticalOptions="Fill"
+              MaximumHeightRequest="700">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70*" />
+                <RowDefinition Height="30*" />
+            </Grid.RowDefinitions>
+
+            <smarttexteditor:SfSmartTextEditor Grid.Row="0"
+                                               x:Name="CodeEditor"
+                                               HorizontalOptions="Fill" VerticalOptions="Fill"
+                                               Text="{Binding CodeText, Mode=TwoWay}"
+                                               BackgroundColor="LightGray"
+                                               Margin="0">
+                <smarttexteditor:SfSmartTextEditor.TextStyle>
+                    <smarttexteditor:SmartTextEditorStyle
+                        FontSize="16"
+                        TextColor="Blue" />
+                </smarttexteditor:SfSmartTextEditor.TextStyle>
+            </smarttexteditor:SfSmartTextEditor>
+
+            <listView:SfListView
+                x:Name="LogList"
+                Grid.Row="1"
+                HorizontalOptions="Fill" VerticalOptions="Fill"
+                ItemsSource="{Binding LogMessages}"
+                ItemSize="24"
+                AutoFitMode="None"
+                SelectionMode="None">
+                <listView:SfListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Orientation="Horizontal" Padding="4" x:DataType="function:LogEntry">
+                            <Label Text="{Binding Timestamp, StringFormat='[{0:HH:mm:ss}]'}"
+                                   VerticalOptions="Center"
+                                   TextColor="Gray"
+                                   FontFamily="Consolas" />
+                            <Label Text="{Binding Level}"
+                                   VerticalOptions="Center"
+                                   TextColor="{Binding Level, Converter={StaticResource LogLevelToColorConverter}}"
+                                   FontAttributes="Bold"
+                                   Margin="8,0,0,0" />
+                            <Label Text="{Binding Message}"
+                                   VerticalOptions="Center"
+                                   TextColor="Black"
+                                   FontFamily="Consolas"
+                                   Margin="8,0,0,0" />
+                        </StackLayout>
+                    </DataTemplate>
+                </listView:SfListView.ItemTemplate>
+            </listView:SfListView>
+
+        </Grid>
+
+
+        <Grid
+            x:Name="ToolBar"
+            Grid.Row="2"
+            HorizontalOptions="End"
+            HeightRequest="64">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />

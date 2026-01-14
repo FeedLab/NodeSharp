@@ -10,7 +10,7 @@ public class Startup : INodeSharp
 {
     public void Register(IServiceCollection services)
     {
-        services.AddSingletonPopup<FunctionConfigurePopupComponent, FunctionConfigurePopupViewModel>();
+        services.AddTransientPopup<FunctionConfigurePopupComponent, FunctionConfigurePopupViewModel>();
         services.AddKeyedSingleton<INodeInformation, NodeInformation>(NodeName);
     }
     

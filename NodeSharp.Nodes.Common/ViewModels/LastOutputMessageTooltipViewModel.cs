@@ -7,9 +7,12 @@ namespace NodeSharp.Nodes.Common.ViewModels;
 public partial class LastOutputMessageTooltipViewModel: ObservableObject, IQueryAttributable
 {
     [ObservableProperty] private BaseNode? baseNode;
+    [ObservableProperty] private string label = "";
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         BaseNode = (BaseNode)query[nameof(BaseNode)];
+
+        Label = $"Message output for node: ";
     }
 }

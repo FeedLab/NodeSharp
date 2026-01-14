@@ -2,15 +2,19 @@
 
 public interface INodeInformation
 {
-    string TypeId { get; set; }
-    string RuntimeType { get; set; }
-    bool ActivateOnStart { get; set; }
-    bool IsEnabled { get; set; }
-    string? Information { get; set; }
-    string? Symbol { get; set; }
-    int NumberOfInputs { get; set; }
-    int NumberOfOutputs { get; set; }
-    bool HasInformationText { get; }
-    
-  //  ContentView? NodeConfigurePopup { get; }
+    string TypeId { get; }
+    string RuntimeType { get; }
+    bool ActivateOnStart { get; }
+    bool IsEnabled { get; }
+    int NumberOfInputs { get; }
+    int NumberOfOutputs { get; }
+    bool HasOverviewText { get; }
+    INodePresentationInformation PresentationInformation { get; init; }
+}
+
+public interface INodePresentationInformation
+{
+    string OverviewText { get; init; }
+    string FontFamilyName { get; init; }
+    string Symbol { get; init; }
 }
