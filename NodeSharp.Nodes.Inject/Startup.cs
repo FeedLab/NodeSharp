@@ -13,13 +13,20 @@ public class Startup : INodeSharp
     {
         services.AddSingletonPopup<ParameterEditorPopupComponent, ParameterEditorPopupViewModel>();
         services.AddSingletonPopup<InjectConfigurePopupComponent, InjectConfigurePopupViewModel>();
+        
         services.AddSingleton<InjectConfigurePopupViewModel>();
         services.AddSingleton<NodeInjectParameterViewModel>();
+        
+        services.AddTransient<NodeBodyViewModel>();
         
         services.AddKeyedSingleton<INodeInformation, NodeInformation>(NodeName);
     }
 
     public INodeInformation NodeInformation => AppService.GetRequiredKeyedService<INodeInformation>(NodeName);
+    public ContentView? GetNodeBody(BaseNode node)
+    {
+        return new NodeBodyComponent(node);
+    }
 
     public string NodeName => "Inject";
 }

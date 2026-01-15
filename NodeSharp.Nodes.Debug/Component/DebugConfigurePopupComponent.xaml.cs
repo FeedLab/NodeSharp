@@ -6,7 +6,7 @@ public partial class DebugConfigurePopupComponent : ContentView
 {
     public DebugConfigurePopupComponent()
     {
-        var viewModel1 = AppService.GetRequiredService<DebugConfigurePopupViewModel>();
+        var viewModel1 = AppService.GetRequiredService<ViewModel.DebugConfigurePopupViewModel>();
 
         InitializeComponent();
 

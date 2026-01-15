@@ -2,8 +2,9 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="NodeSharp.Nodes.Common.Components.BoxNodeBodyComponent"
-             MinimumWidthRequest="100">
+             xmlns:viewModels="using:NodeSharp.Nodes.Common.ViewModels"
+             x:Class="NodeSharp.Nodes.Common.Components.DefaultBoxNodeBodyComponent"
+             MinimumWidthRequest="100" x:DataType="viewModels:DefaultBoxNodeBodyViewModel">
 
     <Grid Margin="4">
         <Grid.RowDefinitions>
@@ -16,13 +17,15 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <!-- ReSharper disable once Xaml.PossibleNullReferenceException -->
+        <!-- ReSharper disable once Xaml.PossibleNullReferenceException -->
         <Label
             Grid.Column="0"
             Grid.Row="0"
-            Text="{Binding TypeInformation.PresentationInformation.Symbol}"
+            Text="{Binding Node.TypeInformation.PresentationInformation.Symbol}"
             HorizontalOptions="Center"
             VerticalOptions="Center"
-            FontFamily="{Binding TypeInformation.PresentationInformation.FontFamilyName}"
+            FontFamily="{Binding Node.TypeInformation.PresentationInformation.FontFamilyName}"
             FontSize="18"
             TextColor="Black">
             <!-- <Label.GestureRecognizers> -->
@@ -37,12 +40,12 @@
         <Label
             Grid.Column="1"
             Grid.Row="0"
-            Text="{Binding Name}"
+            Text="{Binding Node.Name}"
             LineBreakMode="NoWrap"
             HorizontalOptions="Center"
             FontAttributes="None" TextColor="DarkRed" FontSize="12">
             <Label.Triggers>
-                <DataTrigger TargetType="Label" Binding="{Binding HasFocus}" Value="True">
+                <DataTrigger TargetType="Label" Binding="{Binding Node.HasFocus}" Value="True">
                     <Setter Property="Scale" Value="1.05" />
                     <Setter Property="Shadow">
                         <Setter.Value>
@@ -65,7 +68,7 @@
 
         <Label Grid.Column="1"
                Grid.Row="1"
-               Text="{Binding TypeId}"
+               Text="{Binding Node.TypeId}"
                LineBreakMode="NoWrap"
                HorizontalOptions="Center"
                FontAttributes="None" TextColor="DarkGreen" FontSize="14">

@@ -31,4 +31,19 @@
         <PackageReference Include="Syncfusion.Maui.Toolkit" Version="1.0.8" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <MauiXaml Update="Components\ErrorPopup.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Compile Update="Components\ErrorPopup.xaml.cs">
+        <DependentUpon>ErrorPopup.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
 </Project>

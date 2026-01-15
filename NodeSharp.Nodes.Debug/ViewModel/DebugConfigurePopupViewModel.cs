@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace NodeSharp.Nodes.Debug
+namespace NodeSharp.Nodes.Debug.ViewModel
 {
     public partial class DebugConfigurePopupViewModel(IPopupService popupService) : ObservableObject, IQueryAttributable
     {

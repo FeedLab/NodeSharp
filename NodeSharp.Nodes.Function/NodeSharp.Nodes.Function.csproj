@@ -38,6 +38,16 @@
         <DependentUpon>RandomConfigurePopupComponent.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Component\CodeComponent.xaml.cs">
+        <DependentUpon>CodeComponent.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="Component\CodeComponent.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
     </ItemGroup>
 
 </Project>

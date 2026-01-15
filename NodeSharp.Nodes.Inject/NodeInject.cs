@@ -43,7 +43,7 @@ public class NodeInject : BaseNode
             storage
         )
     {
-        Repeat = new Repeat("Second", 10, false);
+        Repeat = new Repeat("Second", 10);
         ActivateAfter = new ActivateAfter("Second", 1);
         Parameters = [new Parameter("Timestamp", "Number", "Timestamp", "")];
     }
@@ -77,8 +77,7 @@ public class NodeInject : BaseNode
         {
             Repeat = new Repeat(
                 nodeElement.GetProperty("Repeat").GetProperty("Type").GetString()!,
-                nodeElement.GetProperty("Repeat").GetProperty("Value").GetInt32(),
-                nodeElement.GetProperty("Repeat").GetProperty("IsEnabled").GetBoolean()
+                nodeElement.GetProperty("Repeat").GetProperty("Value").GetInt32()
             );
         }
         catch (System.Exception e)
@@ -372,15 +371,14 @@ public class Repeat
 
     public int Value { get; }
 
-    public bool IsEnabled { get; }
+    public bool IsEnabled => Value > 0;
 
     public int RepeatAfterMilliseconds { get; }
 
-    public Repeat(string type, int value, bool isEnabled)
+    public Repeat(string type, int value)
     {
         Type = type;
         Value = value;
-        IsEnabled = isEnabled;
 
         RepeatAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
     }

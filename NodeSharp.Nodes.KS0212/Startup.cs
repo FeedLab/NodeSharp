@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.KS0212.Component;
@@ -17,5 +18,10 @@ public class Startup : INodeSharp
 
     public INodeInformation NodeInformation => AppService.GetRequiredKeyedService<INodeInformation>(NodeName);
 
+    public ContentView? GetNodeBody(BaseNode node)
+    {
+        return new NodeBodyComponent(node);
+    }
+    
     public string NodeName => "KS0212";
 }

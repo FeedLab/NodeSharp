@@ -28,4 +28,17 @@
     <ItemGroup>
       <ProjectReference Include="..\NodeSharp.Nodes.Common\NodeSharp.Nodes.Common.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="Component\NodeBodyComponent.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Component\NodeBodyComponent.xaml.cs">
+        <DependentUpon>NodeBodyComponent.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>
