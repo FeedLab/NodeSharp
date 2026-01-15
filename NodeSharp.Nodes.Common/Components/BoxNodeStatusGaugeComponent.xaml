@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:gauge="clr-namespace:Syncfusion.Maui.Gauges;assembly=Syncfusion.Maui.Gauges"
+             xmlns:common="using:NodeSharp.Nodes.Common"
+             xmlns:viewModels="using:NodeSharp.Nodes.Common.ViewModels"
+             x:Class="NodeSharp.Nodes.Common.Components.BoxNodeStatusGaugeComponent"
+             x:DataType="viewModels:BoxNodeStatusGaugeViewModel"
+             >
+    <gauge:SfLinearGauge x:Name="ProgressBarGauge"
+                         Margin="8,2,8,2"
+                         Minimum="0"
+                         Maximum="100"
+                         HeightRequest="12"
+                         WidthRequest="200"
+                         EnableAxisAnimation="True"
+                         HorizontalOptions="Start"
+                         VerticalOptions="Center"
+                         ShowLabels="False"
+                         ShowTicks="False">
+        <gauge:SfLinearGauge.LineStyle>
+            <gauge:LinearLineStyle CornerStyle="BothCurve"
+                                   Thickness="0" />
+        </gauge:SfLinearGauge.LineStyle>
+                
+                
+        <gauge:SfLinearGauge.BarPointers>
+            <gauge:BarPointer Value="{Binding Node.BoxNodeStatus.Value}"
+                              PointerSize="8"
+                              EnableAnimation="True"
+                              AnimationEasing="{x:Static Easing.CubicOut}"
+                              CornerStyle="BothFlat"
+                              Fill="#00a2ed" />
+        </gauge:SfLinearGauge.BarPointers>
+    </gauge:SfLinearGauge>
+</ContentView>

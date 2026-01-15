@@ -89,6 +89,8 @@ public class NodeFunction : BaseNode
 
             var updatedJsonString = runStatus.Output ?? parametersJsonString;
 
+            MainThread.BeginInvokeOnMainThread(() => { BoxNodeStatus.Message = DateTime.Now.ToString("HH:mm:ss"); });
+
             await SendToConnectedChildrenAsync(updatedJsonString);
 
             return await Task.FromResult(updatedJsonString);

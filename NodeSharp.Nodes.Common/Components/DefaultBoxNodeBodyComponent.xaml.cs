@@ -11,7 +11,6 @@ public partial class DefaultBoxNodeBodyComponent : ContentView
 
     public DefaultBoxNodeBodyComponent(BaseNode node)
     {
-        // viewModel = AppService.GetRequiredService<DefaultBoxNodeBodyViewModel>();
         viewModel = new DefaultBoxNodeBodyViewModel(node);
 
         InitializeComponent();

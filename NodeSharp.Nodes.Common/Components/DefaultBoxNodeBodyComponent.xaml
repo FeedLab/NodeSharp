@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="using:NodeSharp.Nodes.Common.ViewModels"
              x:Class="NodeSharp.Nodes.Common.Components.DefaultBoxNodeBodyComponent"
-             MinimumWidthRequest="100" x:DataType="viewModels:DefaultBoxNodeBodyViewModel">
+             MaximumWidthRequest="200" x:DataType="viewModels:DefaultBoxNodeBodyViewModel">
 
     <Grid Margin="4">
         <Grid.RowDefinitions>
@@ -17,8 +17,6 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- ReSharper disable once Xaml.PossibleNullReferenceException -->
-        <!-- ReSharper disable once Xaml.PossibleNullReferenceException -->
         <Label
             Grid.Column="0"
             Grid.Row="0"

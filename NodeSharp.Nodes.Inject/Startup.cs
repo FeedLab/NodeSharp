@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Inject.Component;
@@ -26,6 +27,11 @@ public class Startup : INodeSharp
     public ContentView? GetNodeBody(BaseNode node)
     {
         return new NodeBodyComponent(node);
+    }
+    
+    public ContentView? GetNBoxNodeStatusComponent(BaseNode node)
+    {
+        return new BoxNodeStatusGaugeComponent(node);
     }
 
     public string NodeName => "Inject";
