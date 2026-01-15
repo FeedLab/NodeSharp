@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
+using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
@@ -29,11 +30,17 @@ public abstract partial class BaseNode : ObservableObject
     
     [JsonIgnore]
     public bool HasOutputMessage => !string.IsNullOrEmpty(OutputMessage);
+
+    [ObservableProperty]
+    [JsonIgnore]
+    private BoxNodeStatus boxNodeStatus;
     
     [JsonIgnore] public INodeInformation TypeInformation { get; set; }
 
-    [JsonIgnore] public ContentView? NodeBody { get; set; }
+    [JsonIgnore] public ContentView? NodeBodyComponent { get; set; }
     
+    [JsonIgnore]  public ContentView? BoxNodeStatusComponent { get; set; }
+
     [JsonIgnore] protected CancellationTokenSource Cts;
 
     [JsonIgnore] private BaseNodeList Nodes { get; }
@@ -60,6 +67,7 @@ public abstract partial class BaseNode : ObservableObject
         Storage storage)
     {
         Cts = new CancellationTokenSource();
+        BoxNodeStatus = new BoxNodeStatus();
         PopupService = AppService.GetRequiredService<IPopupService>();
 
         if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
@@ -100,7 +108,8 @@ public abstract partial class BaseNode : ObservableObject
         X = xPosition;
         Y = yPosition;
         
-        NodeBody = nodeSharp.GetNodeBody(this);
+        NodeBodyComponent = nodeSharp.GetNodeBody(this);
+        BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
     }
 
 
@@ -117,6 +126,8 @@ public abstract partial class BaseNode : ObservableObject
         List<Output> outputs,
         List<Input> inputs)
     {
+        BoxNodeStatus = new BoxNodeStatus();
+        
         var storage = AppService.GetRequiredService<Storage>();
         PopupService = AppService.GetRequiredService<IPopupService>();
 
@@ -142,7 +153,8 @@ public abstract partial class BaseNode : ObservableObject
         Outputs = outputs;
         Inputs = inputs;
         
-        NodeBody = nodeSharp.GetNodeBody(this);
+        NodeBodyComponent = nodeSharp.GetNodeBody(this);
+        BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
     }
 
     public void Abort()
@@ -348,4 +360,20 @@ public class Output(string name, IList<string> connectsToNodeId)
 {
     public string Name { get; } = name;
     public IList<string> ConnectsToNodeId { get; } = connectsToNodeId;
+}
+
+public partial class BoxNodeStatus : ObservableObject
+{
+    [JsonIgnore]
+    [ObservableProperty] 
+    private decimal value;
+    
+    [JsonIgnore]
+    [ObservableProperty] private string message;
+
+    public BoxNodeStatus()
+    {
+        Value = 0;
+        Message = "Ok";
+    }
 }

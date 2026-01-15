@@ -22,6 +22,11 @@ public class Startup : INodeSharp
     {
         return new DefaultBoxNodeBodyComponent(node);
     }
-    
+
+    public ContentView? GetNBoxNodeStatusComponent(BaseNode node)
+    {
+        return new BoxNodeStatusTextComponent(node);
+    }
+
     public string NodeName => "Function";
 }

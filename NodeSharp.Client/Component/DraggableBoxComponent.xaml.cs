@@ -226,7 +226,8 @@ public partial class DraggableBoxComponent : ContentView
                 }
             };
 
-            BoxNodeBodyContainer.Content = boxNode.Node.NodeBody;
+            BoxNodeBodyContainer.Content = boxNode.Node.NodeBodyComponent;
+            BoxNodeStatusContainer.Content = boxNode.Node.BoxNodeStatusComponent;
         }
     }
 

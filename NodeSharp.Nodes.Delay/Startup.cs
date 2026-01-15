@@ -14,11 +14,17 @@ public class Startup : INodeSharp
         services.AddSingletonPopup<DelayConfigurePopupComponent, DelayConfigurePopupViewModel>();
         services.AddKeyedSingleton<INodeInformation, NodeInformation>(NodeName);
     }
+    
     public INodeInformation NodeInformation => AppService.GetRequiredKeyedService<INodeInformation>(NodeName);
 
     public ContentView? GetNodeBody(BaseNode node)
     {
         return new DefaultBoxNodeBodyComponent(node);
+    }
+    
+    public ContentView? GetNBoxNodeStatusComponent(BaseNode node)
+    {
+        return new BoxNodeStatusGaugeComponent(node);
     }
     
     public string NodeName => "Delay";

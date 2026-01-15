@@ -143,14 +143,20 @@ public class NodeInject : BaseNode
                     Debug.WriteLine(
                         $"Inject: Delay is enabled. Waiting {ActivateAfter.ActivateAfterMilliseconds} milliseconds before execute.");
 
-                    var activateAfterMs = ActivateAfter.Type.ConvertTimeToMilliseconds(ActivateAfter.Value);
-                    await Task.Delay(activateAfterMs);
+                    await PeriodicExecutor.DelayedPeriodicExecution(
+                        delay: TimeSpan.FromSeconds(ActivateAfter.Value),
+                        interval: TimeSpan.FromMilliseconds(100),
+                        action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
+                        cancellationToken: Cts.Token
+                    );
                 }
 
                 if (Repeat.IsEnabled)
                 {
                     Debug.WriteLine("Inject: Starting repeating");
 
+                    await MainThread.InvokeOnMainThreadAsync(() => { BoxNodeStatus.Value = 0; });
+                    
                     var repeatMs = Repeat.Type.ConvertTimeToMilliseconds(Repeat.Value);
                     var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(repeatMs));
 
@@ -160,6 +166,13 @@ public class NodeInject : BaseNode
                         {
                             await base.Run();
                             var parametersJsonString = await BuildParametersJson(Parameters);
+
+                            await PeriodicExecutor.DelayedPeriodicExecution(
+                                delay: TimeSpan.FromSeconds(Repeat.Value),
+                                interval: TimeSpan.FromMilliseconds(500),
+                                action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
+                                cancellationToken: Cts.Token);
+                                
                             await SendToConnectedChildrenAsync(parametersJsonString);
                         } while (await timer.WaitForNextTickAsync(Cts.Token));
                     }
@@ -180,6 +193,8 @@ public class NodeInject : BaseNode
 
                     var jsonNode = JsonNode.Parse(parametersJsonString) ?? "";
 
+                    await MainThread.InvokeOnMainThreadAsync(() => { BoxNodeStatus.Value = 100; });
+                    
                     await SendToConnectedChildrenAsync(jsonNode);
                 }
             });

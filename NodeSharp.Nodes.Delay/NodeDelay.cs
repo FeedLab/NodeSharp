@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.Nodes.Delay;
@@ -152,7 +153,13 @@ public class NodeDelay : BaseNode
             if (delayMilliseconds > 0)
             {
                 Debug.WriteLine($"NodeDelay '{this.GetType().Name}' delaying for {delayMilliseconds}ms");
-                await Task.Delay(delayMilliseconds);
+                // await Task.Delay(delayMilliseconds);
+                
+                await PeriodicExecutor.DelayedPeriodicExecution(
+                    delay: TimeSpan.FromSeconds(delayMilliseconds / 1000),
+                    interval: TimeSpan.FromMilliseconds(500),
+                    action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
+                    cancellationToken: Cts.Token);
             }
 
             await SendToConnectedChildrenAsync(parametersJsonString);

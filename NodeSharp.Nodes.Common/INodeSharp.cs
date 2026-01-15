@@ -11,5 +11,7 @@ public interface INodeSharp
     
     public ContentView? GetNodeBody(BaseNode node);
     
+    public ContentView? GetNBoxNodeStatusComponent(BaseNode node);
+    
     public string NodeName { get; }
 }

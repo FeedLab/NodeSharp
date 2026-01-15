@@ -23,5 +23,10 @@ public class Startup : INodeSharp
         return new DefaultBoxNodeBodyComponent(node);
     }
     
+    public ContentView? GetNBoxNodeStatusComponent(BaseNode node)
+    {
+        return null;
+    }
+    
     public string NodeName => "RandomNumber";
 }
