@@ -3,7 +3,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
-             x:Class="NodeSharp.Client.Component.ErrorPopup">
+             x:Class="NodeSharp.Nodes.Common.Components.ErrorPopup">
 
     <Border StrokeShape="RoundRectangle 12"
                 BackgroundColor="White"

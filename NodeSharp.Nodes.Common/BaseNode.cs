@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
+using CommunityToolkit.Mvvm.ComponentModel;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
@@ -11,7 +13,8 @@ using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Common;
 
-public abstract class BaseNode
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
+public abstract partial class BaseNode : ObservableObject
 {
     public event EventHandler<(BaseNode baseNode, string level, string message, string entry)>? OnExitNodeMessage;
     public event EventHandler<BaseNode>? OnEnterNode;
@@ -20,17 +23,21 @@ public abstract class BaseNode
     protected readonly IPopupService PopupService;
 
     [JsonIgnore]
-    public INodeInformation TypeInformation { get; set; }
-
-    [JsonIgnore]
-    public string OutputMessage { get; set; }
-
-    [JsonIgnore]
-    protected CancellationTokenSource Cts;
-
-    [JsonIgnore] 
-    private BaseNodeList Nodes { get; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOutputMessage))]
+    private string outputMessage;
     
+    [JsonIgnore]
+    public bool HasOutputMessage => !string.IsNullOrEmpty(OutputMessage);
+    
+    [JsonIgnore] public INodeInformation TypeInformation { get; set; }
+
+    [JsonIgnore] public ContentView? NodeBody { get; set; }
+    
+    [JsonIgnore] protected CancellationTokenSource Cts;
+
+    [JsonIgnore] private BaseNodeList Nodes { get; }
+
     public string Id { get; }
     public string TypeId { get; }
     public string Name { get; }
@@ -63,14 +70,6 @@ public abstract class BaseNode
         {
             throw new InvalidOperationException($"Node type not found: {name}");
         }
-        // if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
-        // {
-        //     NodeConfigurePopup = nodeSharp..NodeConfigurePopup;
-        // }
-        // else
-        // {
-        //     throw new InvalidOperationException($"Node type not found: {name}");
-        // }
 
         if (storage.GetNodeInformation().TryGetInformation(typeId, out var nodeType))
         {
@@ -100,7 +99,10 @@ public abstract class BaseNode
         ActivateOnStart = activateOnStart;
         X = xPosition;
         Y = yPosition;
+        
+        NodeBody = nodeSharp.GetNodeBody(this);
     }
+
 
 
     protected BaseNode(
@@ -118,15 +120,6 @@ public abstract class BaseNode
         var storage = AppService.GetRequiredService<Storage>();
         PopupService = AppService.GetRequiredService<IPopupService>();
 
-        // if (storage.GetNodeInformation().TryGetInformation(typeId, out var nodeInformation))
-        // {
-        //     NodeConfigurePopup = nodeInformation.NodeConfigurePopup;
-        // }
-        // else
-        // {
-        //     throw new InvalidOperationException($"Node type not found: {name}");
-        // }
-
         if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
         {
             TypeInformation = nodeSharp.NodeInformation;
@@ -135,7 +128,7 @@ public abstract class BaseNode
         {
             throw new InvalidOperationException($"Node type not found: {name}");
         }
-        
+
         Cts = new CancellationTokenSource();
 
         Nodes = nodes;
@@ -148,6 +141,8 @@ public abstract class BaseNode
         Y = yPosition;
         Outputs = outputs;
         Inputs = inputs;
+        
+        NodeBody = nodeSharp.GetNodeBody(this);
     }
 
     public void Abort()
@@ -205,7 +200,7 @@ public abstract class BaseNode
     protected Task SendToConnectedChildrenAsync(string parametersJsonString)
     {
         OutputMessage = parametersJsonString.ToPrettyJson();
-        
+
         Task.Run(() =>
         {
             var tasks = new List<Task>();

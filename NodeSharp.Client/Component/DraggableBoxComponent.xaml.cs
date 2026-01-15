@@ -12,6 +12,7 @@ using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;
+using NodeSharp.Nodes.Function;
 
 namespace NodeSharp.Client.Component;
 
@@ -224,6 +225,8 @@ public partial class DraggableBoxComponent : ContentView
                     UpdateOutputAnchors(boxNode);
                 }
             };
+
+            BoxNodeBodyContainer.Content = boxNode.Node.NodeBody;
         }
     }
 
@@ -416,7 +419,7 @@ public partial class DraggableBoxComponent : ContentView
             {
                 [nameof(BaseNode)] = boxNode.Node
             };
-            
+
             var popupOptions = new PopupOptions
             {
                 CanBeDismissedByTappingOutsideOfPopup = true,
@@ -432,7 +435,7 @@ public partial class DraggableBoxComponent : ContentView
 
     private async void OnPointerExited(object? sender, PointerEventArgs e)
     {
-     //   await popupService.ClosePopupAsync(Shell.Current, true);
+        //   await popupService.ClosePopupAsync(Shell.Current, true);
     }
 }
 

@@ -60,9 +60,7 @@
 
                 </Grid>
 
-                <components:BoxNodeBodyComponent
-                    Grid.Column="1" BindingContext="{Binding Node}">
-                </components:BoxNodeBodyComponent>
+                <ContentView x:Name="BoxNodeBodyContainer" Grid.Column="1" />
             </Grid>
         </Border>
     </Grid>

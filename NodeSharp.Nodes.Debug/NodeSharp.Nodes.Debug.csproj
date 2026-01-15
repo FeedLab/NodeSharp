@@ -40,4 +40,8 @@
       <AdditionalFiles Include="Component\RandomConfigurePopupComponent.xaml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ViewModel\" />
+    </ItemGroup>
+
 </Project>
