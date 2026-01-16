@@ -83,13 +83,14 @@ public class NodeRandomNumber : BaseNode
         }
     }
 
-    public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
+    protected override async Task<JsonNode?> RunFromInput(BaseNode parentNode, string inputJsonString)
     {
+        var stopWatch = EnterNode(this);
+
         try
         {
-            EnterNode(this);
-        
-            await base.RunFromInput(parentNode, parametersJsonString);
+            var fromInput = await base.RunFromInput(parentNode, inputJsonString);
+
             var randomNumber = 0;
             if (RandomData.Source.Equals("Fixed", StringComparison.OrdinalIgnoreCase))
             {
@@ -97,7 +98,7 @@ public class NodeRandomNumber : BaseNode
             }
             else if (RandomData.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
             {
-                randomNumber = RandomNumberFromInputData(parametersJsonString);
+                randomNumber = RandomNumberFromInputData(inputJsonString);
             }
             else
             {
@@ -106,9 +107,9 @@ public class NodeRandomNumber : BaseNode
             string updatedJsonString;
             try
             {
-                var parsed = string.IsNullOrWhiteSpace(parametersJsonString)
+                var parsed = string.IsNullOrWhiteSpace(inputJsonString)
                     ? null
-                    : JsonNode.Parse(parametersJsonString);
+                    : JsonNode.Parse(inputJsonString);
                 if (parsed is JsonObject obj)
                 {
                     obj["RandomNumber"] = randomNumber;
@@ -131,15 +132,17 @@ public class NodeRandomNumber : BaseNode
                     $"NodeRandomNumber '{Name}' received invalid JSON from parent '{parentNode.Name}'.", ex);
             }
             
+            MainThread.BeginInvokeOnMainThread(() => { BoxNodeStatus.Message = $"Rnd: {randomNumber}"; });
+            
             var jsonNode = JsonNode.Parse(updatedJsonString) ?? "";
 
-            await SendToConnectedChildrenAsync(jsonNode);
-            
-            return updatedJsonString;
+            OutputMessage = await SendToConnectedChildrenAsync(jsonNode);
+
+            return fromInput;
         }
         finally
         {
-            LeaveNode(this);
+            LeaveNode(this, stopWatch);
         }
     }
     private int RandomNumberFromFixedData()

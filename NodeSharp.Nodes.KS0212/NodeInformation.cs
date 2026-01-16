@@ -20,7 +20,7 @@ namespace NodeSharp.Nodes.KS0212;
         public bool ActivateOnStart => false;
         public bool IsEnabled => true;
         public int NumberOfInputs => 1;
-        public int NumberOfOutputs => 5;
+        public int NumberOfOutputs => 6;
 
         public bool HasOverviewText => !string.IsNullOrWhiteSpace(PresentationInformation.OverviewText);
         public INodePresentationInformation PresentationInformation { get; init; } = new NodePresentationInformation();

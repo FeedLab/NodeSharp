@@ -124,19 +124,19 @@ public class NodeInject : BaseNode
         }
     }
 
-    public override Task Run()
+    public override Task<string> Run()
     {
-        EnterNode(this);
+        var stopwatch = EnterNode(this);
 
         try
         {
             if (!ActivateOnStart)
             {
-                return Task.CompletedTask;
+                return Task.FromResult(OutputMessage);
             }
 
 
-            var _ = Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 if (ActivateAfter.Value > 0)
                 {
@@ -167,13 +167,14 @@ public class NodeInject : BaseNode
                             await base.Run();
                             var parametersJsonString = await BuildParametersJson(Parameters);
 
+                            await SendToConnectedChildrenAsync(parametersJsonString);
+
                             await PeriodicExecutor.DelayedPeriodicExecution(
                                 delay: TimeSpan.FromSeconds(Repeat.Value),
                                 interval: TimeSpan.FromMilliseconds(500),
                                 action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
                                 cancellationToken: Cts.Token);
                                 
-                            await SendToConnectedChildrenAsync(parametersJsonString);
                         } while (await timer.WaitForNextTickAsync(Cts.Token));
                     }
                     catch (OperationCanceledException)
@@ -195,16 +196,16 @@ public class NodeInject : BaseNode
 
                     await MainThread.InvokeOnMainThreadAsync(() => { BoxNodeStatus.Value = 100; });
                     
-                    await SendToConnectedChildrenAsync(jsonNode);
+                    OutputMessage = await SendToConnectedChildrenAsync(jsonNode);
                 }
             });
+
+            return Task.FromResult(OutputMessage);
         }
         finally
         {
-            LeaveNode(this);
+            LeaveNode(this, stopwatch);
         }
-
-        return Task.CompletedTask;
     }
 
 
