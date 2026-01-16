@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace NodeSharp.Nodes.KS0212.ViewModel
 {
-    public partial class Ks0212ConfigurePopupViewModel(IPopupService popupService) : ObservableObject, IQueryAttributable
+    public partial class Ks0212ConfigurePopupViewModel : ObservableObject, IQueryAttributable
     {
         [ObservableProperty] private NodeKs0212? selectedNode;
         

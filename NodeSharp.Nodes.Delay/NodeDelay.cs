@@ -81,13 +81,13 @@ public class NodeDelay : BaseNode
         }
     }
 
-    public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
+    protected override async Task<JsonNode?> RunFromInput(BaseNode parentNode, string inputJsonString)
     {
+        var stopwatch = EnterNode(this);
+
         try
         {
-            EnterNode(this);
-
-            await base.RunFromInput(parentNode, parametersJsonString);
+            var fromInput = await base.RunFromInput(parentNode, inputJsonString);
 
             var delayMilliseconds = 0;
 
@@ -104,9 +104,9 @@ public class NodeDelay : BaseNode
             }
             else if (Delay.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
             {
-                var root = string.IsNullOrWhiteSpace(parametersJsonString)
+                var root = string.IsNullOrWhiteSpace(inputJsonString)
                     ? null
-                    : JsonNode.Parse(parametersJsonString);
+                    : JsonNode.Parse(inputJsonString);
 
 
                 var delayNode = root.GetByPath(Delay.PathToDelayNode) as JsonObject;
@@ -154,7 +154,7 @@ public class NodeDelay : BaseNode
             {
                 Debug.WriteLine($"NodeDelay '{this.GetType().Name}' delaying for {delayMilliseconds}ms");
                 // await Task.Delay(delayMilliseconds);
-                
+
                 await PeriodicExecutor.DelayedPeriodicExecution(
                     delay: TimeSpan.FromSeconds(delayMilliseconds / 1000),
                     interval: TimeSpan.FromMilliseconds(500),
@@ -162,13 +162,13 @@ public class NodeDelay : BaseNode
                     cancellationToken: Cts.Token);
             }
 
-            await SendToConnectedChildrenAsync(parametersJsonString);
+            OutputMessage = await SendToConnectedChildrenAsync(inputJsonString);
 
-            return await Task.FromResult(parametersJsonString);
+            return fromInput;
         }
         finally
         {
-            LeaveNode(this);
+            LeaveNode(this, stopwatch);
         }
     }
 }

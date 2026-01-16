@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -77,27 +78,27 @@ public class NodeFunction : BaseNode
         FunctionData = new FunctionData(functionProp);
     }
 
-    public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
-    {
+    protected override async Task<JsonNode?> RunFromInput(BaseNode parentNode, string inputJsonString)
+    {    
+        var stopwatch = EnterNode(this);
+        
         try
         {
-            EnterNode(this);
+            var fromInput = await base.RunFromInput(parentNode, inputJsonString);
 
-            await base.RunFromInput(parentNode, parametersJsonString);
+            var runStatus = FunctionData.ExecuteScript(inputJsonString);
 
-            var runStatus = FunctionData.ExecuteScript(parametersJsonString);
-
-            var updatedJsonString = runStatus.Output ?? parametersJsonString;
+            var updatedJsonString = runStatus.Output ?? inputJsonString;
 
             MainThread.BeginInvokeOnMainThread(() => { BoxNodeStatus.Message = DateTime.Now.ToString("HH:mm:ss"); });
 
-            await SendToConnectedChildrenAsync(updatedJsonString);
+            OutputMessage = await SendToConnectedChildrenAsync(updatedJsonString);
 
-            return await Task.FromResult(updatedJsonString);
+            return await Task.FromResult(fromInput);
         }
         finally
         {
-            LeaveNode(this);
+            LeaveNode(this, stopwatch);
         }
     }
 

@@ -14,32 +14,43 @@ using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Common;
 
-[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
+    "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
+[SuppressMessage("Usage", "CsWinRT1030:Project does not enable unsafe blocks")]
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0020:Invalid use of attributes dependent on [ObservableProperty]")]
 public abstract partial class BaseNode : ObservableObject
 {
     public event EventHandler<(BaseNode baseNode, string level, string message, string entry)>? OnExitNodeMessage;
     public event EventHandler<BaseNode>? OnEnterNode;
-    public event EventHandler<BaseNode>? OnLeaveNode;
+    public event EventHandler<(BaseNode, Stopwatch)>? OnLeaveNode;
 
     protected readonly IPopupService PopupService;
 
-    [JsonIgnore]
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasOutputMessage))]
+    [JsonIgnore] [NotifyPropertyChangedFor(nameof(HasOutputMessage))]
     private string outputMessage;
-    
-    [JsonIgnore]
-    public bool HasOutputMessage => !string.IsNullOrEmpty(OutputMessage);
 
-    [ObservableProperty]
     [JsonIgnore]
-    private BoxNodeStatus boxNodeStatus;
-    
+    public string OutputMessage
+    {
+        get => outputMessage;
+        set
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                SetProperty(ref outputMessage, value.ToPrettyJson());
+            }
+        }
+    }
+
+    [JsonIgnore] public bool HasOutputMessage => !string.IsNullOrEmpty(OutputMessage);
+
+    [ObservableProperty] [JsonIgnore] private BoxNodeStatus boxNodeStatus;
+
     [JsonIgnore] public INodeInformation TypeInformation { get; set; }
 
     [JsonIgnore] public ContentView? NodeBodyComponent { get; set; }
-    
-    [JsonIgnore]  public ContentView? BoxNodeStatusComponent { get; set; }
+
+    [JsonIgnore] public ContentView? BoxNodeStatusComponent { get; set; }
 
     [JsonIgnore] protected CancellationTokenSource Cts;
 
@@ -107,11 +118,10 @@ public abstract partial class BaseNode : ObservableObject
         ActivateOnStart = activateOnStart;
         X = xPosition;
         Y = yPosition;
-        
+
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
     }
-
 
 
     protected BaseNode(
@@ -127,7 +137,7 @@ public abstract partial class BaseNode : ObservableObject
         List<Input> inputs)
     {
         BoxNodeStatus = new BoxNodeStatus();
-        
+
         var storage = AppService.GetRequiredService<Storage>();
         PopupService = AppService.GetRequiredService<IPopupService>();
 
@@ -152,7 +162,7 @@ public abstract partial class BaseNode : ObservableObject
         Y = yPosition;
         Outputs = outputs;
         Inputs = inputs;
-        
+
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
     }
@@ -172,48 +182,88 @@ public abstract partial class BaseNode : ObservableObject
         OnExitNodeMessage?.Invoke(this, (baseNode, level, message, entry));
     }
 
-    protected virtual void EnterNode(BaseNode node)
+    protected virtual Stopwatch EnterNode(BaseNode node)
     {
+        var stopWatch = Stopwatch.StartNew();
         OnEnterNode?.Invoke(this, node);
+
+        return stopWatch;
     }
 
-    protected virtual void LeaveNode(BaseNode node)
+    protected virtual void LeaveNode(BaseNode node, Stopwatch stopWatch)
     {
-        OnLeaveNode?.Invoke(this, node);
+        OnLeaveNode?.Invoke(this, (node, stopWatch));
     }
 
-    public virtual Task Run()
+    public virtual Task<string> Run()
     {
+        OutputMessage = "";
+
         if (!ActivateOnStart)
         {
-            return Task.CompletedTask;
+            return Task.FromResult("Not a ActivateOnStart node");
         }
 
         Cts = new CancellationTokenSource();
 
-        Debug.WriteLine($"BaseNode {FormatNode()} has been activated during start of node");
+        var message = $"BaseNode {FormatNode()} has been activated during start of node";
 
-        return Task.CompletedTask;
+        Debug.WriteLine(message);
+
+        return Task.FromResult(message);
     }
 
-    public virtual Task<string> RunFromInput(BaseNode parent, string parametersJsonString)
+    protected virtual Task<JsonNode?> RunFromInput(BaseNode parent, string inputJsonString)
     {
         Cts = new CancellationTokenSource();
+        
+        var inputJson = JsonNode.Parse(inputJsonString);
+        
 
-        Debug.WriteLine($"Node {FormatNode()} has been activated by parent node {parent.FormatNode()}");
-        return Task.FromResult(parametersJsonString);
+        var message = $"Node {FormatNode()} has been activated by parent node {parent.FormatNode()}";
+        
+        Debug.WriteLine(message);
+        
+        return Task.FromResult(inputJson);
     }
 
-    protected Task SendToConnectedChildrenAsync(JsonNode jsonNode)
+    protected async Task<string> SendToConnectedChildrenAsync(JsonNode outputNode, Output output)
+    {
+            var outputJsonString = outputNode.ToJsonString();
+            return await SendToConnectedChildrenAsync(outputJsonString, output);
+    }
+
+    protected Task<string> SendToConnectedChildrenAsync(string outputJsonString, Output output)
+    {
+        _ = Task.Run(() =>
+        {
+            var tasks = new List<Task>();
+
+                foreach (var nodeId in output.ConnectsToNodeId)
+                {
+                    var targetNode = Nodes.Find(f => f.Id == nodeId);
+                    if (targetNode is null)
+                    {
+                        throw new InvalidOperationException($"Node not found: {nodeId}");
+                    }
+
+                    tasks.Add(targetNode.RunFromInput(this, outputJsonString));
+                }
+
+            return Task.FromResult(Task.WhenAll(tasks));
+        });
+
+        return Task.FromResult(outputJsonString);
+    }
+
+    protected Task<string> SendToConnectedChildrenAsync(JsonNode jsonNode)
     {
         return SendToConnectedChildrenAsync(jsonNode.ToJsonString());
     }
 
-    protected Task SendToConnectedChildrenAsync(string parametersJsonString)
+    protected Task<string> SendToConnectedChildrenAsync(string parametersJsonString)
     {
-        OutputMessage = parametersJsonString.ToPrettyJson();
-
-        Task.Run(() =>
+        _ = Task.Run(() =>
         {
             var tasks = new List<Task>();
 
@@ -230,11 +280,11 @@ public abstract partial class BaseNode : ObservableObject
                     tasks.Add(targetNode.RunFromInput(this, parametersJsonString));
                 }
             }
-
+            
             return Task.FromResult(Task.WhenAll(tasks));
         });
 
-        return Task.CompletedTask;
+        return Task.FromResult(parametersJsonString);
     }
 
 
@@ -362,14 +412,13 @@ public class Output(string name, IList<string> connectsToNodeId)
     public IList<string> ConnectsToNodeId { get; } = connectsToNodeId;
 }
 
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
+    "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class BoxNodeStatus : ObservableObject
 {
-    [JsonIgnore]
-    [ObservableProperty] 
-    private decimal value;
-    
-    [JsonIgnore]
-    [ObservableProperty] private string message;
+    [JsonIgnore] [ObservableProperty] private decimal value;
+
+    [JsonIgnore] [ObservableProperty] private string message;
 
     public BoxNodeStatus()
     {
