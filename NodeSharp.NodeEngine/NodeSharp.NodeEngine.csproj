@@ -32,6 +32,7 @@
       <ProjectReference Include="..\NodeSharp.Nodes.Delay\NodeSharp.Nodes.Delay.csproj" />
       <ProjectReference Include="..\NodeSharp.Nodes.Function\NodeSharp.Nodes.Function.csproj" />
       <ProjectReference Include="..\NodeSharp.Nodes.Inject\NodeSharp.Nodes.Inject.csproj" />
+      <ProjectReference Include="..\NodeSharp.Nodes.KS0212\NodeSharp.Nodes.KS0212.csproj" />
       <ProjectReference Include="..\NodeSharp.Nodes.Random\NodeSharp.Nodes.Random.csproj" />
     </ItemGroup>
 

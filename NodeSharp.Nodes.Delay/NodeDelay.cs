@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
+using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.Nodes.Delay;
@@ -80,13 +81,13 @@ public class NodeDelay : BaseNode
         }
     }
 
-    public override async Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
+    protected override async Task<JsonNode?> RunFromInput(BaseNode parentNode, string inputJsonString)
     {
+        var stopwatch = EnterNode(this);
+
         try
         {
-            EnterNode(this);
-
-            await base.RunFromInput(parentNode, parametersJsonString);
+            var fromInput = await base.RunFromInput(parentNode, inputJsonString);
 
             var delayMilliseconds = 0;
 
@@ -103,9 +104,9 @@ public class NodeDelay : BaseNode
             }
             else if (Delay.Source.Equals("FromInput", StringComparison.OrdinalIgnoreCase))
             {
-                var root = string.IsNullOrWhiteSpace(parametersJsonString)
+                var root = string.IsNullOrWhiteSpace(inputJsonString)
                     ? null
-                    : JsonNode.Parse(parametersJsonString);
+                    : JsonNode.Parse(inputJsonString);
 
 
                 var delayNode = root.GetByPath(Delay.PathToDelayNode) as JsonObject;
@@ -152,16 +153,21 @@ public class NodeDelay : BaseNode
             if (delayMilliseconds > 0)
             {
                 Debug.WriteLine($"NodeDelay '{this.GetType().Name}' delaying for {delayMilliseconds}ms");
-                await Task.Delay(delayMilliseconds);
+
+                await PeriodicExecutor.DelayedPeriodicExecution(
+                    delay: TimeSpan.FromSeconds(delayMilliseconds / 1000),
+                    interval: TimeSpan.FromMilliseconds(500),
+                    action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
+                    cancellationToken: Cts.Token);
             }
 
-            await SendToConnectedChildrenAsync(parametersJsonString);
+            await SendToConnectedChildrenAsync(inputJsonString);
 
-            return await Task.FromResult(parametersJsonString);
+            return fromInput;
         }
         finally
         {
-            LeaveNode(this);
+            LeaveNode(this, stopwatch);
         }
     }
 }

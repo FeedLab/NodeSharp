@@ -1,9 +1,8 @@
 ﻿using CommunityToolkit.Maui;
-using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;
 
-namespace NodeSharp.Client.Component;
+namespace NodeSharp.Nodes.Common.Components;
 
 public partial class ErrorPopup : ContentView
 {

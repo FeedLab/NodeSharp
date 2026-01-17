@@ -43,9 +43,9 @@ public class NodeInject : BaseNode
             storage
         )
     {
-        Repeat = new Repeat("Second", 10, false);
+        Repeat = new Repeat("Second", 10);
         ActivateAfter = new ActivateAfter("Second", 1);
-        Parameters = new List<Parameter>();
+        Parameters = [new Parameter("Timestamp", "Number", "Timestamp", "")];
     }
 
     public NodeInject(
@@ -77,8 +77,7 @@ public class NodeInject : BaseNode
         {
             Repeat = new Repeat(
                 nodeElement.GetProperty("Repeat").GetProperty("Type").GetString()!,
-                nodeElement.GetProperty("Repeat").GetProperty("Value").GetInt32(),
-                nodeElement.GetProperty("Repeat").GetProperty("IsEnabled").GetBoolean()
+                nodeElement.GetProperty("Repeat").GetProperty("Value").GetInt32()
             );
         }
         catch (System.Exception e)
@@ -125,33 +124,39 @@ public class NodeInject : BaseNode
         }
     }
 
-    public override Task Run()
+    public override Task<string> Run()
     {
-        EnterNode(this);
+        var stopwatch = EnterNode(this);
 
         try
         {
             if (!ActivateOnStart)
             {
-                return Task.CompletedTask;
+                return Task.FromResult(OutputMessage);
             }
 
 
-            var _ = Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 if (ActivateAfter.Value > 0)
                 {
                     Debug.WriteLine(
                         $"Inject: Delay is enabled. Waiting {ActivateAfter.ActivateAfterMilliseconds} milliseconds before execute.");
 
-                    var activateAfterMs = ActivateAfter.Type.ConvertTimeToMilliseconds(ActivateAfter.Value);
-                    await Task.Delay(activateAfterMs);
+                    await PeriodicExecutor.DelayedPeriodicExecution(
+                        delay: TimeSpan.FromSeconds(ActivateAfter.Value),
+                        interval: TimeSpan.FromMilliseconds(100),
+                        action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
+                        cancellationToken: Cts.Token
+                    );
                 }
 
                 if (Repeat.IsEnabled)
                 {
                     Debug.WriteLine("Inject: Starting repeating");
 
+                    await MainThread.InvokeOnMainThreadAsync(() => { BoxNodeStatus.Value = 0; });
+                    
                     var repeatMs = Repeat.Type.ConvertTimeToMilliseconds(Repeat.Value);
                     var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(repeatMs));
 
@@ -161,7 +166,15 @@ public class NodeInject : BaseNode
                         {
                             await base.Run();
                             var parametersJsonString = await BuildParametersJson(Parameters);
+
                             await SendToConnectedChildrenAsync(parametersJsonString);
+
+                            await PeriodicExecutor.DelayedPeriodicExecution(
+                                delay: TimeSpan.FromSeconds(Repeat.Value),
+                                interval: TimeSpan.FromMilliseconds(500),
+                                action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
+                                cancellationToken: Cts.Token);
+                                
                         } while (await timer.WaitForNextTickAsync(Cts.Token));
                     }
                     catch (OperationCanceledException)
@@ -181,16 +194,18 @@ public class NodeInject : BaseNode
 
                     var jsonNode = JsonNode.Parse(parametersJsonString) ?? "";
 
+                    await MainThread.InvokeOnMainThreadAsync(() => { BoxNodeStatus.Value = 100; });
+                    
                     await SendToConnectedChildrenAsync(jsonNode);
                 }
             });
+
+            return Task.FromResult(OutputMessage);
         }
         finally
         {
-            LeaveNode(this);
+            LeaveNode(this, stopwatch);
         }
-
-        return Task.CompletedTask;
     }
 
 
@@ -372,15 +387,14 @@ public class Repeat
 
     public int Value { get; }
 
-    public bool IsEnabled { get; }
+    public bool IsEnabled => Value > 0;
 
     public int RepeatAfterMilliseconds { get; }
 
-    public Repeat(string type, int value, bool isEnabled)
+    public Repeat(string type, int value)
     {
         Type = type;
         Value = value;
-        IsEnabled = isEnabled;
 
         RepeatAfterMilliseconds = Type.ConvertTimeToMilliseconds(Value);
     }

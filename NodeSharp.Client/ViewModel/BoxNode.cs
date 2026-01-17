@@ -33,16 +33,20 @@ public partial class BoxNode : ObservableObject
         Height = 50;
         width = 0;
         
-        baseNode.OnEnterNode += (o, node) =>
+        baseNode.OnEnterNode += (o, nodeRun) =>
         {
-            Debug.WriteLine($"Node entered: {Name} ({NodeId})");
+            Debug.WriteLine($"Node entered (Run): {nodeRun.Name} ({nodeRun.Id})");
             
             HasFocus = true;
         };
         
-        baseNode.OnLeaveNode += (o, node) =>
+        baseNode.OnLeaveNode += (o, valueTuple) =>
         {
-            Debug.WriteLine($"Node exited: {Name} ({NodeId})");
+            var nodeRun = valueTuple.Item1;
+            var stopWatch = valueTuple.Item2;
+            var elapsedTime = stopWatch.ElapsedMilliseconds;
+            
+            Debug.WriteLine($"Node exited (Run): {nodeRun.Name} ({nodeRun.Id}::{elapsedTime}ms)");
             
             HasFocus = false;
         };

@@ -48,18 +48,14 @@ public static class MauiProgram
         builder.Services.AddScoped<ToolBarViewModel>();
         builder.Services.AddSingleton<CurvedLineDrawable>();
         builder.Services.AddSingleton<LineConnectionManager>();
-        builder.Services.AddSingleton<BoxNodeBodyViewModel>();
-        builder.Services.AddSingletonPopup<CodeComponent, CodeViewModel>();
-        builder.Services.AddSingletonPopup<LastOutputMessageTooltipComponent, LastOutputMessageTooltipViewModel>();
         
-        builder.Services.AddTransientPopup<ErrorPopup, ErrorPopupViewModel>();
 
         var storage = new Storage();
         RegisterDynamicNodes(builder.Services, storage);
 
         builder.Services.AddSingleton(storage);
 
-
+        Startup.Register(builder.Services);
 
 #if DEBUG
         builder.Logging.AddDebug();

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -6,27 +7,31 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace NodeSharp.Nodes.Inject.ViewModel;
 
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class ParameterEditorPopupViewModel : ObservableObject, IQueryAttributable
 {
-    [ObservableProperty] private string name = "<Change this>";
+    [ObservableProperty] private string name;
 
-    [ObservableProperty] private string primitiveType = "String";
+    [ObservableProperty] private string primitiveType;
 
-    [ObservableProperty] private string primitiveValue = string.Empty;
+    [ObservableProperty] private string primitiveValue;
 
     [ObservableProperty] private int selectedTabIndex;
 
-    [ObservableProperty] private ParameterItem originalParameter;
+    [ObservableProperty] private ParameterItem? originalParameter;
 
     private readonly IPopupService popupService;
 
-    public bool IsNameValid => !string.IsNullOrWhiteSpace(Name);
+    private bool IsNameValid => !string.IsNullOrWhiteSpace(Name);
 
     public ParameterItem? ParameterItem { get; set; }
 
     public ParameterEditorPopupViewModel(IPopupService popupService)
     {
         this.popupService = popupService;
+        Name = "<Change this>";
+        PrimitiveType = "String";
+        PrimitiveValue = string.Empty;
 
         SelectedTabIndex = 0;
     }

@@ -9,5 +9,9 @@ public interface INodeSharp
     
     public INodeInformation NodeInformation { get; }
     
+    public ContentView? GetNodeBody(BaseNode node);
+    
+    public ContentView? GetNBoxNodeStatusComponent(BaseNode node);
+    
     public string NodeName { get; }
 }

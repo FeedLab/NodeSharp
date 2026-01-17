@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Model;
@@ -37,25 +38,34 @@ public class NodeDebug : BaseNode
     {
     }
 
-    public override Task<string> RunFromInput(BaseNode parentNode, string parametersJsonString)
+    protected override async Task<JsonNode?> RunFromInput(BaseNode parentNode, string inputJsonString)
     {
+        var stopwatch = EnterNode(this);
+
         try
         {
-            EnterNode(this);
+            var fromInput = await base.RunFromInput(parentNode, inputJsonString);
 
-            base.RunFromInput(parentNode, parametersJsonString);
+            if (fromInput is null)
+            {
+                throw new InvalidOperationException($"NodeDebug '{Name}' has no input data.");
+            }
 
-            SendToConnectedChildrenAsync(parametersJsonString);
-            
-            System.Diagnostics.Debug.WriteLine($"{Name}: {parametersJsonString}");
+            OutputMessage = inputJsonString;
 
-            ExitNodeMessage(this, "Output", parametersJsonString, Name);
+            System.Diagnostics.Debug.WriteLine($"{Name}: {inputJsonString}");
 
-            return Task.FromResult(parametersJsonString);
+            ExitNodeMessage(
+                this,
+                "Output",
+                fromInput.ToJsonString(new JsonSerializerOptions { WriteIndented = true }),
+                Name);
+
+            return fromInput;
         }
         finally
         {
-            LeaveNode(this);
+            LeaveNode(this, stopwatch);
         }
     }
 }
