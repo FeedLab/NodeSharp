@@ -4,10 +4,12 @@ using CommunityToolkit.Mvvm.Input;
 using NodeSharp.Nodes.Common.Extension;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Maui.Core;
 
 namespace NodeSharp.Nodes.Inject.ViewModel;
 
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class NodeInjectParameterViewModel : ObservableObject
 {
     private readonly IPopupService popupService;

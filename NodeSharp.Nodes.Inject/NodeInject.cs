@@ -196,7 +196,7 @@ public class NodeInject : BaseNode
 
                     await MainThread.InvokeOnMainThreadAsync(() => { BoxNodeStatus.Value = 100; });
                     
-                    OutputMessage = await SendToConnectedChildrenAsync(jsonNode);
+                    await SendToConnectedChildrenAsync(jsonNode);
                 }
             });
 

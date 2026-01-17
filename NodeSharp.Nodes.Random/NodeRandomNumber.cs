@@ -136,7 +136,7 @@ public class NodeRandomNumber : BaseNode
             
             var jsonNode = JsonNode.Parse(updatedJsonString) ?? "";
 
-            OutputMessage = await SendToConnectedChildrenAsync(jsonNode);
+            await SendToConnectedChildrenAsync(jsonNode);
 
             return fromInput;
         }

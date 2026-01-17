@@ -17,7 +17,8 @@ namespace NodeSharp.Nodes.Common;
 [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
     "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 [SuppressMessage("Usage", "CsWinRT1030:Project does not enable unsafe blocks")]
-[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0020:Invalid use of attributes dependent on [ObservableProperty]")]
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
+    "MVVMTK0020:Invalid use of attributes dependent on [ObservableProperty]")]
 public abstract partial class BaseNode : ObservableObject
 {
     public event EventHandler<(BaseNode baseNode, string level, string message, string entry)>? OnExitNodeMessage;
@@ -26,31 +27,35 @@ public abstract partial class BaseNode : ObservableObject
 
     protected readonly IPopupService PopupService;
 
-    [JsonIgnore] [NotifyPropertyChangedFor(nameof(HasOutputMessage))]
-    private string outputMessage;
+    // [JsonIgnore] [NotifyPropertyChangedFor(nameof(HasOutputMessage))]
+    [ObservableProperty] [JsonIgnore] private string outputMessage;
 
-    [JsonIgnore]
-    public string OutputMessage
+    partial void OnOutputMessageChanged(string value)
     {
-        get => outputMessage;
-        set
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                SetProperty(ref outputMessage, value.ToPrettyJson());
-            }
-        }
+        OnPropertyChanged(nameof(HasOutputMessage));
     }
+    // [JsonIgnore]
+    // public string OutputMessage
+    // {
+    //     get => outputMessage;
+    //     set
+    //     {
+    //         if (!string.IsNullOrEmpty(value))
+    //         {
+    //             SetProperty(ref outputMessage, value.ToPrettyJson());
+    //         }
+    //     }
+    // }
 
     [JsonIgnore] public bool HasOutputMessage => !string.IsNullOrEmpty(OutputMessage);
 
     [ObservableProperty] [JsonIgnore] private BoxNodeStatus boxNodeStatus;
 
-    [JsonIgnore] public INodeInformation TypeInformation { get; set; }
+    [ObservableProperty]  [JsonIgnore]private INodeInformation typeInformation;
 
-    [JsonIgnore] public ContentView? NodeBodyComponent { get; set; }
+    [ObservableProperty] [JsonIgnore] private ContentView? nodeBodyComponent;
 
-    [JsonIgnore] public ContentView? BoxNodeStatusComponent { get; set; }
+    [ObservableProperty] [JsonIgnore] private ContentView? boxNodeStatusComponent;
 
     [JsonIgnore] protected CancellationTokenSource Cts;
 
@@ -80,6 +85,7 @@ public abstract partial class BaseNode : ObservableObject
         Cts = new CancellationTokenSource();
         BoxNodeStatus = new BoxNodeStatus();
         PopupService = AppService.GetRequiredService<IPopupService>();
+        OutputMessage = string.Empty;
 
         if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
         {
@@ -137,6 +143,7 @@ public abstract partial class BaseNode : ObservableObject
         List<Input> inputs)
     {
         BoxNodeStatus = new BoxNodeStatus();
+        OutputMessage = string.Empty;
 
         var storage = AppService.GetRequiredService<Storage>();
         PopupService = AppService.GetRequiredService<IPopupService>();
@@ -212,43 +219,57 @@ public abstract partial class BaseNode : ObservableObject
 
         return Task.FromResult(message);
     }
+    
+    // protected virtual Task<JsonNode> RunFromInput(BaseNode parent, JsonNode inputJson)
+    // {
+    //     Cts = new CancellationTokenSource();
+    //
+    //     var message = $"Node {FormatNode()} has been activated by parent node {parent.FormatNode()}";
+    //
+    //     Debug.WriteLine(message);
+    //
+    //     return Task.FromResult(inputJson);
+    // }
 
     protected virtual Task<JsonNode?> RunFromInput(BaseNode parent, string inputJsonString)
     {
         Cts = new CancellationTokenSource();
-        
+
         var inputJson = JsonNode.Parse(inputJsonString);
-        
+
 
         var message = $"Node {FormatNode()} has been activated by parent node {parent.FormatNode()}";
-        
+
         Debug.WriteLine(message);
-        
+
         return Task.FromResult(inputJson);
     }
 
-    protected async Task<string> SendToConnectedChildrenAsync(JsonNode outputNode, Output output)
+    protected async Task SendToConnectedChildrenAsync(JsonNode outputNode, Output output)
     {
-            var outputJsonString = outputNode.ToJsonString();
-            return await SendToConnectedChildrenAsync(outputJsonString, output);
+        var outputJsonString = outputNode.ToJsonString();
+        
+        OutputMessage = outputJsonString.ToPrettyJson();
+        
+        await SendToConnectedChildrenAsync(outputJsonString, output);
     }
 
-    protected Task<string> SendToConnectedChildrenAsync(string outputJsonString, Output output)
+    protected Task SendToConnectedChildrenAsync(string outputJsonString, Output output)
     {
         _ = Task.Run(() =>
         {
             var tasks = new List<Task>();
 
-                foreach (var nodeId in output.ConnectsToNodeId)
+            foreach (var nodeId in output.ConnectsToNodeId)
+            {
+                var targetNode = Nodes.Find(f => f.Id == nodeId);
+                if (targetNode is null)
                 {
-                    var targetNode = Nodes.Find(f => f.Id == nodeId);
-                    if (targetNode is null)
-                    {
-                        throw new InvalidOperationException($"Node not found: {nodeId}");
-                    }
-
-                    tasks.Add(targetNode.RunFromInput(this, outputJsonString));
+                    throw new InvalidOperationException($"Node not found: {nodeId}");
                 }
+
+                tasks.Add(targetNode.RunFromInput(this, outputJsonString));
+            }
 
             return Task.FromResult(Task.WhenAll(tasks));
         });
@@ -256,12 +277,16 @@ public abstract partial class BaseNode : ObservableObject
         return Task.FromResult(outputJsonString);
     }
 
-    protected Task<string> SendToConnectedChildrenAsync(JsonNode jsonNode)
+    protected Task SendToConnectedChildrenAsync(JsonNode outputNode)
     {
-        return SendToConnectedChildrenAsync(jsonNode.ToJsonString());
+        var outputJsonString = outputNode.ToJsonString();
+        
+        OutputMessage = outputJsonString.ToPrettyJson();
+        
+        return SendToConnectedChildrenAsync(outputNode.ToJsonString());
     }
 
-    protected Task<string> SendToConnectedChildrenAsync(string parametersJsonString)
+    protected Task SendToConnectedChildrenAsync(string parametersJsonString)
     {
         _ = Task.Run(() =>
         {
@@ -280,7 +305,7 @@ public abstract partial class BaseNode : ObservableObject
                     tasks.Add(targetNode.RunFromInput(this, parametersJsonString));
                 }
             }
-            
+
             return Task.FromResult(Task.WhenAll(tasks));
         });
 
