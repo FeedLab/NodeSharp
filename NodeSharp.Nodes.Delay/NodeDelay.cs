@@ -153,7 +153,6 @@ public class NodeDelay : BaseNode
             if (delayMilliseconds > 0)
             {
                 Debug.WriteLine($"NodeDelay '{this.GetType().Name}' delaying for {delayMilliseconds}ms");
-                // await Task.Delay(delayMilliseconds);
 
                 await PeriodicExecutor.DelayedPeriodicExecution(
                     delay: TimeSpan.FromSeconds(delayMilliseconds / 1000),
@@ -162,7 +161,7 @@ public class NodeDelay : BaseNode
                     cancellationToken: Cts.Token);
             }
 
-            OutputMessage = await SendToConnectedChildrenAsync(inputJsonString);
+            await SendToConnectedChildrenAsync(inputJsonString);
 
             return fromInput;
         }

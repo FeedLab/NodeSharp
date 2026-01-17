@@ -92,7 +92,7 @@ public class NodeFunction : BaseNode
 
             MainThread.BeginInvokeOnMainThread(() => { BoxNodeStatus.Message = DateTime.Now.ToString("HH:mm:ss"); });
 
-            OutputMessage = await SendToConnectedChildrenAsync(updatedJsonString);
+            await SendToConnectedChildrenAsync(updatedJsonString);
 
             return await Task.FromResult(fromInput);
         }

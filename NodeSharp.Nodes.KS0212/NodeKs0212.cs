@@ -118,28 +118,28 @@ public class NodeKs0212 : BaseNode
             if (newRelaySettings.RelayOne is not null && newRelaySettings.RelayOne != CurrentRelaySettings.RelayOne)
             {
                 var relayOne = CreateRelayMessage((bool)newRelaySettings.RelayOne);
-                OutputMessage = await SendToConnectedChildrenAsync(relayOne, Outputs[1]);
+                await SendToConnectedChildrenAsync(relayOne, Outputs[1]);
                 CurrentRelaySettings.RelayOne = newRelaySettings.RelayOne;
             }
 
             if (newRelaySettings.RelayTwo is not null && newRelaySettings.RelayTwo != CurrentRelaySettings.RelayTwo)
             {
                 var relayTwo = CreateRelayMessage((bool)newRelaySettings.RelayTwo!);
-                OutputMessage = await SendToConnectedChildrenAsync(relayTwo, Outputs[2]);
+                await SendToConnectedChildrenAsync(relayTwo, Outputs[2]);
                 CurrentRelaySettings.RelayTwo = newRelaySettings.RelayTwo;
             }
 
             if (newRelaySettings.RelayThree is not null && newRelaySettings.RelayThree != CurrentRelaySettings.RelayThree)
             {
                 var relayThree = CreateRelayMessage((bool)newRelaySettings.RelayThree!);
-                OutputMessage = await SendToConnectedChildrenAsync(relayThree, Outputs[3]);
+                await SendToConnectedChildrenAsync(relayThree, Outputs[3]);
                 CurrentRelaySettings.RelayThree = newRelaySettings.RelayThree;
             }
 
             if (newRelaySettings.RelayFour is not null && newRelaySettings.RelayFour != CurrentRelaySettings.RelayFour)
             {
                 var relayFour = CreateRelayMessage((bool)newRelaySettings.RelayFour!);
-                OutputMessage = await SendToConnectedChildrenAsync(relayFour, Outputs[4]);
+                await SendToConnectedChildrenAsync(relayFour, Outputs[4]);
                 CurrentRelaySettings.RelayFour = newRelaySettings.RelayFour;
             }
             
@@ -152,7 +152,7 @@ public class NodeKs0212 : BaseNode
                 ["Input"] = jsonInput
             };
             
-            OutputMessage = await SendToConnectedChildrenAsync(relaySettingsJson, Outputs[0]);
+            await SendToConnectedChildrenAsync(relaySettingsJson, Outputs[0]);
 
             return relaySettingsJson;
         }
@@ -160,7 +160,7 @@ public class NodeKs0212 : BaseNode
         {
             var jsonErrorMessage = JsonErrorMessage(inputJsonString, ex.Message);
             
-            OutputMessage = await SendToConnectedChildrenAsync(jsonErrorMessage, Outputs[5]);
+            await SendToConnectedChildrenAsync(jsonErrorMessage, Outputs[5]);
 
             throw;
         }
@@ -252,22 +252,22 @@ public partial class RelaySettings : ObservableObject
         
         RelayOne = settings.TryGetPropertyIgnoreCase(nameof(RelayOne), out var oneProperty) &&
                    oneProperty.ValueKind is JsonValueKind.True or JsonValueKind.False 
-                   ? (bool?)oneProperty.GetBoolean() 
+                   ? oneProperty.GetBoolean() 
                    : null;
 
         RelayTwo = settings.TryGetPropertyIgnoreCase(nameof(RelayTwo), out var twoProperty) &&
                    twoProperty.ValueKind is JsonValueKind.True or JsonValueKind.False 
-                   ? (bool?)twoProperty.GetBoolean() 
+                   ? twoProperty.GetBoolean() 
                    : null;
 
         RelayThree = settings.TryGetPropertyIgnoreCase(nameof(RelayThree), out var threeProperty) &&
                      threeProperty.ValueKind is JsonValueKind.True or JsonValueKind.False 
-                     ? (bool?)threeProperty.GetBoolean() 
+                     ? threeProperty.GetBoolean() 
                      : null;
 
         RelayFour = settings.TryGetPropertyIgnoreCase(nameof(RelayFour), out var fourProperty) &&
                     fourProperty.ValueKind is JsonValueKind.True or JsonValueKind.False 
-                    ? (bool?)fourProperty.GetBoolean() 
+                    ? fourProperty.GetBoolean() 
                     : null;
     }
 }
