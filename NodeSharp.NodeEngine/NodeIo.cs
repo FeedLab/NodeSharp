@@ -50,7 +50,7 @@ public class NodeIo(Storage storage)
         var options = new JsonSerializerOptions
         {
             WriteIndented = true,
-            ReferenceHandler = ReferenceHandler.IgnoreCycles
+            ReferenceHandler = ReferenceHandler.Preserve
         };
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = options.WriteIndented });
 
@@ -209,35 +209,20 @@ public class NodeIo(Storage storage)
         }
     }
 
-    static List<Output> ParseOutputs(JsonElement outputsElement)
+    static List<Output> ParseOutputs(JsonElement inputsElement)
     {
-        // Supports:
-        // 1) [{ "Name": "...", "ConnectsToNodeId": ["..."] }, ...]
-        // 2) ["nodeId-1", "nodeId-2", ...]
-        return outputsElement.ValueKind switch
-        {
-            JsonValueKind.Array when outputsElement.GetArrayLength() == 0 => [],
-
-            JsonValueKind.Array when outputsElement[0].ValueKind == JsonValueKind.Object =>
-                outputsElement.EnumerateArray()
-                    .Select(o => new Output(
-                        o.GetProperty("Name").GetString()!,
-                        o.GetProperty("ConnectsToNodeId").EnumerateArray().Select(x => x.GetString()!).ToList()
-                    ))
-                    .ToList(),
-
-            JsonValueKind.Array when outputsElement[0].ValueKind == JsonValueKind.String =>
-                outputsElement.EnumerateArray()
-                    .Select((nodeIdElement, index) => new Output(
-                        $"Output {index + 1}",
-                        new List<string> { nodeIdElement.GetString()! }
-                    ))
-                    .ToList(),
-
-            _ => throw new InvalidOperationException(
-                "Invalid 'Outputs' JSON shape. Expected array of objects or array of strings.")
-        };
+        return inputsElement.EnumerateArray()
+            .Select(i => new Output(
+                i.GetProperty("Name").GetString()!,
+                i.GetProperty("connectsToNodeId").EnumerateArray().Select(x => x.GetString()!).ToArray()
+                , new Point(
+                    i.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number ? xProp.GetInt32() : 0,
+                    i.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number ? yProp.GetInt32() : 0
+                )
+            ))
+            .ToList();
     }
+    
 
     static List<Input> ParseInputs(JsonElement inputsElement)
     {
@@ -245,6 +230,10 @@ public class NodeIo(Storage storage)
             .Select(i => new Input(
                 i.GetProperty("Name").GetString()!,
                 i.GetProperty("ConnectsToParentNodeId").EnumerateArray().Select(x => x.GetString()!).ToArray()
+                , new Point(
+                    i.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number ? xProp.GetInt32() : 0,
+                    i.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number ? yProp.GetInt32() : 0
+                )
             ))
             .ToList();
     }

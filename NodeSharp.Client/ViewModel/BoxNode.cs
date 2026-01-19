@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using NodeSharp.Client.Component;
 using NodeSharp.Nodes.Common;
 
 namespace NodeSharp.Client.ViewModel;
@@ -21,7 +22,8 @@ public partial class BoxNode : ObservableObject
 
     public BoxNode(BaseNode baseNode)
     {
-        node = baseNode;
+        Node = baseNode;
+        
         // this.diagramViewModel = diagramViewModel;
         NodeId = node.Id;
         Name = node.Name;
@@ -29,8 +31,8 @@ public partial class BoxNode : ObservableObject
         IsEnabled = node.IsEnabled;
         X = node.X;
         Y = node.Y;
-        Width = 130;
-        Height = 50;
+        Width = baseNode.BoxDimension.Width;
+        Height = baseNode.BoxDimension.Height;
         width = 0;
         
         baseNode.OnEnterNode += (o, nodeRun) =>
@@ -84,7 +86,10 @@ public partial class BoxNode : ObservableObject
             return X;
         }
     }
-    
+
+    [ObservableProperty] private Rect bounds;
+    [ObservableProperty] private Point? absolutePosition;
+
     [ObservableProperty] private double x;
 
     [ObservableProperty] private double y;
@@ -100,51 +105,61 @@ public partial class BoxNode : ObservableObject
     [ObservableProperty] private Color boxColor;
 
     [ObservableProperty] private BaseNode node;
+    
+    [ObservableProperty] private  DraggableBoxComponent? draggableBoxComponent;
 
     [ObservableProperty] private string name;
     
     [ObservableProperty] private bool hasFocus;
 
+    // private void CalculateInputNodePositions()
+    // {
+    //     const double fromVerticalMargin = 8.0;
+    //     
+    //     InputNodes.Clear();
+    //
+    //     var inputs = this.Node.Inputs;
+    //     var verticalStep = (Height - fromVerticalMargin) / (inputs.Count + 1);
+    //     var yPositionDelta = (fromVerticalMargin / 2) + (verticalStep / 2);
+    //
+    //     for (var i = 0; i < inputs.Count; i++)
+    //     {
+    //         var fromSquareYPos = verticalStep * (i + 1);
+    //         var ptInputSquare = new AnchorPoint(Node.Id, 0, fromSquareYPos, this, InOrOutConnection.In);
+    //
+    //         InputNodes.Add(ptInputSquare);
+    //     }
+    // }
+    
     private void CalculateInputNodePositions()
     {
-        const double fromVerticalMargin = 8.0;
-        
         InputNodes.Clear();
 
+        // this.Node.RecalculateInputNodes(Height);
         var inputs = this.Node.Inputs;
-        var verticalStep = (Height - fromVerticalMargin) / (inputs.Count + 1);
-        var yPositionDelta = (fromVerticalMargin / 2) + (verticalStep / 2);
 
-        for (var i = 0; i < inputs.Count; i++)
+        foreach (var input in inputs)
         {
-            var fromSquareYPos = verticalStep * (i + 1);
-            var ptInputSquare = new AnchorPoint(Node.Id, 0, fromSquareYPos, this, InOrOutConnection.In);
-
+            var ptInputSquare = new AnchorPoint(Node.Id, input.StartPosition.X, input.StartPosition.Y, this, InOrOutConnection.In);
+       
             InputNodes.Add(ptInputSquare);
         }
     }
     
     private void CalculateOutputNodePositions()
     {
-        const double verticalMargin = 8.0;
-
-        OutputNodes.Clear();
-
-        var outputs = Node.Outputs;
-        var availableHeight = Height - verticalMargin;
-        var verticalStep = availableHeight / (outputs.Count + 1);
-        // var yPositionDelta = (verticalMargin / 2);
-        var index = 1;
-        foreach (var output in outputs)
         {
-            var connectedIds = output.ConnectsToNodeId.ToList();
-            var yPosition = (verticalStep * index);// - yPositionDelta;
+            OutputNodes.Clear();
 
-            //    var anchorPoint = new AnchorPoint(connectedIds, 0, yPosition + (verticalMargin / 2), boxNode,
-            var anchorPoint = new AnchorPoint(connectedIds, 0, yPosition, this, InOrOutConnection.Out);
-            OutputNodes.Add(anchorPoint);
+            // this.Node.RecalculateOutputNodes(Height);
+            var outputs = this.Node.Outputs;
 
-            index++;
+            foreach (var output in outputs)
+            {
+                var ptInputSquare = new AnchorPoint(Node.Id, output.StartPosition.X, output.StartPosition.Y, this, InOrOutConnection.Out);
+       
+                OutputNodes.Add(ptInputSquare);
+            }
         }
     }
     

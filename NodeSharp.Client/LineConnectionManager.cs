@@ -21,15 +21,19 @@ public class LineConnectionManager()
 {
     public IList<LineConnection> Connections { get; set; } = [];
     // private IList<(Point Start, Point End)> Connections { get; set; } = [];
-
+    
     public AnchorPoint? DragStartAnchor { get; set; }
+    public Point DragStartPoint { get; set; }
+    
+    public Point DragEndPoint { get; set; }
     public Point? DragCurrentPoint { get; set; }
     public bool IsDragging => DragStartAnchor != null;
 
-    public void StartDragging(AnchorPoint anchor)
+    public void StartDragging(AnchorPoint anchor, Point dragStartPoint)
     {
+        DragStartPoint = dragStartPoint;
         DragStartAnchor = anchor;
-        DragCurrentPoint = new Point(anchor.AbsoluteCenterX, anchor.AbsoluteCenterY);
+        DragCurrentPoint = new Point(DragStartPoint.X, DragStartPoint.Y);
     }
 
     public void UpdateDragPosition(Point point)
@@ -41,27 +45,23 @@ public class LineConnectionManager()
     {
         if (DragStartAnchor != null && targetAnchor != null && DragStartAnchor != targetAnchor)
         {
-            System.Diagnostics.Debug.WriteLine($"🔗 EndDragging - Start: {DragStartAnchor.BoxNode.NodeId}, Target: {targetAnchor.BoxNode.NodeId}");
+            System.Diagnostics.Debug.WriteLine(
+                $"🔗 EndDragging - Start: {DragStartAnchor.BoxNode.NodeId}, Target: {targetAnchor.BoxNode.NodeId}");
 
             // Create connection between anchors
             // Connection should go from output anchor to input anchor
             AnchorPoint outputAnchor;
             AnchorPoint inputAnchor;
 
-            // Determine which anchor is output and which is input based on their lists
-            if (DragStartAnchor.BoxNode.OutputNodes.Contains(DragStartAnchor))
+            if (DragStartAnchor.ConnectionType == InOrOutConnection.In)
             {
-                // Started from output, target should be input
+                inputAnchor = DragStartAnchor;
+                outputAnchor = targetAnchor;
+            }
+            else if (DragStartAnchor.ConnectionType == InOrOutConnection.Out)
+            {
                 outputAnchor = DragStartAnchor;
                 inputAnchor = targetAnchor;
-                System.Diagnostics.Debug.WriteLine("🔗 Direction: Output -> Input");
-            }
-            else if (targetAnchor.BoxNode.OutputNodes.Contains(targetAnchor))
-            {
-                // Started from input, target is output (reverse)
-                outputAnchor = targetAnchor;
-                inputAnchor = DragStartAnchor;
-                System.Diagnostics.Debug.WriteLine("🔗 Direction: Input <- Output (reversed)");
             }
             else
             {
@@ -70,6 +70,17 @@ public class LineConnectionManager()
                 DragCurrentPoint = null;
                 return;
             }
+
+            inputAnchor.X = DragStartPoint.X;
+            inputAnchor.Y = DragStartPoint.Y;
+
+            if (DragCurrentPoint is null)
+            {
+                throw new InvalidOperationException("DragCurrentPoint is null.");
+            }
+
+            outputAnchor.X = DragEndPoint.X;
+            outputAnchor.Y = DragEndPoint.Y;
 
             // Get the source and target nodes
             var sourceNode = outputAnchor.BoxNode.Node;
@@ -90,21 +101,25 @@ public class LineConnectionManager()
                         outputAnchor.Ids.Add(targetNodeId);
                     }
 
-                    System.Diagnostics.Debug.WriteLine($"✅ Connection created: {sourceNode.Id} (anchor {anchorIndex}) -> {targetNodeId}");
+                    System.Diagnostics.Debug.WriteLine(
+                        $"✅ Connection created: {sourceNode.Id} (anchor {anchorIndex}) -> {targetNodeId}");
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"⚠️ Connection already exists: {sourceNode.Id} -> {targetNodeId}");
+                    System.Diagnostics.Debug.WriteLine(
+                        $"⚠️ Connection already exists: {sourceNode.Id} -> {targetNodeId}");
                 }
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine($"⚠️ Invalid anchor index: {anchorIndex} (Outputs count: {sourceNode.Outputs.Count})");
+                System.Diagnostics.Debug.WriteLine(
+                    $"⚠️ Invalid anchor index: {anchorIndex} (Outputs count: {sourceNode.Outputs.Count})");
             }
         }
         else
         {
-            System.Diagnostics.Debug.WriteLine($"🔗 EndDragging - No connection (Start: {DragStartAnchor?.BoxNode.NodeId}, Target: {targetAnchor?.BoxNode.NodeId})");
+            System.Diagnostics.Debug.WriteLine(
+                $"🔗 EndDragging - No connection (Start: {DragStartAnchor?.BoxNode.NodeId}, Target: {targetAnchor?.BoxNode.NodeId})");
         }
 
         DragStartAnchor = null;
@@ -134,7 +149,6 @@ public class LineConnectionManager()
 
                 foreach (var nodeToId in output.ConnectsToNodeId)
                 {
-
                     if (boxNodeDictionary.TryGetValue(nodeToId, out var boxNodeTo))
                     {
                         var toPt = boxNodeTo.PtCenter;
@@ -149,13 +163,14 @@ public class LineConnectionManager()
             System.Diagnostics.Debug.WriteLine($"  Node {boxNode.NodeId}: {boxNode.Node.Outputs.Count} outputs");
             foreach (var output in boxNode.Node.Outputs)
             {
-                System.Diagnostics.Debug.WriteLine($"    Output connects to: {string.Join(", ", output.ConnectsToNodeId)}");
+                System.Diagnostics.Debug.WriteLine(
+                    $"    Output connects to: {string.Join(", ", output.ConnectsToNodeId)}");
             }
         }
 
         foreach (var anchorPoint in recalculateLines.SelectMany(s => s.OutputNodes))
         {
-            var cpFrom = new Point(anchorPoint.AbsoluteX, anchorPoint.AbsoluteCenterY);
+            var cpFrom = new Point(anchorPoint.AbsoluteCenterX, anchorPoint.AbsoluteCenterY);
 
             foreach (var targetNodeId in anchorPoint.Ids)
             {
@@ -164,7 +179,8 @@ public class LineConnectionManager()
                     var target = boxNodeTo.InputNodes[0];
                     var cpTo = new Point(target.AbsoluteCenterX, target.AbsoluteCenterY);
 
-                    System.Diagnostics.Debug.WriteLine($"📍 Adding connection: {anchorPoint.BoxNode.NodeId} -> {targetNodeId}");
+                    System.Diagnostics.Debug.WriteLine(
+                        $"📍 Adding connection: {anchorPoint.BoxNode.NodeId} -> {targetNodeId}");
                     Connections.Add(new LineConnection(cpFrom, cpTo));
                 }
             }
@@ -186,7 +202,8 @@ public class LineConnectionManager()
         {
             if (IsPointNearLine(clickPoint, connection.Start, connection.End, tolerance))
             {
-                System.Diagnostics.Debug.WriteLine($"🎯 Line found near click point: {connection.Start} -> {connection.End}");
+                System.Diagnostics.Debug.WriteLine(
+                    $"🎯 Line found near click point: {connection.Start} -> {connection.End}");
                 return connection;
             }
         }
@@ -254,14 +271,14 @@ public class LineConnectionManager()
         {
             return null;
         }
-        
+
         foreach (var connection in Connections)
         {
             connection.IsSelected = false;
         }
-        
+
         lineAtPoint.IsSelected = true;
-        
+
         return lineAtPoint;
     }
 
@@ -271,7 +288,7 @@ public class LineConnectionManager()
     public bool CancelSelection()
     {
         var hasStartAnchor = DragStartAnchor != null;
-        
+
         // Deselect all lines
         foreach (var connection in Connections)
         {
@@ -283,7 +300,7 @@ public class LineConnectionManager()
         DragCurrentPoint = null;
 
         System.Diagnostics.Debug.WriteLine("❌ Line selection and dragging canceled");
-        
+
         return hasStartAnchor;
     }
 }

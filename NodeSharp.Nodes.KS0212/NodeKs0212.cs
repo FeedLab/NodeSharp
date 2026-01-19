@@ -42,17 +42,19 @@ public class NodeKs0212 : BaseNode
         InitialRelaySettings = new RelaySettings();
         CurrentRelaySettings = new RelaySettings();
 
+        BoxDimension = new Rect(0, 0, 250, 235);
+
         Outputs.Clear();
 
-        Outputs.Add(new Output("Relay status", new List<string>()));
-        Outputs.Add(new Output("Relay 1", new List<string>()));
-        Outputs.Add(new Output("Relay 2", new List<string>()));
-        Outputs.Add(new Output("Relay 3", new List<string>()));
-        Outputs.Add(new Output("Relay 4", new List<string>()));
-        Outputs.Add(new Output("Error", new List<string>()));
+        Outputs.Add(new Output("Relay status", new List<string>(), new Point(50, 30)));
+        Outputs.Add(new Output("Relay 1", new List<string>(), new Point(50, 70)));
+        Outputs.Add(new Output("Relay 2", new List<string>(), new Point(50, 100)));
+        Outputs.Add(new Output("Relay 3", new List<string>(), new Point(50, 130)));
+        Outputs.Add(new Output("Relay 4", new List<string>(), new Point(50, 160)));
+        Outputs.Add(new Output("Error", new List<string>(), new Point(50, 200)));
 
         Inputs.Clear();
-        Inputs.Add(new Input("Input", new List<string>()));
+        Inputs.Add(new Input("Input", new List<string>(), new Point(0, BoxDimension.Height / 2)));
     }
 
 
@@ -98,13 +100,11 @@ public class NodeKs0212 : BaseNode
 
         try
         {
-
-            
             var jsonInput = await base.RunFromInput(parentNode, inputJsonString);
 
 
             var jsonElement = JsonDocument.Parse(inputJsonString).RootElement;
-         
+
             var newRelaySettings = new RelaySettings(jsonElement, "Payload");
 
             if (!jsonElement.TryGetPropertyIgnoreCase("Payload", out var settings) ||
@@ -114,7 +114,7 @@ public class NodeKs0212 : BaseNode
 
                 throw new NodeParseException(errorMessage, "Payload");
             }
-            
+
             if (newRelaySettings.RelayOne is not null && newRelaySettings.RelayOne != CurrentRelaySettings.RelayOne)
             {
                 var relayOne = CreateRelayMessage((bool)newRelaySettings.RelayOne);
@@ -129,7 +129,8 @@ public class NodeKs0212 : BaseNode
                 CurrentRelaySettings.RelayTwo = newRelaySettings.RelayTwo;
             }
 
-            if (newRelaySettings.RelayThree is not null && newRelaySettings.RelayThree != CurrentRelaySettings.RelayThree)
+            if (newRelaySettings.RelayThree is not null &&
+                newRelaySettings.RelayThree != CurrentRelaySettings.RelayThree)
             {
                 var relayThree = CreateRelayMessage((bool)newRelaySettings.RelayThree!);
                 await SendToConnectedChildrenAsync(relayThree, Outputs[3]);
@@ -142,7 +143,7 @@ public class NodeKs0212 : BaseNode
                 await SendToConnectedChildrenAsync(relayFour, Outputs[4]);
                 CurrentRelaySettings.RelayFour = newRelaySettings.RelayFour;
             }
-            
+
             var relaySettingsJson = new JsonObject
             {
                 ["RelayOne"] = CurrentRelaySettings.RelayOne,
@@ -151,7 +152,7 @@ public class NodeKs0212 : BaseNode
                 ["RelayFour"] = CurrentRelaySettings.RelayFour,
                 ["Input"] = jsonInput
             };
-            
+
             await SendToConnectedChildrenAsync(relaySettingsJson, Outputs[0]);
 
             return relaySettingsJson;
@@ -159,7 +160,7 @@ public class NodeKs0212 : BaseNode
         catch (Exception ex)
         {
             var jsonErrorMessage = JsonErrorMessage(inputJsonString, ex.Message);
-            
+
             await SendToConnectedChildrenAsync(jsonErrorMessage, Outputs[5]);
 
             throw;
@@ -224,6 +225,16 @@ public class NodeKs0212 : BaseNode
             options: popupOptions,
             shellParameters: queryAttributes);
     }
+    
+    public override void RecalculateInputNodes(double height)
+    {
+        Inputs[0].StartPosition = new Point(1, height / 2);
+    }
+    
+    public override void RecalculateOutputNodes(double height)
+    {
+        Outputs[0].StartPosition = new Point(1, height / 2);
+    }
 }
 
 public partial class RelaySettings : ObservableObject
@@ -249,25 +260,25 @@ public partial class RelaySettings : ObservableObject
 
             throw new NodeParseException(errorMessage, nodeName);
         }
-        
+
         RelayOne = settings.TryGetPropertyIgnoreCase(nameof(RelayOne), out var oneProperty) &&
-                   oneProperty.ValueKind is JsonValueKind.True or JsonValueKind.False 
-                   ? oneProperty.GetBoolean() 
-                   : null;
+                   oneProperty.ValueKind is JsonValueKind.True or JsonValueKind.False
+            ? oneProperty.GetBoolean()
+            : null;
 
         RelayTwo = settings.TryGetPropertyIgnoreCase(nameof(RelayTwo), out var twoProperty) &&
-                   twoProperty.ValueKind is JsonValueKind.True or JsonValueKind.False 
-                   ? twoProperty.GetBoolean() 
-                   : null;
+                   twoProperty.ValueKind is JsonValueKind.True or JsonValueKind.False
+            ? twoProperty.GetBoolean()
+            : null;
 
         RelayThree = settings.TryGetPropertyIgnoreCase(nameof(RelayThree), out var threeProperty) &&
-                     threeProperty.ValueKind is JsonValueKind.True or JsonValueKind.False 
-                     ? threeProperty.GetBoolean() 
-                     : null;
+                     threeProperty.ValueKind is JsonValueKind.True or JsonValueKind.False
+            ? threeProperty.GetBoolean()
+            : null;
 
         RelayFour = settings.TryGetPropertyIgnoreCase(nameof(RelayFour), out var fourProperty) &&
-                    fourProperty.ValueKind is JsonValueKind.True or JsonValueKind.False 
-                    ? fourProperty.GetBoolean() 
-                    : null;
+                    fourProperty.ValueKind is JsonValueKind.True or JsonValueKind.False
+            ? fourProperty.GetBoolean()
+            : null;
     }
 }

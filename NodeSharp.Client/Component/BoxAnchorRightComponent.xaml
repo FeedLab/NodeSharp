@@ -4,26 +4,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NodeSharp.Client.Component.BoxAnchorRightComponent">
 
-    <ContentView.Resources>
-        <Style TargetType="BoxView">
-            <Setter Property="AnchorX" Value="0.5" />
-            <Setter Property="AnchorY" Value="0.5" />
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="PointerOver">
-                            <VisualState.Setters>
-                                <Setter Property="ScaleX" Value="1.5" />
-                                <Setter Property="ScaleY" Value="1.5" />
-                                <Setter Property="ZIndex" Value="999" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
-        </Style>
-    </ContentView.Resources>
+    <!-- <ContentView.Resources> -->
+    <!--     <Style TargetType="BoxView"> -->
+    <!--         <Setter Property="AnchorX" Value="0.5" /> -->
+    <!--         <Setter Property="AnchorY" Value="0.5" /> -->
+    <!--         <Setter Property="VisualStateManager.VisualStateGroups"> -->
+    <!--             <VisualStateGroupList> -->
+    <!--                 <VisualStateGroup x:Name="CommonStates"> -->
+    <!--                     <VisualState x:Name="Normal" /> -->
+    <!--                     <VisualState x:Name="PointerOver"> -->
+    <!--                         <VisualState.Setters> -->
+    <!--                             <Setter Property="ScaleX" Value="1.5" /> -->
+    <!--                             <Setter Property="ScaleY" Value="1.5" /> -->
+    <!--                             <Setter Property="ZIndex" Value="999" /> -->
+    <!--                         </VisualState.Setters> -->
+    <!--                     </VisualState> -->
+    <!--                 </VisualStateGroup> -->
+    <!--             </VisualStateGroupList> -->
+    <!--         </Setter> -->
+    <!--     </Style> -->
+    <!-- </ContentView.Resources> -->
 
     <AbsoluteLayout x:Name="CanvasRightAnchorArea" AutomationId="CanvasRightAnchorArea"
                     HorizontalOptions="Fill"

@@ -7,7 +7,8 @@
              xmlns:viewModel="clr-namespace:NodeSharp.Client.ViewModel"
              x:Class="NodeSharp.Client.Component.DiagramViewComponent"
              Background="White"
-             IsClippedToBounds="True">
+             IsClippedToBounds="True"
+             x:Name="DrawingView">
 
     <Grid Background="Transparent" IsClippedToBounds="True">
         <Grid.GestureRecognizers>
@@ -17,6 +18,7 @@
         </Grid.GestureRecognizers>
 
         <GraphicsView x:Name="ConnectionCanvas"
+                      AutomationId="ConnectionCanvas"
                       WidthRequest="3000"
                       HeightRequest="2000"
                       HorizontalOptions="Start"
@@ -45,6 +47,8 @@
                     <component:DraggableBoxComponent
                         AutomationId="{Binding NodeId, Mode=TwoWay}"
                         X="{Binding X, Mode=TwoWay}"
+                        WidthRequest="{Binding Node.BoxDimension.Width, Mode=TwoWay}"
+                        HeightRequest="{Binding Node.BoxDimension.Height, Mode=TwoWay}"
                         Y="{Binding Y, Mode=TwoWay}"
                         BoxColor="{Binding BoxColor}"
                         x:DataType="viewModel:BoxNode" />

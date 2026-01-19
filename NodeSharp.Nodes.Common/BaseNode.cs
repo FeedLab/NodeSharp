@@ -49,13 +49,25 @@ public abstract partial class BaseNode : ObservableObject
 
     [JsonIgnore] public bool HasOutputMessage => !string.IsNullOrEmpty(OutputMessage);
 
-    [ObservableProperty] [JsonIgnore] private BoxNodeStatus boxNodeStatus;
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private Rect boxDimension;
+    
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private BoxNodeStatus boxNodeStatus;
 
-    [ObservableProperty]  [JsonIgnore]private INodeInformation typeInformation;
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private INodeInformation typeInformation;
 
-    [ObservableProperty] [JsonIgnore] private ContentView? nodeBodyComponent;
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private ContentView? nodeBodyComponent;
 
-    [ObservableProperty] [JsonIgnore] private ContentView? boxNodeStatusComponent;
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private ContentView? boxNodeStatusComponent;
 
     [JsonIgnore] protected CancellationTokenSource Cts;
 
@@ -86,6 +98,7 @@ public abstract partial class BaseNode : ObservableObject
         BoxNodeStatus = new BoxNodeStatus();
         PopupService = AppService.GetRequiredService<IPopupService>();
         OutputMessage = string.Empty;
+        BoxDimension = new Rect(0, 0, 100, 60);
 
         if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
         {
@@ -101,14 +114,20 @@ public abstract partial class BaseNode : ObservableObject
             Inputs = new List<Input>();
             Outputs = new List<Output>();
 
-            for (var input = 0; input < nodeType!.NumberOfInputs; input++)
+            if (Inputs.Count == 0 && nodeType is not null)
             {
-                Inputs.Add(new Input("Input 1", new List<string>()));
+                for (var input = 0; input < nodeType.NumberOfInputs; input++)
+                {
+                    Inputs.Add(new Input("Input 1", new List<string>(), new Point(1, 1)));
+                }
             }
 
-            for (var output = 0; output < nodeType.NumberOfOutputs; output++)
+            if (Outputs.Count == 0 && nodeType is not null)
             {
-                Outputs.Add(new Output("Output 1", new List<string>()));
+                for (var output = 0; output < nodeType.NumberOfOutputs; output++)
+                {
+                    Outputs.Add(new Output("Output 1", new List<string>(), new Point(1, 1)));
+                }
             }
         }
         else
@@ -144,6 +163,7 @@ public abstract partial class BaseNode : ObservableObject
     {
         BoxNodeStatus = new BoxNodeStatus();
         OutputMessage = string.Empty;
+        BoxDimension = new Rect(0, 0, 100, 60);
 
         var storage = AppService.GetRequiredService<Storage>();
         PopupService = AppService.GetRequiredService<IPopupService>();
@@ -219,7 +239,7 @@ public abstract partial class BaseNode : ObservableObject
 
         return Task.FromResult(message);
     }
-    
+
     // protected virtual Task<JsonNode> RunFromInput(BaseNode parent, JsonNode inputJson)
     // {
     //     Cts = new CancellationTokenSource();
@@ -248,9 +268,9 @@ public abstract partial class BaseNode : ObservableObject
     protected async Task SendToConnectedChildrenAsync(JsonNode outputNode, Output output)
     {
         var outputJsonString = outputNode.ToJsonString();
-        
+
         OutputMessage = outputJsonString.ToPrettyJson();
-        
+
         await SendToConnectedChildrenAsync(outputJsonString, output);
     }
 
@@ -280,9 +300,9 @@ public abstract partial class BaseNode : ObservableObject
     protected Task SendToConnectedChildrenAsync(JsonNode outputNode)
     {
         var outputJsonString = outputNode.ToJsonString();
-        
+
         OutputMessage = outputJsonString.ToPrettyJson();
-        
+
         return SendToConnectedChildrenAsync(outputNode.ToJsonString());
     }
 
@@ -423,18 +443,49 @@ public abstract partial class BaseNode : ObservableObject
     }
 
     private string FormatNode() => $"{Name}:{TypeId}";
+
+    public virtual void RecalculateInputNodes(double height)
+    {
+    }
+
+    public virtual void RecalculateOutputNodes(double height)
+    {
+        
+    }
 }
 
-public class Input(string name, IList<string> connectsToParentNodeId)
+public partial class Input : ObservableObject
 {
-    public string Name { get; } = name;
-    public IList<string> ConnectsToParentNodeId { get; } = connectsToParentNodeId;
+    public Input(string name, IList<string> connectsToParentNodeId, Point startPosition)
+    {
+        Name = name;
+        ConnectsToParentNodeId = connectsToParentNodeId;
+        StartPosition = startPosition;
+    }
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private Point startPosition;
+    [ObservableProperty] private string name;
+    [ObservableProperty] private IList<string> connectsToParentNodeId;
 }
 
-public class Output(string name, IList<string> connectsToNodeId)
+public partial class Output : ObservableObject
 {
-    public string Name { get; } = name;
-    public IList<string> ConnectsToNodeId { get; } = connectsToNodeId;
+    public Output(string name, IList<string> connectsToNodeId, Point startPosition)
+    {
+        Name = name;
+        ConnectsToNodeId = connectsToNodeId;
+        StartPosition = startPosition;
+    }
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private Point startPosition;
+
+    [ObservableProperty] private string name;
+
+    [ObservableProperty] private IList<string> connectsToNodeId;
 }
 
 [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",

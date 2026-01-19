@@ -1,33 +1,41 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using NodeSharp.Nodes.Common;
 
 namespace NodeSharp.Client.ViewModel;
 
-[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
+    "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class AnchorPoint : ObservableObject
 {
-    private readonly InOrOutConnection connectionType;
+    private readonly Input input;
 
-    public AnchorPoint(string id, double x, double y, BoxNode boxNode, InOrOutConnection connectionType)
+    public AnchorPoint( BoxNode boxNode, Input input)
     {
-        this.connectionType = connectionType;
-        BoxNode= boxNode;
+        this.input = input;
+        this.ConnectionType = connectionType;
+        BoxNode = boxNode;
         X = x;
         Y = y;
-        
-        Ids.Add(id);
     }
     
+    public AnchorPoint(string id, double x, double y, BoxNode boxNode, InOrOutConnection connectionType)
+    {
+        this.ConnectionType = connectionType;
+        BoxNode = boxNode;
+        X = x;
+        Y = y;
+    }
+
     public AnchorPoint(IEnumerable<string> ids, double x, double y, BoxNode boxNode, InOrOutConnection connectionType)
     {
-        this.connectionType = connectionType;
+        this.ConnectionType = connectionType;
         BoxNode = boxNode;
         X = x;
         Y = y;
 
         foreach (var id in ids)
         {
-            Ids.Add(id);
         }
     }
 
@@ -35,72 +43,75 @@ public partial class AnchorPoint : ObservableObject
     {
         get
         {
-            if (connectionType == InOrOutConnection.In)
+            if (ConnectionType == InOrOutConnection.In)
             {
-                return BoxNode.X + (LayoutBounds.Width / 2.0);;
+                return BoxNode.X + X + 5; // X is relative to LeftAnchorArea, +5 centers 10px element
             }
-            
-            return BoxNode.X + BoxNode.Width + (LayoutBounds.Width / 2.0);;
+
+            return BoxNode.X + BoxNode.Width + X; // No +5 needed since X already represents the center
         }
     }
-    
+
     public double AbsoluteCenterY
     {
         get
         {
-            if (connectionType == InOrOutConnection.In)
+            if (ConnectionType == InOrOutConnection.In)
             {
                 return BoxNode.Y + Y + (LayoutBounds.Height / 2.0);
             }
-            
+
             return BoxNode.Y + Y + (LayoutBounds.Height / 2.0);
         }
     }
-    
+
     public double AbsoluteX
     {
         get
         {
-            if (connectionType == InOrOutConnection.In)
+            if (ConnectionType == InOrOutConnection.In)
             {
                 return BoxNode.X;
             }
-            
+
             return BoxNode.X + BoxNode.Width;
         }
     }
-    
+
     public double AbsoluteY
     {
         get
         {
-            if (connectionType == InOrOutConnection.In)
+            if (ConnectionType == InOrOutConnection.In)
             {
                 return BoxNode.Y + Y;
             }
-            
+
             return BoxNode.Y + Y;
         }
     }
-    [ObservableProperty] 
-    private double x;
-    
-    [ObservableProperty] 
-    private double y;
 
-    [ObservableProperty] 
-    private BoxNode boxNode;
+    [ObservableProperty] private InOrOutConnection connectionType;
+
+    [ObservableProperty] private double x;
+
+    [ObservableProperty] private double y;
     
-    [ObservableProperty]
-    private IList<string> ids = [];
-    
-    public Rect LayoutBounds 
-    { 
+    [ObservableProperty] private double canvasX;
+
+    [ObservableProperty] private double canvasY;
+
+    [ObservableProperty] private BoxNode boxNode;
+
+    [ObservableProperty] private IList<string> ids = [];
+
+    public Rect LayoutBounds
+    {
         get
         {
             var width = 6;
             var height = 6;
-            
+
             var rect = new Rect(X, Y - (height / 2.0), width, height);
             System.Diagnostics.Debug.WriteLine($"LayoutBounds: {rect}");
             return rect;

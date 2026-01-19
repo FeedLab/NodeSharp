@@ -30,10 +30,26 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <Grid x:Name="LeftAnchorArea" BackgroundColor="Transparent" Grid.Column="0" Grid.Row="0"
+              InputTransparent="False" VerticalOptions="Fill">
+            <component:BoxAnchorLeftComponent BindableLayout.ItemsSource="{Binding .}" />
+        </Grid>
+        <Grid x:Name="RightAnchorArea" BackgroundColor="Transparent" Grid.Column="2" Grid.Row="0"
+              InputTransparent="False" VerticalOptions="Fill">
+            <component:BoxAnchorRightComponent BindableLayout.ItemsSource="{Binding .}" />
+
+        </Grid>
 
         <Border
             x:Name="MainBorder"
-            Grid.Row="0"
+            Grid.Column="1" Grid.Row="0"
             InputTransparent="False"
             Margin="0"
             Padding="0"
@@ -53,22 +69,13 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Grid x:Name="LeftAnchorArea" BackgroundColor="Transparent" Grid.Column="0" Grid.Row="0"
-                      InputTransparent="False">
-                    <component:BoxAnchorLeftComponent BindableLayout.ItemsSource="{Binding .}" />
-                </Grid>
-                <Grid x:Name="RightAnchorArea" BackgroundColor="Transparent" Grid.Column="2" Grid.Row="0"
-                      InputTransparent="False">
-                    <component:BoxAnchorRightComponent BindableLayout.ItemsSource="{Binding .}" />
-
-                </Grid>
-
                 <ContentView x:Name="BoxNodeBodyContainer" Grid.Column="1" />
             </Grid>
         </Border>
 
         <Grid
             Grid.Row="1"
+            Grid.Column="1" 
             HorizontalOptions="Center">
 
             <ContentView x:Name="BoxNodeStatusContainer" />
