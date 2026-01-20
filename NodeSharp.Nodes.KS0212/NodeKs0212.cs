@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using CommunityToolkit.Maui;
@@ -46,15 +47,15 @@ public class NodeKs0212 : BaseNode
 
         Outputs.Clear();
 
-        Outputs.Add(new Output("Relay status", new List<string>(), new Point(50, 30)));
-        Outputs.Add(new Output("Relay 1", new List<string>(), new Point(50, 70)));
-        Outputs.Add(new Output("Relay 2", new List<string>(), new Point(50, 100)));
-        Outputs.Add(new Output("Relay 3", new List<string>(), new Point(50, 130)));
-        Outputs.Add(new Output("Relay 4", new List<string>(), new Point(50, 160)));
-        Outputs.Add(new Output("Error", new List<string>(), new Point(50, 200)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay status", [], new Point(50, 30)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 1", [], new Point(50, 70)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 2", [], new Point(50, 100)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 3", [], new Point(50, 130)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 4", [], new Point(50, 160)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Error", [], new Point(50, 200)));
 
         Inputs.Clear();
-        Inputs.Add(new Input("Input", new List<string>(), new Point(0, BoxDimension.Height / 2)));
+        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, BoxDimension.Height / 2)));
     }
 
 

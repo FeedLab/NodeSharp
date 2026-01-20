@@ -12,104 +12,118 @@ public enum InOrOutConnection
     Out = 1002
 }
 
-[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator", "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
+[SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
+    "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class BoxNode : ObservableObject
 {
-    public IList<(Point Start, Point End)> Connections { get; } = [];
     public IList<AnchorPoint> InputNodes { get; } = [];
     public IList<AnchorPoint> OutputNodes { get; } = [];
-    
 
     public BoxNode(BaseNode baseNode)
     {
         Node = baseNode;
-        
-        // this.diagramViewModel = diagramViewModel;
-        NodeId = node.Id;
-        Name = node.Name;
+        AbsolutePosition = new Point(0, 0);
         BoxColor = Colors.BlanchedAlmond;
-        IsEnabled = node.IsEnabled;
-        X = node.X;
-        Y = node.Y;
-        Width = baseNode.BoxDimension.Width;
-        Height = baseNode.BoxDimension.Height;
-        width = 0;
-        
+        SetInitialPosition(baseNode);
+
         baseNode.OnEnterNode += (o, nodeRun) =>
         {
             Debug.WriteLine($"Node entered (Run): {nodeRun.Name} ({nodeRun.Id})");
-            
+
             HasFocus = true;
         };
-        
+
         baseNode.OnLeaveNode += (o, valueTuple) =>
         {
             var nodeRun = valueTuple.Item1;
             var stopWatch = valueTuple.Item2;
             var elapsedTime = stopWatch.ElapsedMilliseconds;
-            
+
             Debug.WriteLine($"Node exited (Run): {nodeRun.Name} ({nodeRun.Id}::{elapsedTime}ms)");
-            
+
             HasFocus = false;
         };
     }
 
-   
-    public Point PtCenter
+    private void SetInitialPosition(BaseNode baseNode)
     {
-        get => new(XCenter, YCenter);
+        X = baseNode.X;
+        Y = baseNode.Y;
     }
 
 
-    public double YCenter
+    partial void OnXChanged(double value)
     {
-        get
-        {
-            if (Height > 0)
-            {
-                return (Height / 2) + Y;
-            }
-
-            return Y;
-        }
+        XCenter = value - (Node.BoxDimension.Width / 2);
     }
-
-    public double XCenter
+    
+    partial void OnYChanged(double value)
     {
-        get
-        {
-            if (Width > 0)
-            {
-                return (Width / 2) + X;
-            }
-
-            return X;
-        }
+        YCenter = value - (Node.BoxDimension.Height / 2);
     }
+    
+    // public Point PtCenter
+    // {
+    //     get => new(XCenter, YCenter);
+    // }
+
+
+    // public double YCenter
+    // {
+    //     get
+    //     {
+    //         if (Height > 0)
+    //         {
+    //             return (Height / 2) + Y;
+    //         }
+    //
+    //         return Y;
+    //     }
+    // }
+    //
+    // public double XCenter
+    // {
+    //     get
+    //     {
+    //         if (Width > 0)
+    //         {
+    //             return (Width / 2) + X;
+    //         }
+    //
+    //         return X;
+    //     }
+    // }
 
     [ObservableProperty] private Rect bounds;
-    [ObservableProperty] private Point? absolutePosition;
 
+    [ObservableProperty] private Point absolutePosition;
+
+    //
     [ObservableProperty] private double x;
 
     [ObservableProperty] private double y;
 
-    [ObservableProperty] private double width;
+    [ObservableProperty] private double xCenter;
 
-    [ObservableProperty] private double height;
-
-    [ObservableProperty] private string nodeId;
-
-    [ObservableProperty] private bool isEnabled;
-
+    [ObservableProperty] private double yCenter;
+    //
+    // [ObservableProperty] private double width;
+    //
+    // [ObservableProperty] private double height;
+    //
+    // [ObservableProperty] private string nodeId;
+    //
+    // [ObservableProperty] private bool isEnabled;
+    //
     [ObservableProperty] private Color boxColor;
-
+    //
     [ObservableProperty] private BaseNode node;
-    
-    [ObservableProperty] private  DraggableBoxComponent? draggableBoxComponent;
 
-    [ObservableProperty] private string name;
-    
+    //
+    [ObservableProperty] private DraggableBoxComponent? draggableBoxComponent;
+    //
+    // [ObservableProperty] private string name;
+
     [ObservableProperty] private bool hasFocus;
 
     // private void CalculateInputNodePositions()
@@ -130,42 +144,49 @@ public partial class BoxNode : ObservableObject
     //         InputNodes.Add(ptInputSquare);
     //     }
     // }
-    
-    private void CalculateInputNodePositions()
+
+    private void AddInputNodePositions()
     {
         InputNodes.Clear();
 
-        // this.Node.RecalculateInputNodes(Height);
         var inputs = this.Node.Inputs;
 
         foreach (var input in inputs)
         {
-            var ptInputSquare = new AnchorPoint(Node.Id, input.StartPosition.X, input.StartPosition.Y, this, InOrOutConnection.In);
-       
+            var ptInputSquare = new AnchorPoint(this, input);
+
             InputNodes.Add(ptInputSquare);
         }
     }
-    
-    private void CalculateOutputNodePositions()
+
+    private void AddOutputNodePositions()
     {
         {
             OutputNodes.Clear();
 
-            // this.Node.RecalculateOutputNodes(Height);
             var outputs = this.Node.Outputs;
 
             foreach (var output in outputs)
             {
-                var ptInputSquare = new AnchorPoint(Node.Id, output.StartPosition.X, output.StartPosition.Y, this, InOrOutConnection.Out);
-       
+                var ptInputSquare = new AnchorPoint(this, output);
+
                 OutputNodes.Add(ptInputSquare);
             }
         }
     }
-    
-    partial void OnHeightChanged(double value)
+
+    partial void OnBoundsChanged(Rect value)
     {
-       CalculateInputNodePositions();
-       CalculateOutputNodePositions();
+        AddInputNodePositions();
+        AddOutputNodePositions();
+    }
+
+
+    public void RebuildAnchorPointConnections(IList<BoxNode> boxNodes)
+    {
+        foreach (var inputNode in InputNodes)
+        {
+            inputNode.RebuildAnchorPointConnections(boxNodes);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
@@ -118,7 +119,7 @@ public abstract partial class BaseNode : ObservableObject
             {
                 for (var input = 0; input < nodeType.NumberOfInputs; input++)
                 {
-                    Inputs.Add(new Input("Input 1", new List<string>(), new Point(1, 1)));
+                    Inputs.Add(new Input(Guid.CreateVersion7(),"Input 1", new ObservableCollection<string>(), new Point(1, 1)));
                 }
             }
 
@@ -126,7 +127,7 @@ public abstract partial class BaseNode : ObservableObject
             {
                 for (var output = 0; output < nodeType.NumberOfOutputs; output++)
                 {
-                    Outputs.Add(new Output("Output 1", new List<string>(), new Point(1, 1)));
+                    Outputs.Add(new Output(Guid.CreateVersion7(),"Output 1", new ObservableCollection<string>(), new Point(1, 1)));
                 }
             }
         }
@@ -456,8 +457,9 @@ public abstract partial class BaseNode : ObservableObject
 
 public partial class Input : ObservableObject
 {
-    public Input(string name, IList<string> connectsToParentNodeId, Point startPosition)
+    public Input(Guid id, string name, ObservableCollection<string> connectsToParentNodeId, Point startPosition)
     {
+        Id = id;
         Name = name;
         ConnectsToParentNodeId = connectsToParentNodeId;
         StartPosition = startPosition;
@@ -466,14 +468,17 @@ public partial class Input : ObservableObject
     [ObservableProperty]
     [property: JsonIgnore]
     private Point startPosition;
+    
+    [ObservableProperty] private Guid id;
     [ObservableProperty] private string name;
-    [ObservableProperty] private IList<string> connectsToParentNodeId;
+    [ObservableProperty] private ObservableCollection<string> connectsToParentNodeId;
 }
 
 public partial class Output : ObservableObject
 {
-    public Output(string name, IList<string> connectsToNodeId, Point startPosition)
+    public Output(Guid id, string name, ObservableCollection<string> connectsToNodeId, Point startPosition)
     {
+        Id = id;
         Name = name;
         ConnectsToNodeId = connectsToNodeId;
         StartPosition = startPosition;
@@ -483,9 +488,11 @@ public partial class Output : ObservableObject
     [property: JsonIgnore]
     private Point startPosition;
 
+    [ObservableProperty] private Guid id;
+    
     [ObservableProperty] private string name;
 
-    [ObservableProperty] private IList<string> connectsToNodeId;
+    [ObservableProperty] private ObservableCollection<string> connectsToNodeId;
 }
 
 [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",

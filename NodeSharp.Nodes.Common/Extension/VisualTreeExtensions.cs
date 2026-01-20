@@ -69,4 +69,50 @@ public static class VisualTreeExtensions
             .OfType<T>()
             .FirstOrDefault();
     }
+
+    /// <summary>
+    /// Gets the position of an element relative to another element in the visual tree
+    /// </summary>
+    public static Point GetRelativePosition(
+        this IVisualTreeElement element,
+        IVisualTreeElement relativeTo)
+    {
+        var visualElement = (VisualElement)element;
+        var relativeElement = (VisualElement)relativeTo;
+
+        double x = 0, y = 0;
+        var current = visualElement;
+
+        while (current != null && current != relativeElement)
+        {
+            x += current.Bounds.X;
+            y += current.Bounds.Y;
+            current = current.Parent as VisualElement;
+        }
+
+        return new Point(x, y);
+    }
+    
+    public static bool IsElementLoaded(this IVisualTreeElement element)
+    {
+        if (element is VisualElement ve)
+            return ve.IsLoaded;
+
+        if (element is IView view)
+            return view.Handler != null; // attached to native platform view tree
+
+        return false;
+    }
+
+    public static bool IsElementLaidOut(this IVisualTreeElement element)
+    {
+        // “Loaded” doesn’t guarantee layout has happened yet.
+        if (element is VisualElement ve)
+            return ve.IsLoaded && ve.Width > 0 && ve.Height > 0;
+
+        if (element is IView view && view.Handler != null)
+            return view.Width > 0 && view.Height > 0;
+
+        return false;
+    }
 }

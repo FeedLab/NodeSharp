@@ -153,7 +153,10 @@ public partial class DraggableBoxComponent : ContentView
 
                 boxNode.DraggableBoxComponent = element;
                 boxNode.Bounds = bounds;
-                boxNode.AbsolutePosition = position;
+                boxNode.AbsolutePosition = position.Value;
+                
+                UpdateInputAnchors(boxNode);
+                UpdateOutputAnchors(boxNode);
             }
             else
             {
@@ -227,7 +230,7 @@ public partial class DraggableBoxComponent : ContentView
                     }
 
                     WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
-                    lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+      //              lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
 
                     // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
 
@@ -244,23 +247,23 @@ public partial class DraggableBoxComponent : ContentView
     {
         if (BindingContext is BoxNode boxNode)
         {
-            boxNode.Node.RecalculateInputNodes(Height);
-            boxNode.Node.RecalculateOutputNodes(Height);
-
-            UpdateInputAnchors(boxNode);
-            UpdateOutputAnchors(boxNode);
-
-            boxNode.PropertyChanged += (s, args) =>
-            {
-                if (args.PropertyName == nameof(BoxNode.Height))
-                {
-                    boxNode.Node.RecalculateInputNodes(Height);
-                    boxNode.Node.RecalculateOutputNodes(Height);
-
-                    UpdateInputAnchors(boxNode);
-                    UpdateOutputAnchors(boxNode);
-                }
-            };
+            // boxNode.Node.RecalculateInputNodes(Height);
+            // boxNode.Node.RecalculateOutputNodes(Height);
+            //
+            // UpdateInputAnchors(boxNode);
+            // UpdateOutputAnchors(boxNode);
+            //
+            // boxNode.PropertyChanged += (s, args) =>
+            // {
+            //     if (args.PropertyName == nameof(BoxNode.Node.BoxDimension.Height))
+            //     {
+            //         boxNode.Node.RecalculateInputNodes(Height);
+            //         boxNode.Node.RecalculateOutputNodes(Height);
+            //
+            //         UpdateInputAnchors(boxNode);
+            //         UpdateOutputAnchors(boxNode);
+            //     }
+            // };
 
             BoxNodeBodyContainer.Content = boxNode.Node.NodeBodyComponent;
             BoxNodeStatusContainer.Content = boxNode.Node.BoxNodeStatusComponent;
@@ -286,106 +289,6 @@ public partial class DraggableBoxComponent : ContentView
 
         foreach (var anchor in boxNode.InputNodes)
         {
-            var boxViewLine = new BoxView
-            {
-                WidthRequest = 50, // Make it larger for easier interaction
-                HeightRequest = 1,
-                Color = Colors.DarkGray,
-                InputTransparent = false, // Explicitly enable input
-                AnchorX = 0.5,
-                AnchorY = 0.5,
-                ZIndex = 500
-            };
-
-            var boxView = new Ellipse
-            {
-                WidthRequest = 10,
-                HeightRequest = 10,
-                Fill = Colors.Transparent,
-                Stroke = Colors.Black,
-                StrokeThickness = 2,
-                InputTransparent = false,
-                ZIndex = 1000
-            };
-
-            var pointerGesture = new PointerGestureRecognizer();
-            pointerGesture.PointerEntered += (s, e) =>
-            {
-                boxView.Stroke = Colors.Blue;
-                boxView.Scale = 1.5;
-                Debug.WriteLine($"✓ Input anchor ENTERED - IsDragging: {lineConnectionManager.IsDragging}");
-            };
-            pointerGesture.PointerExited += (s, e) =>
-            {
-                boxView.Stroke = Colors.Black;
-                boxView.Scale = 1.0;
-                Debug.WriteLine("✓ Input anchor EXITED");
-            };
-            pointerGesture.PointerPressed += (s, e) =>
-            {
-                Debug.WriteLine($"🔵 POINTER PRESSED - Setting drag state (was: {lineConnectionManager.IsDragging})");
-                
-                var position = e.GetPosition(this);
-                if (position.HasValue)
-                {
-                    lineConnectionManager.StartDragging(anchor, position.Value);
-                    // anchor.X = position.Value.X;
-                    // anchor.Y = position.Value.Y;
-                }
-                
-                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
-            };
-            pointerGesture.PointerReleased += (s, e) =>
-            {
-                Debug.WriteLine("🔵 POINTER RELEASED - Clearing drag state and redrawing");
-                
-                var position = e.GetPosition(this);
-                if (position.HasValue)
-                {
-                    anchor.X = position.Value.X;
-                    anchor.Y = position.Value.Y;
-                }
-                
-                lineConnectionManager.EndDragging(anchor);
-
-                lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
-
-                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
-                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
-            };
-            boxView.GestureRecognizers.Add(pointerGesture);
-
-            //   AbsoluteLayout.SetLayoutBounds(boxView, anchor.LayoutBounds);
-            AbsoluteLayout.SetLayoutBounds(boxView, new Rect(anchor.X - 5, anchor.Y - 5, 10, 10));
-            AbsoluteLayout.SetLayoutFlags(boxView, AbsoluteLayoutFlags.None);
-
-            AbsoluteLayout.SetLayoutBounds(boxViewLine, new Rect(0, anchor.Y, 50, 1));
-            AbsoluteLayout.SetLayoutFlags(boxViewLine, AbsoluteLayoutFlags.None);
-
-            absoluteLayout.Children.Add(boxViewLine);
-            absoluteLayout.Children.Add(boxView);
-        }
-    }
-
-    private void UpdateOutputAnchors(BoxNode boxNode)
-    {
-        var rightAnchorArea = this.FindByName<Grid>("RightAnchorArea");
-        if (rightAnchorArea == null) return;
-
-        rightAnchorArea.InputTransparent = false;
-
-        var component = rightAnchorArea.Children.OfType<BoxAnchorRightComponent>().FirstOrDefault();
-        if (component == null) return;
-
-        var absoluteLayout = component.FindByName<AbsoluteLayout>("CanvasRightAnchorArea");
-        if (absoluteLayout == null) return;
-
-        absoluteLayout.InputTransparent = false;
-        absoluteLayout.Children.Clear();
-
-        foreach (var anchor in boxNode.OutputNodes)
-        {
-            var anchorNode = new AnchorOutComponent(anchor);
             // var boxViewLine = new BoxView
             // {
             //     WidthRequest = 50, // Make it larger for easier interaction
@@ -408,22 +311,62 @@ public partial class DraggableBoxComponent : ContentView
             //     ZIndex = 1000
             // };
 
-            // var boxView = new BoxView
-            // {
-            //     WidthRequest = 10,
-            //     HeightRequest = 10,
-            //     Color = Colors.Black,
-            //     InputTransparent = false,
-            //     AnchorX = 0.5,
-            //     AnchorY = 0.5,
-            //     ZIndex = 1000 // Ensure it's on top
-            // };
-
+            var anchorNode= new AnchorComponent(anchor);
+            anchor.AnchorComponent = anchorNode;
+            
             var pointerGesture = new PointerGestureRecognizer();
             pointerGesture.PointerEntered += (s, e) =>
             {
-                // boxView.Stroke = Colors.Red;
-                // boxView.Scale = 1.5;
+                Debug.WriteLine($"✓ Input anchor ENTERED - IsDragging: {lineConnectionManager.IsDragging}");
+            };
+            pointerGesture.PointerExited += (s, e) =>
+            {
+                Debug.WriteLine("✓ Input anchor EXITED");
+            };
+            pointerGesture.PointerPressed += (s, e) =>
+            {
+                Debug.WriteLine($"🔵 POINTER PRESSED - Setting drag state (was: {lineConnectionManager.IsDragging})");
+                
+               
+//                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
+            };
+            pointerGesture.PointerReleased += (s, e) =>
+            {
+                Debug.WriteLine("🔵 POINTER RELEASED - Clearing drag state and redrawing");
+
+            };
+            anchorNode.GestureRecognizers.Add(pointerGesture);
+
+            AbsoluteLayout.SetLayoutFlags(anchorNode, AbsoluteLayoutFlags.None);
+            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 10));
+            absoluteLayout.Children.Add(anchorNode);
+        }
+    }
+
+    private void UpdateOutputAnchors(BoxNode boxNode)
+    {
+        var rightAnchorArea = this.FindByName<Grid>("RightAnchorArea");
+        if (rightAnchorArea == null) return;
+
+        rightAnchorArea.InputTransparent = false;
+
+        var component = rightAnchorArea.Children.OfType<BoxAnchorRightComponent>().FirstOrDefault();
+        if (component == null) return;
+
+        var absoluteLayout = component.FindByName<AbsoluteLayout>("CanvasRightAnchorArea");
+        if (absoluteLayout == null) return;
+
+        absoluteLayout.InputTransparent = false;
+        absoluteLayout.Children.Clear();
+
+        foreach (var anchor in boxNode.OutputNodes)
+        {
+            var anchorNode= new AnchorComponent(anchor);
+            anchor.AnchorComponent = anchorNode;
+            
+            var pointerGesture = new PointerGestureRecognizer();
+            pointerGesture.PointerEntered += (s, e) =>
+            {
                 Debug.WriteLine("✓ Output anchor ENTERED");
             };
             pointerGesture.PointerExited += (s, e) =>
@@ -437,49 +380,32 @@ public partial class DraggableBoxComponent : ContentView
                 // var canvasSurface = this.FindByName<Element>("ConnectionCanvas");
                 // var canvasSurface = this.FindInParents<GraphicsView>("ConnectionCanvas");
                 
-                var position = e.GetPosition(this);
-                if (position.HasValue)
-                {
-                    lineConnectionManager.StartDragging(anchor, position.Value);
-
-                    // anchor.X = position.Value.X;
-                    // anchor.Y = position.Value.Y;
-                }
-                
-                // Calculate absolute coordinates
-                // var boxPosition = this.GetAbsolutePosition("ConnectionCanvas");
+                // var position = e.GetPosition(this);
                 //
-                // if (boxPosition is null)
+                // if (position.HasValue)
                 // {
-                //     throw new InvalidOperationException("Box position could not be calculated.");
+                //     lineConnectionManager.StartDragging(anchor, position.Value);
+                //
+                //     // anchor.X = position.Value.X;
+                //     // anchor.Y = position.Value.Y;
                 // }
-                
-                // anchor.X = boxPosition.Value.X + anchor.X;
-                // anchor.Y = boxPosition.Value.Y + anchor.Y;
-
-
-                
-                // Debug.WriteLine($"🔴 POINTER PRESSED - Absolute coordinates: X={absoluteX}, Y={absoluteY}");
-                // Debug.WriteLine($"🔴 Box position: X={boxPosition.Value.X}, Y={boxPosition.Value.Y}");
-                // Debug.WriteLine($"🔴 Anchor relative position: X={anchor.X}, Y={anchor.Y}");
-                // Debug.WriteLine($"🔴 Setting drag state (was: {lineConnectionManager.IsDragging})");
-
-                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
+                //
+                // WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
             };
             pointerGesture.PointerReleased += (s, e) =>
             {
-                Debug.WriteLine("🔴 POINTER RELEASED - Clearing drag state and redrawing");
-                
-                var position = e.GetPosition(this);
-                if (position.HasValue)
-                {
-                    anchor.X = position.Value.X;
-                    anchor.Y = position.Value.Y;
-                }
-
-                lineConnectionManager.EndDragging(anchor);
-                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
-                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+                // Debug.WriteLine("🔴 POINTER RELEASED - Clearing drag state and redrawing");
+                //
+                // var position = e.GetPosition(this);
+                // if (position.HasValue)
+                // {
+                //     anchor.X = position.Value.X;
+                //     anchor.Y = position.Value.Y;
+                // }
+                //
+                // lineConnectionManager.EndDragging(anchor);
+                // WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
+                // WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
             };
             anchorNode.GestureRecognizers.Add(pointerGesture);
 

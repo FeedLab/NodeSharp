@@ -273,7 +273,7 @@ public partial class DiagramViewComponent : ContentView
 
                 nodeIo.Add(nodeInfo.TypeId, dropX, dropY);
 
-                lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
+                // lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
 
                 WeakReferenceMessenger.Default.Send(new NodeActionEvent
                     { ActionEventType = NodeActionEventType.Add });

@@ -11,14 +11,14 @@ using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Client.Component;
 
-public partial class AnchorOutComponent : ContentView
+public partial class AnchorComponent : ContentView
 {
     private readonly AnchorPoint anchorPoint;
     private readonly BoxNode node;
 
     private readonly LineConnectionManager lineConnectionManager;
 
-    public AnchorOutComponent(AnchorPoint anchorPoint)
+    public AnchorComponent(AnchorPoint anchorPoint)
     {
         this.anchorPoint = anchorPoint;
         this.node = this.anchorPoint.BoxNode;
@@ -70,7 +70,7 @@ public partial class AnchorOutComponent : ContentView
         var position = e.GetPosition(visualAncestor);
         if (position.HasValue)
         {
-            lineConnectionManager.StartDragging(anchorPoint, position.Value);
+            lineConnectionManager.StartDragging(anchorPoint);
         }
 
         WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });

@@ -118,7 +118,7 @@ public partial class ToolBarViewModel : ObservableObject
 
             await PickFileAsync();
 
-            lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+       //     lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
 
             WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
 

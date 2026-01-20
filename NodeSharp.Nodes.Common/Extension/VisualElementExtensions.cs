@@ -18,18 +18,17 @@ public static class VisualElementExtensions
 
         while (parent != null)
         {
-            // Get the layout bounds for the current element
+            // Accumulate the current element's position using Bounds
             if (current is VisualElement visualElement)
             {
-                var bounds = AbsoluteLayout.GetLayoutBounds(visualElement);
-                absoluteX += bounds.X;
-                absoluteY += bounds.Y;
+                absoluteX += visualElement.Bounds.X;
+                absoluteY += visualElement.Bounds.Y;
             }
 
             // Check if we've reached the target layout
             var name = parent.AutomationId;
-            
-            if ( name == topmostLayoutName)
+
+            if (name == topmostLayoutName)
             {
                 // Found the target layout, return the accumulated position
                 return new Point(absoluteX, absoluteY);

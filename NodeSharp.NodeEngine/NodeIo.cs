@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CommunityToolkit.Maui.Core.Extensions;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Debug;
 using NodeSharp.Nodes.Delay;
@@ -209,33 +211,100 @@ public class NodeIo(Storage storage)
         }
     }
 
-    static List<Output> ParseOutputs(JsonElement inputsElement)
+    static List<Output> ParseOutputs(JsonElement outputsElement)
     {
-        return inputsElement.EnumerateArray()
-            .Select(i => new Output(
-                i.GetProperty("Name").GetString()!,
-                i.GetProperty("connectsToNodeId").EnumerateArray().Select(x => x.GetString()!).ToArray()
-                , new Point(
-                    i.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number ? xProp.GetInt32() : 0,
-                    i.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number ? yProp.GetInt32() : 0
-                )
-            ))
-            .ToList();
+        if (outputsElement.ValueKind != JsonValueKind.Array)
+            return new List<Output>();
+
+        var result = new List<Output>();
+
+        foreach (var o in outputsElement.EnumerateArray())
+        {
+            string name = o.TryGetPropertyIgnoreCase("Name", out var nameProp) && nameProp.ValueKind == JsonValueKind.String
+                ? nameProp.GetString() ?? string.Empty
+                : string.Empty;
+
+            var connectsTo = Array.Empty<string>();
+            if (o.TryGetProperty("connectsToNodeId", out var cProp) && cProp.ValueKind == JsonValueKind.Array)
+            {
+                connectsTo = cProp.EnumerateArray()
+                    .Where(e => e.ValueKind == JsonValueKind.String)
+                    .Select(e => e.GetString()!)
+                    .ToArray();
+            }
+
+            var x = o.TryGetPropertyIgnoreCase("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number && xProp.TryGetInt32(out var xi)
+                ? xi
+                : 0;
+
+            var y = o.TryGetPropertyIgnoreCase("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number && yProp.TryGetInt32(out var yi)
+                ? yi
+                : 0;
+            
+            var id = o.TryGetPropertyIgnoreCase("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String && idProp.TryGetGuid(out var idi)
+                ? idi
+                : Guid.CreateVersion7();
+
+            result.Add(new Output(id, name, connectsTo.ToObservableCollection(), new Point(x, y)));
+        }
+
+        return result;
     }
     
 
     static List<Input> ParseInputs(JsonElement inputsElement)
     {
-        return inputsElement.EnumerateArray()
-            .Select(i => new Input(
-                i.GetProperty("Name").GetString()!,
-                i.GetProperty("ConnectsToParentNodeId").EnumerateArray().Select(x => x.GetString()!).ToArray()
-                , new Point(
-                    i.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number ? xProp.GetInt32() : 0,
-                    i.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number ? yProp.GetInt32() : 0
-                )
-            ))
-            .ToList();
+        if (inputsElement.ValueKind != JsonValueKind.Array)
+            return new List<Input>();
+        
+        var result = new List<Input>();
+        
+        foreach (var o in inputsElement.EnumerateArray())
+        {
+            var name = o.TryGetPropertyIgnoreCase("Name", out var nameProp) && nameProp.ValueKind == JsonValueKind.String
+                ? nameProp.GetString() ?? string.Empty
+                : string.Empty;
+
+            var connectsTo = Array.Empty<string>();
+            if (o.TryGetProperty("ConnectsToParentNodeId", out var cProp) && cProp.ValueKind == JsonValueKind.Array)
+            {
+                connectsTo = cProp.EnumerateArray()
+                    .Where(e => e.ValueKind == JsonValueKind.String)
+                    .Select(e => e.GetString()!)
+                    .ToArray();
+            }
+
+            var x = o.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number && xProp.TryGetInt32(out var xi)
+                ? xi
+                : 0;
+
+            var y = o.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number && yProp.TryGetInt32(out var yi)
+                ? yi
+                : 0;
+            
+            var id = o.TryGetProperty("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String && idProp.TryGetGuid(out var idi)
+                ? idi
+                : Guid.CreateVersion7();
+
+            result.Add(new Input(id, name, connectsTo.ToObservableCollection(), new Point(x, y)));
+        }
+
+        return result;
+
+        //
+        // return inputsElement.EnumerateArray()
+        //     .Select(i => new Input(
+        //         i.GetProperty("Name").GetString()!,
+        //         i.GetProperty("ConnectsToParentNodeId").EnumerateArray().Select(x => x.GetString()!).ToObservableCollection()
+        //         , new Point(
+        //             i.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number ? xProp.GetInt32() : 0,
+        //             i.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number ? yProp.GetInt32() : 0
+        //         ),
+        //         i.TryGetProperty("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String && idProp.TryGetGuid(out var idi)
+        //             ? idi
+        //             : Guid.CreateVersion7()
+        //     ))
+        //     .ToList();
     }
 
     public void Clear()
