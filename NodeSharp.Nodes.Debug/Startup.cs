@@ -27,4 +27,6 @@ public class Startup : INodeSharp
     }
     
     public string NodeName => "Debug";
+    
+    public Type NodeType => typeof(NodeDebug);
 }

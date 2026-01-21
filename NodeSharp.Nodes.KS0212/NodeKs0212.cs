@@ -88,6 +88,7 @@ public class NodeKs0212 : BaseNode
         {
             InitialRelaySettings = new RelaySettings(nodeElement, "InitialRelaySettings");
             CurrentRelaySettings = new RelaySettings();
+            BoxDimension = new Rect(0, 0, 250, 235);
         }
         catch (Exception e)
         {
@@ -226,16 +227,16 @@ public class NodeKs0212 : BaseNode
             options: popupOptions,
             shellParameters: queryAttributes);
     }
-    
-    public override void RecalculateInputNodes(double height)
-    {
-        Inputs[0].StartPosition = new Point(1, height / 2);
-    }
-    
-    public override void RecalculateOutputNodes(double height)
-    {
-        Outputs[0].StartPosition = new Point(1, height / 2);
-    }
+
+    // public override void RecalculateInputNodes(double height)
+    // {
+    //     Inputs[0].StartPosition = new Point(1, height / 2);
+    // }
+    //
+    // public override void RecalculateOutputNodes(double height)
+    // {
+    //     Outputs[0].StartPosition = new Point(1, height / 2);
+    // }
 }
 
 public partial class RelaySettings : ObservableObject

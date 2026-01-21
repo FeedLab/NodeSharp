@@ -50,24 +50,19 @@ public abstract partial class BaseNode : ObservableObject
 
     [JsonIgnore] public bool HasOutputMessage => !string.IsNullOrEmpty(OutputMessage);
 
-    [ObservableProperty]
-    [property: JsonIgnore]
+    [ObservableProperty] [property: JsonIgnore]
     private Rect boxDimension;
-    
-    [ObservableProperty]
-    [property: JsonIgnore]
+
+    [ObservableProperty] [property: JsonIgnore]
     private BoxNodeStatus boxNodeStatus;
 
-    [ObservableProperty]
-    [property: JsonIgnore]
+    [ObservableProperty] [property: JsonIgnore]
     private INodeInformation typeInformation;
 
-    [ObservableProperty]
-    [property: JsonIgnore]
+    [ObservableProperty] [property: JsonIgnore]
     private ContentView? nodeBodyComponent;
 
-    [ObservableProperty]
-    [property: JsonIgnore]
+    [ObservableProperty] [property: JsonIgnore]
     private ContentView? boxNodeStatusComponent;
 
     [JsonIgnore] protected CancellationTokenSource Cts;
@@ -119,7 +114,8 @@ public abstract partial class BaseNode : ObservableObject
             {
                 for (var input = 0; input < nodeType.NumberOfInputs; input++)
                 {
-                    Inputs.Add(new Input(Guid.CreateVersion7(),"Input 1", new ObservableCollection<string>(), new Point(1, 1)));
+                    Inputs.Add(new Input(Guid.CreateVersion7(), "Input 1", new ObservableCollection<string>(),
+                        new Point(1, 1)));
                 }
             }
 
@@ -127,7 +123,8 @@ public abstract partial class BaseNode : ObservableObject
             {
                 for (var output = 0; output < nodeType.NumberOfOutputs; output++)
                 {
-                    Outputs.Add(new Output(Guid.CreateVersion7(),"Output 1", new ObservableCollection<string>(), new Point(1, 1)));
+                    Outputs.Add(new Output(Guid.CreateVersion7(), "Output 1", new ObservableCollection<string>(),
+                        new Point(1, 1)));
                 }
             }
         }
@@ -451,7 +448,6 @@ public abstract partial class BaseNode : ObservableObject
 
     public virtual void RecalculateOutputNodes(double height)
     {
-        
     }
 }
 
@@ -465,13 +461,13 @@ public partial class Input : ObservableObject
         StartPosition = startPosition;
     }
 
-    [ObservableProperty]
-    [property: JsonIgnore]
-    private Point startPosition;
-    
-    [ObservableProperty] private Guid id;
-    [ObservableProperty] private string name;
-    [ObservableProperty] private ObservableCollection<string> connectsToParentNodeId;
+    [ObservableProperty] [JsonIgnore] private Point startPosition;
+
+    [ObservableProperty] [JsonIgnore] private Guid id;
+
+    [ObservableProperty] [JsonIgnore] private string name;
+
+    [ObservableProperty] [JsonIgnore] private ObservableCollection<string> connectsToParentNodeId;
 }
 
 public partial class Output : ObservableObject
@@ -484,15 +480,13 @@ public partial class Output : ObservableObject
         StartPosition = startPosition;
     }
 
-    [ObservableProperty]
-    [property: JsonIgnore]
-    private Point startPosition;
+    [ObservableProperty] [JsonIgnore] private Point startPosition;
 
-    [ObservableProperty] private Guid id;
-    
-    [ObservableProperty] private string name;
+    [ObservableProperty] [JsonIgnore] private Guid id;
 
-    [ObservableProperty] private ObservableCollection<string> connectsToNodeId;
+    [ObservableProperty] [JsonIgnore] private string name;
+
+    [ObservableProperty] [JsonIgnore] private ObservableCollection<string> connectsToNodeId;
 }
 
 [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",

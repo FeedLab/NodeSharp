@@ -48,6 +48,17 @@ public partial class AnchorComponent : ContentView
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
 
         this.Loaded += OnLoaded;
+        this.Unloaded += OnUnloaded;
+    }
+
+    private void OnUnloaded(object? sender, EventArgs e)
+    {
+        var draggableBoxComponent = this.FindVisualAncestor<DraggableBoxComponent>();
+
+        if (draggableBoxComponent != null)
+        {
+            draggableBoxComponent.PropertyChanged -= OnDraggableBoxComponentOnPropertyChanged;
+        }
     }
 
     private void OnLoaded(object? sender, EventArgs e)
@@ -82,18 +93,27 @@ public partial class AnchorComponent : ContentView
 
     private void CalculateAbsolutePosition()
     {
-        var canvas = this.GetVisualAncestors().OfType<AbsoluteLayout>()
-            .Single(s => s.AutomationId == "CanvasSurface");
-
-        if (canvas is null)
+        try
         {
-            throw new InvalidOperationException("CanvasSurface not found for anchor component");
-        }
+            if (this.Handler == null || !this.IsLoaded) return;
+            
+            var canvas = this.GetVisualAncestors().OfType<AbsoluteLayout>()
+                .Single(s => s.AutomationId == "CanvasSurface");
 
-        var positionPt = AnchorConnectionControl.GetRelativePosition(canvas);
+            if (canvas is null)
+            {
+                throw new InvalidOperationException("CanvasSurface not found for anchor component");
+            }
+
+            var positionPt = AnchorConnectionControl.GetRelativePosition(canvas);
 
         
-        anchorPoint.SetRelativePosition(positionPt, AnchorConnectionControl.Width, AnchorConnectionControl.Height);
+            anchorPoint.SetRelativePosition(positionPt, AnchorConnectionControl.Width, AnchorConnectionControl.Height);
+        }
+        catch (Exception _)
+        {
+            return;
+        }
     }
 
     private void OnPointerEntered(object sender, PointerEventArgs e)

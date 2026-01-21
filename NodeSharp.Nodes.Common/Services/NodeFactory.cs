@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json;
 using NodeSharp.Nodes.Common.Model;
 
@@ -25,12 +26,45 @@ public class NodeFactory
     {
         var nodeType = GetNodeType(typeId);
 
-        var parameters = new object[]
-        {
-            nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storageParam
-        };
+        // Find the constructor that takes Storage parameter (for new node creation)
+        var constructor = nodeType.GetConstructors()
+            .FirstOrDefault(c =>
+            {
+                var parameters = c.GetParameters();
+                return parameters.Length >= 9 &&
+                       parameters[0].ParameterType == typeof(BaseNodeList) &&
+                       parameters[8].ParameterType == typeof(Storage);
+            });
 
-        var instance = Activator.CreateInstance(nodeType, parameters);
+        if (constructor == null)
+        {
+            throw new InvalidOperationException(
+                $"Could not find appropriate constructor for node type: {typeId}");
+        }
+
+        var constructorParams = constructor.GetParameters();
+        var parameters = new object[constructorParams.Length];
+
+        // Fill in the known parameters
+        parameters[0] = nodes;
+        parameters[1] = id;
+        parameters[2] = typeId;
+        parameters[3] = name;
+        parameters[4] = isEnabled;
+        parameters[5] = activateOnStart;
+        parameters[6] = xPosition;
+        parameters[7] = yPosition;
+        parameters[8] = storageParam;
+
+        // For any additional parameters (like RandomDataPayload, DelayPayload, etc.),
+        // create default instances using Activator
+        for (int i = 9; i < constructorParams.Length; i++)
+        {
+            var paramType = constructorParams[i].ParameterType;
+            parameters[i] = Activator.CreateInstance(paramType)!;
+        }
+
+        var instance = constructor.Invoke(parameters);
 
         if (instance is not BaseNode node)
         {
@@ -55,12 +89,30 @@ public class NodeFactory
     {
         var nodeType = GetNodeType(typeId);
 
+        // Find the constructor that takes JsonElement parameter (for JSON deserialization)
+        var constructor = nodeType.GetConstructors()
+            .FirstOrDefault(c =>
+            {
+                var parameters = c.GetParameters();
+                return parameters.Length == 11 &&
+                       parameters[0].ParameterType == typeof(BaseNodeList) &&
+                       parameters[8].ParameterType == typeof(List<Output>) &&
+                       parameters[9].ParameterType == typeof(List<Input>) &&
+                       parameters[10].ParameterType == typeof(JsonElement);
+            });
+
+        if (constructor == null)
+        {
+            throw new InvalidOperationException(
+                $"Could not find appropriate JSON constructor for node type: {typeId}");
+        }
+
         var parameters = new object[]
         {
             nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs, nodeElement
         };
 
-        var instance = Activator.CreateInstance(nodeType, parameters);
+        var instance = constructor.Invoke(parameters);
 
         if (instance is not BaseNode node)
         {
