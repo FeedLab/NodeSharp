@@ -230,14 +230,16 @@ public partial class DraggableBoxComponent : ContentView
                     }
 
                     WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
-      //              lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
 
                     // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
 
                     break;
 
                 case GestureStatus.Completed:
+                    lineConnectionManager.RebuildAnchorPointConnections(diagramViewModel.BoxNodes);
+
                     WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeInDraggingMode = false });
+                    WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
                     break;
             }
         }

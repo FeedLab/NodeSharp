@@ -3,36 +3,5 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NodeSharp.Client.Component.AnchorComponent">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"></ColumnDefinition>
-            <ColumnDefinition Width="10"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
 
-        <BoxView
-            Grid.Column="0"
-            HorizontalOptions="Fill"
-            HeightRequest="1"
-            Color="LightBlue"
-            InputTransparent="False"
-            AnchorY="0.5"
-            AnchorX="0.0" />
-
-        <Ellipse
-            Grid.Column="1"
-            WidthRequest="10"
-            HeightRequest="10"
-            Stroke="Blue"
-            Fill="Transparent"
-            StrokeThickness="3"
-            InputTransparent="False"
-            AnchorY="0.5"
-            AnchorX="0.5" x:Name="MyEllipse"
-            ZIndex="900">
-            <Ellipse.GestureRecognizers>
-                <PointerGestureRecognizer PointerEntered="OnPointerEntered" PointerExited="OnPointerExited"
-                                          PointerPressed="OnPointerPressed" PointerReleased="OnPointerReleased" />
-            </Ellipse.GestureRecognizers>
-        </Ellipse>
-    </Grid>
 </ContentView>

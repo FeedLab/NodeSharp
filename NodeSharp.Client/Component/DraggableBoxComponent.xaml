@@ -19,7 +19,8 @@
     </ContentView.Resources>
 
     <Grid
-        x:Name="ParentGrid"
+        x:Name="DraggableBoxParentGrid"
+        AutomationId="DraggableBoxParentGrid"
         InputTransparent="False">
         <Grid.GestureRecognizers>
             <PanGestureRecognizer PanUpdated="OnPanUpdated" />

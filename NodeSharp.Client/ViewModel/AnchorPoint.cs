@@ -1,7 +1,12 @@
-﻿using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Extension;
@@ -80,10 +85,10 @@ public partial class AnchorPoint : ObservableObject
                 throw exception;
             }
             
-            if (anchorComponent is VisualElement ve)
-            {
-                ve.Loaded += OnLoaded;
-            }
+            // if (value is VisualElement ve)
+            // {
+            //     ve.Loaded += OnLoaded;
+            // }
 
             anchorComponent = value;
 
@@ -91,23 +96,23 @@ public partial class AnchorPoint : ObservableObject
         }
     }
 
-    private void OnLoaded(object? sender, EventArgs e)
-    {
-            CalculateAbsolutePosition();
-    }
-
-    private void CalculateAbsolutePosition()
-    {
-        CanvasSurface = anchorComponent?.GetVisualAncestors().OfType<AbsoluteLayout>()
-            .Single(s => s.AutomationId == "CanvasSurface");
-
-        if (CanvasSurface is null)
-        {
-            throw new InvalidOperationException("CanvasSurface not found for anchor component");
-        }
-            
-        RelativePosition = anchorComponent?.GetRelativePosition(CanvasSurface);
-    }
+    // private void OnLoaded(object? sender, EventArgs e)
+    // {
+    //         CalculateAbsolutePosition();
+    // }
+    //
+    // private void CalculateAbsolutePosition()
+    // {
+    //     CanvasSurface = anchorComponent?.GetVisualAncestors().OfType<AbsoluteLayout>()
+    //         .Single(s => s.AutomationId == "CanvasSurface");
+    //
+    //     if (CanvasSurface is null)
+    //     {
+    //         throw new InvalidOperationException("CanvasSurface not found for anchor component");
+    //     }
+    //         
+    //     RelativePosition = anchorComponent?.GetRelativePosition(CanvasSurface);
+    // }
 
     public Input? InputConnection { get; }
     public Output? OutputConnection { get; }
