@@ -271,7 +271,7 @@ public partial class DiagramViewComponent : ContentView
                 var dropY = (dropPosition.Value.Y - panY) / scale;
 
 
-                nodeIo.Add(nodeInfo.TypeId, dropX, dropY);
+                nodeIo.Add(nodeInfo, dropX, dropY);
 
                 // lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
 

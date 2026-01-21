@@ -146,8 +146,6 @@ public partial class AnchorPoint : ObservableObject
 
     public void RebuildAnchorPointConnections(IList<BoxNode> boxNodes)
     {
-        // var inputNodeList = nodeIo.Nodes.SelectMany(s => s.Inputs).ToList();
-        // var outputNodeList = nodeIo.Nodes.SelectMany(s => s.Outputs).ToList();
         var inputAnchorPoints = boxNodes.SelectMany(s => s.InputNodes).ToList();
         var outputAnchorPoints = boxNodes.SelectMany(s => s.OutputNodes).ToList();
 
@@ -176,5 +174,22 @@ public partial class AnchorPoint : ObservableObject
         {
             throw new InvalidOperationException("AnchorPoint must be connected to either an Input or Output.");
         }
+    }
+
+    public void SetRelativePosition(Point positionPt, double width, double height)
+    {
+        if (ConnectionType == InOrOutConnection.Out)
+        {
+            positionPt.X += width;
+            positionPt.Y += height / 2;
+            RelativePosition = positionPt;  
+        }
+        else
+        {
+            positionPt.X += 0;
+            positionPt.Y += height / 2;
+            RelativePosition = positionPt;  
+        }
+        RelativePosition = positionPt;
     }
 }

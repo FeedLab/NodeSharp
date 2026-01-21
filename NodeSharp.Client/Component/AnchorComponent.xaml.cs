@@ -91,10 +91,9 @@ public partial class AnchorComponent : ContentView
         }
 
         var positionPt = AnchorConnectionControl.GetRelativePosition(canvas);
-        positionPt.X += AnchorConnectionControl.Width/2;
-        positionPt.Y += AnchorConnectionControl.Height/2;
+
         
-        anchorPoint.RelativePosition = positionPt;
+        anchorPoint.SetRelativePosition(positionPt, AnchorConnectionControl.Width, AnchorConnectionControl.Height);
     }
 
     private void OnPointerEntered(object sender, PointerEventArgs e)

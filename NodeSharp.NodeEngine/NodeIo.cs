@@ -313,17 +313,17 @@ public class NodeIo(Storage storage)
         fileNameSaved = null;
     }
 
-    public void Add(string nodeTypeName, double dropX, double dropY)
+    public void Add(INodeInformation nodeInfo, double dropX, double dropY)
     {
         var id = $"{Guid.CreateVersion7()}";
-        var typeId = nodeTypeName;
-        var name = $"{nodeTypeName} {nodes.Count + 1}";
+        var typeId = nodeInfo.TypeId;
+        var name = $"{nodeInfo.TypeId} {nodes.Count + 1}";
         var xPosition = (int)dropX;
         var yPosition = (int)dropY;
-        var isEnabled = true;
-        var activateOnStart = false;
+        var isEnabled = nodeInfo.IsEnabled;
+        var activateOnStart = nodeInfo.ActivateOnStart;
 
-        BaseNode node = nodeTypeName switch
+        BaseNode node = nodeInfo.TypeId switch
         {
             "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, true, xPosition, yPosition,
                 storage),
@@ -337,7 +337,7 @@ public class NodeIo(Storage storage)
                 yPosition, storage, new FunctionData()),
             "KS0212" => new NodeKs0212(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
                 storage),
-            _ => throw new InvalidOperationException($"Unknown node type: {nodeTypeName}")
+            _ => throw new InvalidOperationException($"Unknown node type: {nodeInfo.TypeId}")
         };
 
         nodes.Add(node);
