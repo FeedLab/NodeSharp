@@ -3,5 +3,60 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="NodeSharp.Client.Component.AnchorComponent">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
+        <Label 
+            x:Name="ConnectionName"
+            Grid.Column="0"
+            Grid.Row="0"
+            Margin="0,0,0,-4"
+            HorizontalOptions="Center"
+            HorizontalTextAlignment="Center"
+            VerticalOptions="Center"
+            VerticalTextAlignment="Center"
+            TextColor="DarkSlateGrey"
+            Background="Transparent"
+            FontSize="9"
+            FontFamily="Verdana"
+            />
+        <BoxView
+            x:Name="ConnectionLine"
+            Grid.Column="0"
+            Grid.Row="1"
+            WidthRequest="50"
+            HeightRequest="1"
+            HorizontalOptions="Fill"
+            Color="LightBlue"
+            InputTransparent="False"
+            AnchorY="0.5"
+            AnchorX="0.0" />
+
+        <Ellipse
+            x:Name="AnchorConnectionControl"
+            Grid.Column="1"
+            Grid.Row="1"
+            WidthRequest="10"
+            HeightRequest="10"
+            Stroke="Blue"
+            Fill="Transparent"
+            StrokeThickness="3"
+            InputTransparent="False"
+            AnchorY="0.5"
+            AnchorX="0.5"
+            ZIndex="900">
+            <Ellipse.GestureRecognizers>
+                <PointerGestureRecognizer PointerEntered="OnPointerEntered" PointerExited="OnPointerExited"
+                                          PointerPressed="OnPointerPressed" PointerReleased="OnPointerReleased" />
+            </Ellipse.GestureRecognizers>
+        </Ellipse>
+    </Grid>
 </ContentView>

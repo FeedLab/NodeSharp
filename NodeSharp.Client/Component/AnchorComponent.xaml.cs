@@ -19,76 +19,35 @@ public partial class AnchorComponent : ContentView
 
     private readonly LineConnectionManager lineConnectionManager;
 
-    private Ellipse AnchorConnectionControl;
-
     public AnchorComponent(AnchorPoint anchorPoint)
     {
         this.anchorPoint = anchorPoint;
         this.node = this.anchorPoint.BoxNode;
 
-        BuildUI();
+        InitializeComponent();
+
+        // Set column positions based on connection type
+        if (anchorPoint.ConnectionType == InOrOutConnection.Out)
+        {
+            Grid.SetColumn(ConnectionLine, 0);
+            Grid.SetColumn(AnchorConnectionControl, 1);
+            
+            Grid.SetColumn(ConnectionName, 0);
+            ConnectionName.Text = anchorPoint.OutputConnection?.Name ?? string.Empty;
+        }
+        else
+        {
+            Grid.SetColumn(ConnectionLine, 1);
+            Grid.SetColumn(AnchorConnectionControl, 0);
+          
+            Grid.SetColumn(ConnectionName, 1);
+            ConnectionName.Text = anchorPoint.InputConnection?.Name ?? string.Empty;
+        }
+        
 
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
 
         this.Loaded += OnLoaded;
-    }
-
-    private void BuildUI()
-    {
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = new GridLength(50) },
-                new ColumnDefinition { Width = new GridLength(10) }
-            }
-        };
-
-        var boxView = new BoxView
-        {
-            HorizontalOptions = LayoutOptions.Fill,
-            HeightRequest = 1,
-            Color = Colors.LightBlue,
-            InputTransparent = false,
-            AnchorY = 0.5,
-            AnchorX = 0.0
-        };
-
-        AnchorConnectionControl = new Ellipse
-        {
-            WidthRequest = 10,
-            HeightRequest = 10,
-            Stroke = new SolidColorBrush(Colors.Blue),
-            Fill = new SolidColorBrush(Colors.Transparent),
-            StrokeThickness = 3,
-            InputTransparent = false,
-            AnchorY = 0.5,
-            AnchorX = 0.5,
-            ZIndex = 900
-        };
-
-        if (anchorPoint.ConnectionType == InOrOutConnection.Out)
-        {
-            Grid.SetColumn(boxView, 0);
-            Grid.SetColumn(AnchorConnectionControl, 1);
-        }
-        else
-        {
-            Grid.SetColumn(boxView, 1);
-            Grid.SetColumn(AnchorConnectionControl, 0); 
-        }
-
-        var pointerGestureRecognizer = new PointerGestureRecognizer();
-        pointerGestureRecognizer.PointerEntered += OnPointerEntered;
-        pointerGestureRecognizer.PointerExited += OnPointerExited;
-        pointerGestureRecognizer.PointerPressed += OnPointerPressed;
-        pointerGestureRecognizer.PointerReleased += OnPointerReleased;
-        AnchorConnectionControl.GestureRecognizers.Add(pointerGestureRecognizer);
-
-        grid.Children.Add(boxView);
-        grid.Children.Add(AnchorConnectionControl);
-
-        Content = grid;
     }
 
     private void OnLoaded(object? sender, EventArgs e)

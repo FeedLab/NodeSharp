@@ -340,7 +340,7 @@ public partial class DraggableBoxComponent : ContentView
             anchorNode.GestureRecognizers.Add(pointerGesture);
 
             AbsoluteLayout.SetLayoutFlags(anchorNode, AbsoluteLayoutFlags.None);
-            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 10));
+            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 25));
             absoluteLayout.Children.Add(anchorNode);
         }
     }
@@ -415,7 +415,7 @@ public partial class DraggableBoxComponent : ContentView
             // AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(anchor.X - 5, anchor.Y - 5, 10, 10));
             AbsoluteLayout.SetLayoutFlags(anchorNode, AbsoluteLayoutFlags.None);
 
-            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 10));
+            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 25));
             // AbsoluteLayout.SetLayoutFlags(boxViewLine, AbsoluteLayoutFlags.None);
             //
             // absoluteLayout.Children.Add(boxViewLine);

@@ -47,7 +47,7 @@ public class NodeKs0212 : BaseNode
 
         Outputs.Clear();
 
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay status", [], new Point(50, 30)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Status", [], new Point(50, 30)));
         Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 1", [], new Point(50, 70)));
         Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 2", [], new Point(50, 100)));
         Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 3", [], new Point(50, 130)));
