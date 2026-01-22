@@ -256,7 +256,8 @@ public partial class DiagramViewComponent : ContentView
     {
         if (lineConnectionManager.IsDragging)
         {
-            var position = e.GetPosition(CanvasSurface);
+            var position = e.GetPosition(this);
+            // var position = e.GetPosition(CanvasSurface);
             if (position != null)
             {
                 lineConnectionManager.UpdateDragPosition(position.Value);

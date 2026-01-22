@@ -136,11 +136,7 @@ public partial class AnchorComponent : ContentView
 
     private void OnPointerPressed(object? sender, PointerEventArgs e)
     {
-        var positionTmp = this.GetAbsolutePosition("CanvasSurface");
-        var visualAncestor = this.FindVisualAncestor<AbsoluteLayout>();
-
-        visualAncestor = visualAncestor?.FindVisualAncestor<AbsoluteLayout>();
-
+        var visualAncestor = this.FindVisualAncestor<DiagramViewComponent>();
 
         var position = e.GetPosition(visualAncestor);
         if (position.HasValue)

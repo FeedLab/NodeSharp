@@ -50,8 +50,8 @@ public class CurvedLineDrawable : IDrawable
             canvas.StrokeSize = 2;
             canvas.StrokeDashPattern = [5, 5];
 
-            var start = new Point(lineConnectionManager.DragStartAnchor.X,
-                lineConnectionManager.DragStartAnchor.Y);
+            var start = new Point(lineConnectionManager.DragStartAnchor.RelativePosition.Value.X,
+                lineConnectionManager.DragStartAnchor.RelativePosition.Value.Y);
             var end = lineConnectionManager.DragCurrentPoint.Value;
 
             var path = new PathF();
