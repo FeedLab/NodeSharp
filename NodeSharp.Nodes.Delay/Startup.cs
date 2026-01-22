@@ -28,4 +28,6 @@ public class Startup : INodeSharp
     }
     
     public string NodeName => "Delay";
+    
+    public Type NodeType => typeof(NodeDelay);
 }

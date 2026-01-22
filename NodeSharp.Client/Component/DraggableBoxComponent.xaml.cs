@@ -4,6 +4,7 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.Nodes.Common;
@@ -31,6 +32,12 @@ public partial class DraggableBoxComponent : ContentView
     public new static readonly BindableProperty YProperty =
         BindableProperty.Create(nameof(Y), typeof(double), typeof(DraggableBoxComponent), 0.0);
 
+    public new static readonly BindableProperty WidthRequestProperty =
+        BindableProperty.Create(nameof(WidthRequest), typeof(double), typeof(DraggableBoxComponent), 100.0);
+
+    public new static readonly BindableProperty HeightRequestProperty =
+        BindableProperty.Create(nameof(HeightRequest), typeof(double), typeof(DraggableBoxComponent), 100.0);
+
     public static readonly BindableProperty TextProperty =
         BindableProperty.Create(nameof(Text), typeof(string), typeof(DraggableBoxComponent), "");
 
@@ -50,6 +57,18 @@ public partial class DraggableBoxComponent : ContentView
     {
         get => (double)GetValue(YProperty);
         set => SetValue(YProperty, value);
+    }
+
+    public new double WidthRequest
+    {
+        get => (double)GetValue(WidthRequestProperty);
+        set => SetValue(WidthRequestProperty, value);
+    }
+
+    public new double HeightRequest
+    {
+        get => (double)GetValue(HeightRequestProperty);
+        set => SetValue(HeightRequestProperty, value);
     }
 
     public string Text
@@ -80,16 +99,18 @@ public partial class DraggableBoxComponent : ContentView
         popupService = AppService.GetRequiredService<IPopupService>();
 
 
-        // Update AbsoluteLayout bounds when X or Y properties change
+        // Update AbsoluteLayout bounds when X, Y, WidthRequest, or HeightRequest properties change
         PropertyChanged += (sender, e) =>
         {
             var view = (VisualElement)sender!;
-            if ((e.PropertyName == nameof(X) || e.PropertyName == nameof(Y)) && Parent is AbsoluteLayout)
+            if ((e.PropertyName == nameof(X) || e.PropertyName == nameof(Y) ||
+                 e.PropertyName == nameof(WidthRequest) || e.PropertyName == nameof(HeightRequest))
+                && Parent is AbsoluteLayout)
             {
                 Dispatcher.Dispatch(() =>
                 {
                     AbsoluteLayout.SetLayoutBounds(this,
-                        new Rect(X, Y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
+                        new Rect(X, Y, WidthRequest, HeightRequest));
                 });
             }
         };
@@ -99,7 +120,7 @@ public partial class DraggableBoxComponent : ContentView
         {
             if (Parent is AbsoluteLayout)
             {
-                AbsoluteLayout.SetLayoutBounds(this, new Rect(X, Y, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
+                AbsoluteLayout.SetLayoutBounds(this, new Rect(X, Y, WidthRequest, HeightRequest));
             }
         };
 
@@ -130,8 +151,12 @@ public partial class DraggableBoxComponent : ContentView
                 var canvasSurface = this.Parent;
                 var position = view.GetAbsolutePosition("CanvasSurface");
 
-                boxNode.Width = view.Width;
-                boxNode.Height = view.Height;
+                boxNode.DraggableBoxComponent = element;
+                boxNode.Bounds = bounds;
+                boxNode.AbsolutePosition = position.Value;
+                
+                UpdateInputAnchors(boxNode);
+                UpdateOutputAnchors(boxNode);
             }
             else
             {
@@ -140,6 +165,14 @@ public partial class DraggableBoxComponent : ContentView
         };
 
         this.BindingContextChanged += OnBindingContextChanged;
+        this.SizeChanged += (s, e) =>
+        {
+            if (BindingContext is BoxNode boxNode)
+            {
+                boxNode.Node.RecalculateInputNodes(Height);
+                boxNode.Node.RecalculateOutputNodes(Height);
+            }
+        };
 
         // Add pointer hover events
         var pointerGesture = new PointerGestureRecognizer();
@@ -197,14 +230,16 @@ public partial class DraggableBoxComponent : ContentView
                     }
 
                     WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
-                    lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
 
                     // WeakReferenceMessenger.Default.Send(new HasNodePositionChanged(true, element, this));
 
                     break;
 
                 case GestureStatus.Completed:
+                    lineConnectionManager.RebuildAnchorPointConnections(diagramViewModel.BoxNodes);
+
                     WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeInDraggingMode = false });
+                    WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
                     break;
             }
         }
@@ -214,17 +249,23 @@ public partial class DraggableBoxComponent : ContentView
     {
         if (BindingContext is BoxNode boxNode)
         {
-            UpdateInputAnchors(boxNode);
-            UpdateOutputAnchors(boxNode);
-
-            boxNode.PropertyChanged += (s, args) =>
-            {
-                if (args.PropertyName == nameof(BoxNode.Height))
-                {
-                    UpdateInputAnchors(boxNode);
-                    UpdateOutputAnchors(boxNode);
-                }
-            };
+            // boxNode.Node.RecalculateInputNodes(Height);
+            // boxNode.Node.RecalculateOutputNodes(Height);
+            //
+            // UpdateInputAnchors(boxNode);
+            // UpdateOutputAnchors(boxNode);
+            //
+            // boxNode.PropertyChanged += (s, args) =>
+            // {
+            //     if (args.PropertyName == nameof(BoxNode.Node.BoxDimension.Height))
+            //     {
+            //         boxNode.Node.RecalculateInputNodes(Height);
+            //         boxNode.Node.RecalculateOutputNodes(Height);
+            //
+            //         UpdateInputAnchors(boxNode);
+            //         UpdateOutputAnchors(boxNode);
+            //     }
+            // };
 
             BoxNodeBodyContainer.Content = boxNode.Node.NodeBodyComponent;
             BoxNodeStatusContainer.Content = boxNode.Node.BoxNodeStatusComponent;
@@ -250,51 +291,57 @@ public partial class DraggableBoxComponent : ContentView
 
         foreach (var anchor in boxNode.InputNodes)
         {
-            var boxView = new BoxView
-            {
-                WidthRequest = 10, // Make it larger for easier interaction
-                HeightRequest = 10,
-                Color = Colors.Black,
-                InputTransparent = false, // Explicitly enable input
-                AnchorX = 0.5,
-                AnchorY = 0.5,
-                ZIndex = 1000 // Ensure it's on top
-            };
+            // var boxViewLine = new BoxView
+            // {
+            //     WidthRequest = 50, // Make it larger for easier interaction
+            //     HeightRequest = 1,
+            //     Color = Colors.DarkGray,
+            //     InputTransparent = false, // Explicitly enable input
+            //     AnchorX = 0.5,
+            //     AnchorY = 0.5,
+            //     ZIndex = 500
+            // };
+            //
+            // var boxView = new Ellipse
+            // {
+            //     WidthRequest = 10,
+            //     HeightRequest = 10,
+            //     Fill = Colors.Transparent,
+            //     Stroke = Colors.Black,
+            //     StrokeThickness = 2,
+            //     InputTransparent = false,
+            //     ZIndex = 1000
+            // };
 
+            var anchorNode= new AnchorComponent(anchor);
+            anchor.AnchorComponent = anchorNode;
+            
             var pointerGesture = new PointerGestureRecognizer();
             pointerGesture.PointerEntered += (s, e) =>
             {
-                boxView.Color = Colors.Blue;
-                boxView.Scale = 1.5;
                 Debug.WriteLine($"✓ Input anchor ENTERED - IsDragging: {lineConnectionManager.IsDragging}");
             };
             pointerGesture.PointerExited += (s, e) =>
             {
-                boxView.Color = Colors.Black;
-                boxView.Scale = 1.0;
                 Debug.WriteLine("✓ Input anchor EXITED");
             };
             pointerGesture.PointerPressed += (s, e) =>
             {
                 Debug.WriteLine($"🔵 POINTER PRESSED - Setting drag state (was: {lineConnectionManager.IsDragging})");
-                lineConnectionManager.StartDragging(anchor);
-                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
+                
+               
+//                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
             };
             pointerGesture.PointerReleased += (s, e) =>
             {
                 Debug.WriteLine("🔵 POINTER RELEASED - Clearing drag state and redrawing");
-                lineConnectionManager.EndDragging(anchor);
 
-                lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
-
-                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
-                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
             };
-            boxView.GestureRecognizers.Add(pointerGesture);
+            anchorNode.GestureRecognizers.Add(pointerGesture);
 
-            AbsoluteLayout.SetLayoutBounds(boxView, anchor.LayoutBounds);
-            AbsoluteLayout.SetLayoutFlags(boxView, AbsoluteLayoutFlags.None);
-            absoluteLayout.Children.Add(boxView);
+            AbsoluteLayout.SetLayoutFlags(anchorNode, AbsoluteLayoutFlags.None);
+            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 25));
+            absoluteLayout.Children.Add(anchorNode);
         }
     }
 
@@ -316,48 +363,63 @@ public partial class DraggableBoxComponent : ContentView
 
         foreach (var anchor in boxNode.OutputNodes)
         {
-            var boxView = new BoxView
-            {
-                WidthRequest = 10,
-                HeightRequest = 10,
-                Color = Colors.Black,
-                InputTransparent = false,
-                AnchorX = 0.5,
-                AnchorY = 0.5,
-                ZIndex = 1000 // Ensure it's on top
-            };
-
+            var anchorNode= new AnchorComponent(anchor);
+            anchor.AnchorComponent = anchorNode;
+            
             var pointerGesture = new PointerGestureRecognizer();
             pointerGesture.PointerEntered += (s, e) =>
             {
-                boxView.Color = Colors.Red;
-                boxView.Scale = 1.5;
                 Debug.WriteLine("✓ Output anchor ENTERED");
             };
             pointerGesture.PointerExited += (s, e) =>
             {
-                boxView.Color = Colors.Black;
-                boxView.Scale = 1.0;
+                // boxView.Stroke = Colors.Black;
+                // boxView.Scale = 1.0;
                 Debug.WriteLine("✓ Output anchor EXITED");
             };
             pointerGesture.PointerPressed += (s, e) =>
             {
-                Debug.WriteLine($"🔴 POINTER PRESSED - Setting drag state (was: {lineConnectionManager.IsDragging})");
-                lineConnectionManager.StartDragging(anchor);
-                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
+                // var canvasSurface = this.FindByName<Element>("ConnectionCanvas");
+                // var canvasSurface = this.FindInParents<GraphicsView>("ConnectionCanvas");
+                
+                // var position = e.GetPosition(this);
+                //
+                // if (position.HasValue)
+                // {
+                //     lineConnectionManager.StartDragging(anchor, position.Value);
+                //
+                //     // anchor.X = position.Value.X;
+                //     // anchor.Y = position.Value.Y;
+                // }
+                //
+                // WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = true });
             };
             pointerGesture.PointerReleased += (s, e) =>
             {
-                Debug.WriteLine("🔴 POINTER RELEASED - Clearing drag state and redrawing");
-                lineConnectionManager.EndDragging(anchor);
-                WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
-                WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+                // Debug.WriteLine("🔴 POINTER RELEASED - Clearing drag state and redrawing");
+                //
+                // var position = e.GetPosition(this);
+                // if (position.HasValue)
+                // {
+                //     anchor.X = position.Value.X;
+                //     anchor.Y = position.Value.Y;
+                // }
+                //
+                // lineConnectionManager.EndDragging(anchor);
+                // WeakReferenceMessenger.Default.Send(new AnchorDraggingStatus { IsAnchorDragging = false });
+                // WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
             };
-            boxView.GestureRecognizers.Add(pointerGesture);
+            anchorNode.GestureRecognizers.Add(pointerGesture);
 
-            AbsoluteLayout.SetLayoutBounds(boxView, anchor.LayoutBounds);
-            AbsoluteLayout.SetLayoutFlags(boxView, AbsoluteLayoutFlags.None);
-            absoluteLayout.Children.Add(boxView);
+            // AbsoluteLayout.SetLayoutBounds(boxView, anchor.LayoutBounds);
+            // AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(anchor.X - 5, anchor.Y - 5, 10, 10));
+            AbsoluteLayout.SetLayoutFlags(anchorNode, AbsoluteLayoutFlags.None);
+
+            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 25));
+            // AbsoluteLayout.SetLayoutFlags(boxViewLine, AbsoluteLayoutFlags.None);
+            //
+            // absoluteLayout.Children.Add(boxViewLine);
+            absoluteLayout.Children.Add(anchorNode);
         }
     }
 

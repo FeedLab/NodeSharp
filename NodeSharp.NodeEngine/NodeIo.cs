@@ -1,9 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CommunityToolkit.Maui.Core.Extensions;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Exception;
+using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Debug;
 using NodeSharp.Nodes.Delay;
 using NodeSharp.Nodes.Function;
@@ -16,6 +19,7 @@ namespace NodeSharp.NodeEngine;
 public class NodeIo(Storage storage)
 {
     private readonly BaseNodeList nodes = [];
+    private readonly NodeFactory nodeFactory = new(storage);
     private string? fileNameSaved;
 
     public BaseNodeList Nodes => nodes;
@@ -146,30 +150,8 @@ public class NodeIo(Storage storage)
             var outputs = ParseOutputs(GetProperty(nodeElement, "Outputs"));
             var inputs = ParseInputs(GetProperty(nodeElement, "Inputs"));
 
-
-            BaseNode node = typeId switch
-            {
-                "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, true, xPosition,
-                    yPosition, outputs, inputs,
-                    nodeElement),
-                "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
-                    outputs, inputs,
-                    nodeElement),
-                "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart,
-                    xPosition, yPosition, outputs,
-                    inputs, nodeElement),
-                "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
-                    outputs, inputs,
-                    nodeElement),
-                "Function" => new NodeFunction(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition,
-                    yPosition,
-                    outputs, inputs,
-                    nodeElement),
-                "KS0212" => new NodeKs0212(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
-                    outputs, inputs,
-                    nodeElement),
-                _ => throw new InvalidOperationException($"Unknown TypeId: {typeId}")
-            };
+            var node = nodeFactory.CreateNodeFromJson(nodes, id, typeId, name, isEnabled, activateOnStart,
+                xPosition, yPosition, outputs, inputs, nodeElement);
 
             nodes.Add(node);
         }
@@ -209,44 +191,126 @@ public class NodeIo(Storage storage)
         }
     }
 
+    static Point GetStartPosition(JsonElement element)
+    {
+        if (element.TryGetPropertyIgnoreCase("StartPosition", out var startPosProp) &&
+            startPosProp.ValueKind == JsonValueKind.Object)
+        {
+            var x = startPosProp.TryGetPropertyIgnoreCase("X", out var xProp) &&
+                    xProp.ValueKind == JsonValueKind.Number && xProp.TryGetDouble(out var xi)
+                ? xi
+                : 0;
+
+            var y = startPosProp.TryGetPropertyIgnoreCase("Y", out var yProp) &&
+                    yProp.ValueKind == JsonValueKind.Number && yProp.TryGetDouble(out var yi)
+                ? yi
+                : 0;
+
+            return new Point(x, y);
+        }
+
+        // Fallback to reading X and Y directly from the element
+        var xDirect = element.TryGetPropertyIgnoreCase("X", out var xDirectProp) &&
+                      xDirectProp.ValueKind == JsonValueKind.Number && xDirectProp.TryGetDouble(out var xDirectValue)
+            ? xDirectValue
+            : 0;
+
+        var yDirect = element.TryGetPropertyIgnoreCase("Y", out var yDirectProp) &&
+                      yDirectProp.ValueKind == JsonValueKind.Number && yDirectProp.TryGetDouble(out var yDirectValue)
+            ? yDirectValue
+            : 0;
+
+        return new Point(xDirect, yDirect);
+    }
+
     static List<Output> ParseOutputs(JsonElement outputsElement)
     {
-        // Supports:
-        // 1) [{ "Name": "...", "ConnectsToNodeId": ["..."] }, ...]
-        // 2) ["nodeId-1", "nodeId-2", ...]
-        return outputsElement.ValueKind switch
+        if (outputsElement.ValueKind != JsonValueKind.Array)
+            return new List<Output>();
+
+        var result = new List<Output>();
+
+        foreach (var o in outputsElement.EnumerateArray())
         {
-            JsonValueKind.Array when outputsElement.GetArrayLength() == 0 => [],
+            string name = o.TryGetPropertyIgnoreCase("Name", out var nameProp) &&
+                          nameProp.ValueKind == JsonValueKind.String
+                ? nameProp.GetString() ?? string.Empty
+                : string.Empty;
 
-            JsonValueKind.Array when outputsElement[0].ValueKind == JsonValueKind.Object =>
-                outputsElement.EnumerateArray()
-                    .Select(o => new Output(
-                        o.GetProperty("Name").GetString()!,
-                        o.GetProperty("ConnectsToNodeId").EnumerateArray().Select(x => x.GetString()!).ToList()
-                    ))
-                    .ToList(),
+            var connectsTo = Array.Empty<string>();
+            if (o.TryGetPropertyIgnoreCase("connectsToNodeId", out var cProp) && cProp.ValueKind == JsonValueKind.Array)
+            {
+                connectsTo = cProp.EnumerateArray()
+                    .Where(e => e.ValueKind == JsonValueKind.String)
+                    .Select(e => e.GetString()!)
+                    .ToArray();
+            }
 
-            JsonValueKind.Array when outputsElement[0].ValueKind == JsonValueKind.String =>
-                outputsElement.EnumerateArray()
-                    .Select((nodeIdElement, index) => new Output(
-                        $"Output {index + 1}",
-                        new List<string> { nodeIdElement.GetString()! }
-                    ))
-                    .ToList(),
 
-            _ => throw new InvalidOperationException(
-                "Invalid 'Outputs' JSON shape. Expected array of objects or array of strings.")
-        };
+            var startPosition = GetStartPosition(o);
+
+            var id = o.TryGetPropertyIgnoreCase("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String &&
+                     idProp.TryGetGuid(out var idi)
+                ? idi
+                : Guid.CreateVersion7();
+
+            result.Add(new Output(id, name, connectsTo.ToObservableCollection(), startPosition));
+        }
+
+        return result;
     }
+
 
     static List<Input> ParseInputs(JsonElement inputsElement)
     {
-        return inputsElement.EnumerateArray()
-            .Select(i => new Input(
-                i.GetProperty("Name").GetString()!,
-                i.GetProperty("ConnectsToParentNodeId").EnumerateArray().Select(x => x.GetString()!).ToArray()
-            ))
-            .ToList();
+        if (inputsElement.ValueKind != JsonValueKind.Array)
+            return new List<Input>();
+
+        var result = new List<Input>();
+
+        foreach (var o in inputsElement.EnumerateArray())
+        {
+            var name = o.TryGetPropertyIgnoreCase("Name", out var nameProp) &&
+                       nameProp.ValueKind == JsonValueKind.String
+                ? nameProp.GetString() ?? string.Empty
+                : string.Empty;
+
+            var connectsTo = Array.Empty<string>();
+            if (o.TryGetPropertyIgnoreCase("ConnectsToParentNodeId", out var cProp) &&
+                cProp.ValueKind == JsonValueKind.Array)
+            {
+                connectsTo = cProp.EnumerateArray()
+                    .Where(e => e.ValueKind == JsonValueKind.String)
+                    .Select(e => e.GetString()!)
+                    .ToArray();
+            }
+
+            var startPosition = GetStartPosition(o);
+
+            var id = o.TryGetPropertyIgnoreCase("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String &&
+                     idProp.TryGetGuid(out var idi)
+                ? idi
+                : Guid.CreateVersion7();
+
+            result.Add(new Input(id, name, connectsTo.ToObservableCollection(), startPosition));
+        }
+
+        return result;
+
+        //
+        // return inputsElement.EnumerateArray()
+        //     .Select(i => new Input(
+        //         i.GetProperty("Name").GetString()!,
+        //         i.GetProperty("ConnectsToParentNodeId").EnumerateArray().Select(x => x.GetString()!).ToObservableCollection()
+        //         , new Point(
+        //             i.TryGetProperty("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number ? xProp.GetInt32() : 0,
+        //             i.TryGetProperty("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number ? yProp.GetInt32() : 0
+        //         ),
+        //         i.TryGetProperty("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String && idProp.TryGetGuid(out var idi)
+        //             ? idi
+        //             : Guid.CreateVersion7()
+        //     ))
+        //     .ToList();
     }
 
     public void Clear()
@@ -255,32 +319,37 @@ public class NodeIo(Storage storage)
         fileNameSaved = null;
     }
 
-    public void Add(string nodeTypeName, double dropX, double dropY)
+    public void Add(INodeInformation nodeInfo, double dropX, double dropY)
     {
         var id = $"{Guid.CreateVersion7()}";
-        var typeId = nodeTypeName;
-        var name = $"{nodeTypeName} {nodes.Count + 1}";
+        var typeId = nodeInfo.TypeId;
+        var name = $"{nodeInfo.TypeId} {nodes.Count + 1}";
         var xPosition = (int)dropX;
         var yPosition = (int)dropY;
-        var isEnabled = true;
-        var activateOnStart = false;
+        var isEnabled = nodeInfo.IsEnabled;
+        var activateOnStart = nodeInfo.ActivateOnStart;
 
-        BaseNode node = nodeTypeName switch
-        {
-            "Inject" => new NodeInject(nodes, id, typeId, name, isEnabled, true, xPosition, yPosition,
-                storage),
-            "Debug" => new NodeDebug(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
-                storage),
-            "RandomNumber" => new NodeRandomNumber(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition,
-                yPosition, storage, new RandomDataPayload()),
-            "Delay" => new NodeDelay(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage,
-                new DelayPayload()),
-            "Function" => new NodeFunction(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition,
-                yPosition, storage, new FunctionData()),
-            "KS0212" => new NodeKs0212(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition,
-                storage),
-            _ => throw new InvalidOperationException($"Unknown node type: {nodeTypeName}")
-        };
+        var node = nodeFactory.CreateNode(nodes, id, typeId, name, isEnabled, activateOnStart,
+            xPosition, yPosition, storage);
+
+        nodes.Add(node);
+    }
+
+    public void Add(INodeInformation nodeInfo, Point position)
+    {
+        var id = $"{Guid.CreateVersion7()}";
+        var typeId = nodeInfo.TypeId;
+        var name = $"{nodeInfo.TypeId} {nodes.Count + 1}";
+        // var xPosition = (int)dropX;
+        // var yPosition = (int)dropY;
+        var isEnabled = nodeInfo.IsEnabled;
+        var activateOnStart = nodeInfo.ActivateOnStart;
+
+        var node = nodeFactory.CreateNode(nodes, id, typeId, name, isEnabled, activateOnStart,
+            0, 0, storage);
+
+        node.X = (int)(position.X - (node.BoxDimension.Width / 2));
+        node.Y = (int)(position.Y - (node.BoxDimension.Height / 2));
 
         nodes.Add(node);
     }

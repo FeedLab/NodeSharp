@@ -32,6 +32,18 @@ public class NodeInformationDictionary : Dictionary<string, INodeSharp>
         return false;
     }
     
+    public bool TryGetNodeType(string typeId, out Type nodeType)
+    {
+        if(TryGetValue(typeId, out var nodeSharpInstance))
+        {
+            nodeType = nodeSharpInstance.NodeType;
+            return true;
+        }
+
+        nodeType = null!;
+        return false;
+    }
+    
     // public NodeInformationDictionary(Storage storage)
     // {
     //     this.storage = storage;

@@ -29,4 +29,6 @@ public class Startup : INodeSharp
     }
     
     public string NodeName => "KS0212";
+    
+    public Type NodeType => typeof(NodeKs0212);
 }

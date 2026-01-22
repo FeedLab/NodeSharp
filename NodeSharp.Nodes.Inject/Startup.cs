@@ -35,4 +35,6 @@ public class Startup : INodeSharp
     }
 
     public string NodeName => "Inject";
+    
+    public Type NodeType => typeof(NodeInject);
 }

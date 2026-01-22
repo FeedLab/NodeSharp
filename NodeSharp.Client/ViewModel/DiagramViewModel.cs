@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.Messaging;
+using NodeSharp.Client.Component;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
 
@@ -22,13 +23,6 @@ public class DiagramViewModel
     public async Task Init(StreamReader reader, string filePath)
     {
         await nodeIo.LoadFromFileAsync(reader, filePath);
-
-        // foreach (var node in nodeIo.Nodes)
-        // {
-        //     var boxNode = new BoxNode(node);
-        //
-        //     BoxNodes.Add(boxNode);
-        // }
     }
 
     private void OnNodesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -65,6 +59,14 @@ public class DiagramViewModel
             {
                 throw new InvalidOperationException("New items must be a single BaseNode.");
             }
+        }
+    }
+    
+    public void PrepareForSave()
+    {
+        foreach (var node in BoxNodes)
+        {
+            node.PrepareForSave();
         }
     }
 

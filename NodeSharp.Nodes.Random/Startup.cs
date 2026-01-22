@@ -29,4 +29,6 @@ public class Startup : INodeSharp
     }
     
     public string NodeName => "RandomNumber";
+    
+    public Type NodeType => typeof(NodeRandomNumber);
 }

@@ -79,7 +79,21 @@ public partial class DiagramViewComponent : ContentView
                 return Task.CompletedTask;
             });
         });
-
+        
+        WeakReferenceMessenger.Default.Register<RebuildAnchorPointStatus>(this, (sender, args) =>
+        {
+            MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                if (args.IsAnchorAdded)
+                {
+                    lineConnectionManager.RebuildAnchorPointConnections(viewModel.BoxNodes);
+                }
+                
+                return Task.CompletedTask;
+            });
+            
+        });
+        
         this.SizeChanged += (sender, eventArgs) =>
         {
             viewportWidth = this.Width;
@@ -267,13 +281,13 @@ public partial class DiagramViewComponent : ContentView
             var dropPosition = e.GetPosition(this);
             if (dropPosition != null)
             {
-                var dropX = (dropPosition.Value.X - panX) / scale;
+                var dropX = (dropPosition.Value.X  - panX) / scale;
                 var dropY = (dropPosition.Value.Y - panY) / scale;
 
 
-                nodeIo.Add(nodeInfo.TypeId, dropX, dropY);
+                nodeIo.Add(nodeInfo, new Point(dropX, dropY));
 
-                lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
+                // lineConnectionManager.RecalculateLines(viewModel.BoxNodes);
 
                 WeakReferenceMessenger.Default.Send(new NodeActionEvent
                     { ActionEventType = NodeActionEventType.Add });

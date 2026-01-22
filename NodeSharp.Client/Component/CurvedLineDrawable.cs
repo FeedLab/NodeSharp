@@ -13,11 +13,31 @@ public class CurvedLineDrawable : IDrawable
         canvas.StrokeColor = Colors.DarkRed;
         canvas.StrokeSize = 2;
 
-       // var lines = lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+        //    var linesx = lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
+        var inputAnchorPoints = diagramViewModel.BoxNodes.SelectMany(s => s.InputNodes).ToList();
+        var outputAnchorPoints = diagramViewModel.BoxNodes.SelectMany(s => s.OutputNodes).ToList();
 
-       var lines = lineConnectionManager.Connections;
+        // var lines = outputAnchorPoints.Select(s =>
+        //     new LineConnection(new Point(s.RelativePosition!.Value.X, s.RelativePosition.Value.Y),
+        //         new Point(s.RelativePosition.Value.X, s.RelativePosition.Value.Y)));
 
-        foreach (var connection in lines)
+        var lineConnections = new List<LineConnection>();
+        
+        foreach (var startAnchorPoint in outputAnchorPoints)
+        {
+            var fromAnchorPt = new Point(startAnchorPoint.RelativePosition!.Value.X,
+                startAnchorPoint.RelativePosition.Value.Y);
+
+            foreach (var endAnchorPoint in startAnchorPoint.ConnectsToNodeId)
+            {
+                var toAnchorPt = new Point(endAnchorPoint.RelativePosition!.Value.X,
+                    endAnchorPoint.RelativePosition.Value.Y);
+                
+                lineConnections.Add(new LineConnection(fromAnchorPt, toAnchorPt));
+            }
+        }
+
+        foreach (var connection in lineConnections)
         {
             DrawCurve(canvas, connection.Start, connection.End, connection.IsSelected);
         }
@@ -28,10 +48,10 @@ public class CurvedLineDrawable : IDrawable
         {
             canvas.StrokeColor = Colors.Blue;
             canvas.StrokeSize = 2;
-            canvas.StrokeDashPattern = new float[] { 5, 5 };
+            canvas.StrokeDashPattern = [5, 5];
 
-            var start = new Point(lineConnectionManager.DragStartAnchor.AbsoluteCenterX,
-                lineConnectionManager.DragStartAnchor.AbsoluteCenterY);
+            var start = new Point(lineConnectionManager.DragStartAnchor.X,
+                lineConnectionManager.DragStartAnchor.Y);
             var end = lineConnectionManager.DragCurrentPoint.Value;
 
             var path = new PathF();

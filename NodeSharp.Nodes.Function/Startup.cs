@@ -29,4 +29,6 @@ public class Startup : INodeSharp
     }
 
     public string NodeName => "Function";
+    
+    public Type NodeType => typeof(NodeFunction);
 }
