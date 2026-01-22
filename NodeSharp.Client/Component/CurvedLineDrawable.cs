@@ -48,7 +48,7 @@ public class CurvedLineDrawable : IDrawable
         {
             canvas.StrokeColor = Colors.Blue;
             canvas.StrokeSize = 2;
-            canvas.StrokeDashPattern = new float[] { 5, 5 };
+            canvas.StrokeDashPattern = [5, 5];
 
             var start = new Point(lineConnectionManager.DragStartAnchor.X,
                 lineConnectionManager.DragStartAnchor.Y);

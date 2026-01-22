@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,53 +20,33 @@ namespace NodeSharp.Client.ViewModel;
 [SuppressMessage("Usage", "CsWinRT1030:Project does not enable unsafe blocks")]
 public partial class AnchorPoint : ObservableObject
 {
-    public AnchorPoint(BoxNode boxNode, Input input)
+    public AnchorPoint(BoxNode boxNode, Input originalInput)
     {
-        InputConnection = input;
+        OriginalInput = originalInput;
         BoxNode = boxNode;
-
+        
         ConnectionType = InOrOutConnection.In;
-        X = input.StartPosition.X;
-        Y = input.StartPosition.Y;
+        Id = originalInput.Id.ToString();
+        X = originalInput.StartPosition.X;
+        Y = originalInput.StartPosition.Y;
 
+        ConnectsToNodeId.CollectionChanged += ConnectsToNodeIdOnCollectionChanged;
         nodeIo = AppService.GetRequiredService<NodeIo>();
-
-        // input.ConnectsToParentNodeId.CollectionChanged += (sender, args) =>
-        // {
-        //     var item = (string)args.NewItems?[0]!;
-        //
-        //     switch(args.Action)
-        //     {
-        //         case NotifyCollectionChangedAction.Add:
-        //             ConnectsToNodeId.Add(item);
-        //             break;
-        //         case NotifyCollectionChangedAction.Remove:
-        //             ConnectsToNodeId.Remove(item);
-        //             break;
-        //         case NotifyCollectionChangedAction.Replace:
-        //             break;
-        //         case NotifyCollectionChangedAction.Move:
-        //             break;
-        //         case NotifyCollectionChangedAction.Reset:
-        //             ConnectsToNodeId.Clear();
-        //             break;
-        //         default:
-        //             throw new ArgumentOutOfRangeException();
-        //     }
-        // };
     }
 
-    public AnchorPoint(BoxNode boxNode, Output output)
+    public AnchorPoint(BoxNode boxNode, Output originalOutput)
     {
-        OutputConnection = output;
+        OriginalOutput = originalOutput;
         BoxNode = boxNode;
 
         ConnectionType = InOrOutConnection.Out;
-        X = output.StartPosition.X;
-        Y = output.StartPosition.Y;
-        
+        Id = originalOutput.Id.ToString();
+        X = originalOutput.StartPosition.X;
+        Y = originalOutput.StartPosition.Y;
+
+        ConnectsToNodeId.CollectionChanged += ConnectsToNodeIdOnCollectionChanged;
+
         nodeIo = AppService.GetRequiredService<NodeIo>();
-        
     }
 
     public IVisualTreeElement? AnchorComponent
@@ -81,46 +62,22 @@ public partial class AnchorPoint : ObservableObject
                     HResult = 0,
                     Source = null
                 };
-                
+
                 throw exception;
             }
-            
-            // if (value is VisualElement ve)
-            // {
-            //     ve.Loaded += OnLoaded;
-            // }
 
             anchorComponent = value;
-
-            
         }
     }
 
-    // private void OnLoaded(object? sender, EventArgs e)
-    // {
-    //         CalculateAbsolutePosition();
-    // }
-    //
-    // private void CalculateAbsolutePosition()
-    // {
-    //     CanvasSurface = anchorComponent?.GetVisualAncestors().OfType<AbsoluteLayout>()
-    //         .Single(s => s.AutomationId == "CanvasSurface");
-    //
-    //     if (CanvasSurface is null)
-    //     {
-    //         throw new InvalidOperationException("CanvasSurface not found for anchor component");
-    //     }
-    //         
-    //     RelativePosition = anchorComponent?.GetRelativePosition(CanvasSurface);
-    // }
+    public Input? OriginalInput { get; }
+    public Output? OriginalOutput { get; }
 
-    public Input? InputConnection { get; }
-    public Output? OutputConnection { get; }
-    private IVisualTreeElement? CanvasSurface { get; set; }
-    
     [ObservableProperty] private InOrOutConnection connectionType;
 
     [ObservableProperty] private double x;
+    
+    [ObservableProperty] private string id;
 
     [ObservableProperty] private double y;
 
@@ -133,15 +90,134 @@ public partial class AnchorPoint : ObservableObject
     [ObservableProperty] private Point? relativePosition;
 
     private IVisualTreeElement? anchorComponent;
-    
-    private readonly NodeIo nodeIo;
-    
-    [ObservableProperty] private ObservableCollection<AnchorPoint> connectsToNodeId = [];
-    
 
-    public void AddConnection(AnchorPoint anchorPoint)
+    private readonly NodeIo nodeIo;
+
+    [ObservableProperty] private ObservableCollection<AnchorPoint> connectsToNodeId = [];
+
+    partial void OnXChanged(double value)
     {
-            
+        switch (ConnectionType)
+        {
+            case InOrOutConnection.In when OriginalInput is not null:
+                OriginalInput.StartPosition = new Point(value, OriginalInput.StartPosition.Y);
+                break;
+            case InOrOutConnection.Out when OriginalOutput is not null:
+                OriginalOutput.StartPosition = new Point(value, OriginalOutput.StartPosition.Y);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    partial void OnYChanged(double value)
+    {
+        switch (ConnectionType)
+        {
+            case InOrOutConnection.In when OriginalInput is not null:
+                OriginalInput.StartPosition = new Point(OriginalInput.StartPosition.X, value);
+                break;
+            case InOrOutConnection.Out when OriginalOutput is not null:
+                OriginalOutput.StartPosition = new Point(OriginalOutput.StartPosition.X, value);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    public void ConnectsToNode(string nodeId)
+    {
+        switch (ConnectionType)
+        {
+            case InOrOutConnection.In when OriginalInput is not null:
+            {
+                OriginalInput.ConnectsToParentNodeId.Add(nodeId);
+                break;
+            }
+            case InOrOutConnection.Out when OriginalOutput is not null:
+            {
+                OriginalOutput.ConnectsToNodeId.Add(nodeId);
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void ConnectsToNodeIdOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // switch (e.Action)
+        // {
+        //     case NotifyCollectionChangedAction.Add:
+        //         UpdateConnectionIds();
+        //         break;
+        //     case NotifyCollectionChangedAction.Remove:
+        //         break;
+        //     case NotifyCollectionChangedAction.Replace:
+        //         break;
+        //     case NotifyCollectionChangedAction.Move:
+        //         break;
+        //     case NotifyCollectionChangedAction.Reset:
+        //         break;
+        //     default:
+        //         throw new ArgumentOutOfRangeException();
+        // }
+        // 
+    }
+
+    // private void InitializeConnectionIds()
+    // {
+    //     switch (ConnectionType)
+    //     {
+    //         case InOrOutConnection.In when OriginalInput is not null:
+    //         {
+    //             var connectionIds = OriginalInput.ConnectsToParentNodeId
+    //                 .Select(s => s)
+    //                 .ToList();
+    //
+    //             
+    //             ConnectsToNodeId = new ObservableCollection<AnchorPoint>(connectionIds);
+    //             break;
+    //         }
+    //         case InOrOutConnection.Out when OriginalOutput is not null:
+    //         {
+    //             var connectionIds = ConnectsToNodeId
+    //                 .Select(s => s.Id.ToString())
+    //                 .ToList();
+    //
+    //             OriginalOutput.ConnectsToNodeId = new ObservableCollection<string>(connectionIds);
+    //             break;
+    //         }
+    //         default:
+    //             throw new ArgumentOutOfRangeException();
+    //     }
+    // }
+    
+    private void UpdateConnectionIds()
+    {
+        switch (ConnectionType)
+        {
+            case InOrOutConnection.In when OriginalInput is not null:
+            {
+                var connectionIds = ConnectsToNodeId
+                    .Select(s => s.Id.ToString())
+                    .ToList();
+
+                OriginalInput.ConnectsToParentNodeId = new ObservableCollection<string>(connectionIds);
+                break;
+            }
+            case InOrOutConnection.Out when OriginalOutput is not null:
+            {
+                var connectionIds = ConnectsToNodeId
+                    .Select(s => s.Id.ToString())
+                    .ToList();
+
+                OriginalOutput.ConnectsToNodeId = new ObservableCollection<string>(connectionIds);
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     public void RebuildAnchorPointConnections(IList<BoxNode> boxNodes)
@@ -151,22 +227,23 @@ public partial class AnchorPoint : ObservableObject
 
         ConnectsToNodeId.Clear();
 
-        if (InputConnection is not null)
+        if (OriginalInput is not null)
         {
+            foreach (var id in OriginalInput.ConnectsToParentNodeId)
+            {
+                var outputNode = outputAnchorPoints.Single(outputAnchorPoint =>
+                    outputAnchorPoint.OriginalOutput?.Id.ToString() == id);
 
-            foreach (var id in InputConnection.ConnectsToParentNodeId)
-            {
-                var outputNode = outputAnchorPoints.Single(outputAnchorPoint => outputAnchorPoint.OutputConnection?.Id.ToString() == id);
-                
                 ConnectsToNodeId.Add(outputNode);
-            }   
+            }
         }
-        else if(OutputConnection is not null)
+        else if (OriginalOutput is not null)
         {
-            foreach (var id in OutputConnection.ConnectsToNodeId)
+            foreach (var id in OriginalOutput.ConnectsToNodeId)
             {
-                var inputNode = inputAnchorPoints.Single(inputAnchorPoint => inputAnchorPoint.InputConnection?.Id.ToString() == id);
-                
+                var inputNode = inputAnchorPoints.Single(inputAnchorPoint =>
+                    inputAnchorPoint.OriginalInput?.Id.ToString() == id);
+
                 ConnectsToNodeId.Add(inputNode);
             }
         }
@@ -182,14 +259,15 @@ public partial class AnchorPoint : ObservableObject
         {
             positionPt.X += width;
             positionPt.Y += height / 2;
-            RelativePosition = positionPt;  
+            RelativePosition = positionPt;
         }
         else
         {
             positionPt.X += 0;
             positionPt.Y += height / 2;
-            RelativePosition = positionPt;  
+            RelativePosition = positionPt;
         }
+
         RelativePosition = positionPt;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using NodeSharp.Client.Component;
@@ -25,6 +26,10 @@ public partial class BoxNode : ObservableObject
         AbsolutePosition = new Point(0, 0);
         BoxColor = Colors.BlanchedAlmond;
         SetInitialPosition(baseNode);
+        StorePositionFromCenter(new Point(baseNode.X, baseNode.Y));
+        
+        AddInputNodePositions();
+        AddOutputNodePositions();
 
         baseNode.OnEnterNode += (o, nodeRun) =>
         {
@@ -56,12 +61,18 @@ public partial class BoxNode : ObservableObject
     {
         XCenter = value - (Node.BoxDimension.Width / 2);
     }
-    
+
     partial void OnYChanged(double value)
     {
         YCenter = value - (Node.BoxDimension.Height / 2);
     }
-    
+
+    public void StorePositionFromCenter(Point pt)
+    {
+        X = pt.X + (Node.BoxDimension.Width / 2);
+        Y = pt.Y + (Node.BoxDimension.Height / 2);
+    }
+
     // public Point PtCenter
     // {
     //     get => new(XCenter, YCenter);
@@ -106,6 +117,7 @@ public partial class BoxNode : ObservableObject
     [ObservableProperty] private double xCenter;
 
     [ObservableProperty] private double yCenter;
+
     //
     // [ObservableProperty] private double width;
     //
@@ -116,6 +128,7 @@ public partial class BoxNode : ObservableObject
     // [ObservableProperty] private bool isEnabled;
     //
     [ObservableProperty] private Color boxColor;
+
     //
     [ObservableProperty] private BaseNode node;
 
@@ -168,17 +181,17 @@ public partial class BoxNode : ObservableObject
 
             foreach (var output in outputs)
             {
-                var ptInputSquare = new AnchorPoint(this, output);
+                var ptOutputSquare = new AnchorPoint(this, output);
 
-                OutputNodes.Add(ptInputSquare);
+                OutputNodes.Add(ptOutputSquare);
             }
         }
     }
 
     partial void OnBoundsChanged(Rect value)
     {
-        AddInputNodePositions();
-        AddOutputNodePositions();
+        // AddInputNodePositions();
+        // AddOutputNodePositions();
     }
 
 
@@ -187,6 +200,32 @@ public partial class BoxNode : ObservableObject
         foreach (var inputNode in InputNodes)
         {
             inputNode.RebuildAnchorPointConnections(boxNodes);
+        }
+        
+        foreach (var outputNode in OutputNodes)
+        {
+            outputNode.RebuildAnchorPointConnections(boxNodes);
+        }
+    }
+
+    public void PrepareForSave()
+    {
+        foreach (var inputNode in InputNodes)
+        {
+            var originalInput = inputNode.OriginalInput;
+
+            if (originalInput == null)
+            {
+                continue;
+            }
+
+            var connectionIds = inputNode.ConnectsToNodeId
+                .Where(w =>  w.OriginalInput != null)
+                .Select(s =>  s.OriginalInput!.Id.ToString())
+                .ToList();
+
+            originalInput.ConnectsToParentNodeId = new ObservableCollection<string>(connectionIds);
+            originalInput.StartPosition = new Point(inputNode.X, inputNode.Y);
         }
     }
 }

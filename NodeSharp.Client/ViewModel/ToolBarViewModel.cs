@@ -118,9 +118,8 @@ public partial class ToolBarViewModel : ObservableObject
 
             await PickFileAsync();
 
-       //     lineConnectionManager.RecalculateLines(diagramViewModel.BoxNodes);
-
-            WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = false });
+            WeakReferenceMessenger.Default.Send(new RebuildAnchorPointStatus { IsAnchorAdded = true });
+            WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
 
             debugViewModel.UpdateToolbarCommandStates();
         }
@@ -220,4 +219,9 @@ public partial class ToolBarViewModel : ObservableObject
 public class ConnectionPointStatus
 {
     public bool IsCanvasInvalid { get; set; }
+}
+
+public class RebuildAnchorPointStatus
+{
+    public bool IsAnchorAdded { get; set; }
 }

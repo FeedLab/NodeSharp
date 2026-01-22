@@ -1,4 +1,5 @@
-﻿using NodeSharp.Client.ViewModel;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using NodeSharp.Client.ViewModel;
 
 namespace NodeSharp.Client;
 
@@ -72,9 +73,16 @@ public class LineConnectionManager()
                 return;
             }
 
-            inputAnchor.ConnectsToNodeId.Add(outputAnchor);
-            outputAnchor.ConnectsToNodeId.Add(inputAnchor);
+            inputAnchor.ConnectsToNode(outputAnchor.Id);
+            outputAnchor.ConnectsToNode(inputAnchor.Id);
+
+            WeakReferenceMessenger.Default.Send(new RebuildAnchorPointStatus { IsAnchorAdded = true });
             
+            // inputAnchor.OriginalInput.ConnectsToParentNodeId.Add(outputAnchor.Id);
+            // outputAnchor.OriginalOutput.ConnectsToNodeId.Add(inputAnchor.Id);
+            // inputAnchor.ConnectsToNodeId.Add(outputAnchor);
+            // outputAnchor.ConnectsToNodeId.Add(inputAnchor);
+
             // Get the source and target nodes
             // var sourceNode = outputAnchor.BoxNode.Node;
             // var targetNodeId = inputAnchor.BoxNode.Node.Id;

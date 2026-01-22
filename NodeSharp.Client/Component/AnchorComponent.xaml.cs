@@ -33,7 +33,7 @@ public partial class AnchorComponent : ContentView
             Grid.SetColumn(AnchorConnectionControl, 1);
             
             Grid.SetColumn(ConnectionName, 0);
-            ConnectionName.Text = anchorPoint.OutputConnection?.Name ?? string.Empty;
+            ConnectionName.Text = anchorPoint.OriginalOutput?.Name ?? string.Empty;
         }
         else
         {
@@ -41,7 +41,7 @@ public partial class AnchorComponent : ContentView
             Grid.SetColumn(AnchorConnectionControl, 0);
           
             Grid.SetColumn(ConnectionName, 1);
-            ConnectionName.Text = anchorPoint.InputConnection?.Name ?? string.Empty;
+            ConnectionName.Text = anchorPoint.OriginalInput?.Name ?? string.Empty;
         }
         
 

@@ -150,7 +150,7 @@ public class NodeIo(Storage storage)
             var outputs = ParseOutputs(GetProperty(nodeElement, "Outputs"));
             var inputs = ParseInputs(GetProperty(nodeElement, "Inputs"));
 
-            var node = nodeFactory.CreateNodeFromJson(nodes, id, typeId, name, isEnabled, activateOnStart, 
+            var node = nodeFactory.CreateNodeFromJson(nodes, id, typeId, name, isEnabled, activateOnStart,
                 xPosition, yPosition, outputs, inputs, nodeElement);
 
             nodes.Add(node);
@@ -193,13 +193,16 @@ public class NodeIo(Storage storage)
 
     static Point GetStartPosition(JsonElement element)
     {
-        if (element.TryGetPropertyIgnoreCase("StartPosition", out var startPosProp) && startPosProp.ValueKind == JsonValueKind.Object)
+        if (element.TryGetPropertyIgnoreCase("StartPosition", out var startPosProp) &&
+            startPosProp.ValueKind == JsonValueKind.Object)
         {
-            var x = startPosProp.TryGetPropertyIgnoreCase("X", out var xProp) && xProp.ValueKind == JsonValueKind.Number && xProp.TryGetDouble(out var xi)
+            var x = startPosProp.TryGetPropertyIgnoreCase("X", out var xProp) &&
+                    xProp.ValueKind == JsonValueKind.Number && xProp.TryGetDouble(out var xi)
                 ? xi
                 : 0;
 
-            var y = startPosProp.TryGetPropertyIgnoreCase("Y", out var yProp) && yProp.ValueKind == JsonValueKind.Number && yProp.TryGetDouble(out var yi)
+            var y = startPosProp.TryGetPropertyIgnoreCase("Y", out var yProp) &&
+                    yProp.ValueKind == JsonValueKind.Number && yProp.TryGetDouble(out var yi)
                 ? yi
                 : 0;
 
@@ -207,11 +210,13 @@ public class NodeIo(Storage storage)
         }
 
         // Fallback to reading X and Y directly from the element
-        var xDirect = element.TryGetPropertyIgnoreCase("X", out var xDirectProp) && xDirectProp.ValueKind == JsonValueKind.Number && xDirectProp.TryGetDouble(out var xDirectValue)
+        var xDirect = element.TryGetPropertyIgnoreCase("X", out var xDirectProp) &&
+                      xDirectProp.ValueKind == JsonValueKind.Number && xDirectProp.TryGetDouble(out var xDirectValue)
             ? xDirectValue
             : 0;
 
-        var yDirect = element.TryGetPropertyIgnoreCase("Y", out var yDirectProp) && yDirectProp.ValueKind == JsonValueKind.Number && yDirectProp.TryGetDouble(out var yDirectValue)
+        var yDirect = element.TryGetPropertyIgnoreCase("Y", out var yDirectProp) &&
+                      yDirectProp.ValueKind == JsonValueKind.Number && yDirectProp.TryGetDouble(out var yDirectValue)
             ? yDirectValue
             : 0;
 
@@ -227,24 +232,25 @@ public class NodeIo(Storage storage)
 
         foreach (var o in outputsElement.EnumerateArray())
         {
-            string name = o.TryGetPropertyIgnoreCase("Name", out var nameProp) && nameProp.ValueKind == JsonValueKind.String
+            string name = o.TryGetPropertyIgnoreCase("Name", out var nameProp) &&
+                          nameProp.ValueKind == JsonValueKind.String
                 ? nameProp.GetString() ?? string.Empty
                 : string.Empty;
 
             var connectsTo = Array.Empty<string>();
-            if (o.TryGetProperty("connectsToNodeId", out var cProp) && cProp.ValueKind == JsonValueKind.Array)
+            if (o.TryGetPropertyIgnoreCase("connectsToNodeId", out var cProp) && cProp.ValueKind == JsonValueKind.Array)
             {
                 connectsTo = cProp.EnumerateArray()
                     .Where(e => e.ValueKind == JsonValueKind.String)
                     .Select(e => e.GetString()!)
                     .ToArray();
             }
-            
-            
+
 
             var startPosition = GetStartPosition(o);
 
-            var id = o.TryGetPropertyIgnoreCase("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String && idProp.TryGetGuid(out var idi)
+            var id = o.TryGetPropertyIgnoreCase("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String &&
+                     idProp.TryGetGuid(out var idi)
                 ? idi
                 : Guid.CreateVersion7();
 
@@ -253,23 +259,25 @@ public class NodeIo(Storage storage)
 
         return result;
     }
-    
+
 
     static List<Input> ParseInputs(JsonElement inputsElement)
     {
         if (inputsElement.ValueKind != JsonValueKind.Array)
             return new List<Input>();
-        
+
         var result = new List<Input>();
-        
+
         foreach (var o in inputsElement.EnumerateArray())
         {
-            var name = o.TryGetPropertyIgnoreCase("Name", out var nameProp) && nameProp.ValueKind == JsonValueKind.String
+            var name = o.TryGetPropertyIgnoreCase("Name", out var nameProp) &&
+                       nameProp.ValueKind == JsonValueKind.String
                 ? nameProp.GetString() ?? string.Empty
                 : string.Empty;
 
             var connectsTo = Array.Empty<string>();
-            if (o.TryGetProperty("ConnectsToParentNodeId", out var cProp) && cProp.ValueKind == JsonValueKind.Array)
+            if (o.TryGetPropertyIgnoreCase("ConnectsToParentNodeId", out var cProp) &&
+                cProp.ValueKind == JsonValueKind.Array)
             {
                 connectsTo = cProp.EnumerateArray()
                     .Where(e => e.ValueKind == JsonValueKind.String)
@@ -279,7 +287,8 @@ public class NodeIo(Storage storage)
 
             var startPosition = GetStartPosition(o);
 
-            var id = o.TryGetProperty("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String && idProp.TryGetGuid(out var idi)
+            var id = o.TryGetPropertyIgnoreCase("Id", out var idProp) && idProp.ValueKind == JsonValueKind.String &&
+                     idProp.TryGetGuid(out var idi)
                 ? idi
                 : Guid.CreateVersion7();
 
@@ -320,8 +329,27 @@ public class NodeIo(Storage storage)
         var isEnabled = nodeInfo.IsEnabled;
         var activateOnStart = nodeInfo.ActivateOnStart;
 
-        var node = nodeFactory.CreateNode(nodes, id, typeId, name, isEnabled, activateOnStart, 
+        var node = nodeFactory.CreateNode(nodes, id, typeId, name, isEnabled, activateOnStart,
             xPosition, yPosition, storage);
+
+        nodes.Add(node);
+    }
+
+    public void Add(INodeInformation nodeInfo, Point position)
+    {
+        var id = $"{Guid.CreateVersion7()}";
+        var typeId = nodeInfo.TypeId;
+        var name = $"{nodeInfo.TypeId} {nodes.Count + 1}";
+        // var xPosition = (int)dropX;
+        // var yPosition = (int)dropY;
+        var isEnabled = nodeInfo.IsEnabled;
+        var activateOnStart = nodeInfo.ActivateOnStart;
+
+        var node = nodeFactory.CreateNode(nodes, id, typeId, name, isEnabled, activateOnStart,
+            0, 0, storage);
+
+        node.X = (int)(position.X - (node.BoxDimension.Width / 2));
+        node.Y = (int)(position.Y - (node.BoxDimension.Height / 2));
 
         nodes.Add(node);
     }

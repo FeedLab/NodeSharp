@@ -358,26 +358,26 @@ public abstract partial class BaseNode : ObservableObject
     {
         Debug.WriteLine($"Validating {Outputs.Count} output connections");
 
-        ValidateConnections(
-            baseNodeList,
-            connections: Outputs.SelectMany(o =>
-                o.ConnectsToNodeId.Select(nodeId => (PortName: o.Name, NodeId: nodeId))),
-            idLabel: "Output ConnectsToNodeId",
-            missingNodeMessage: (portName, nodeId) =>
-                $"Output '{portName}' connects to non-existing node '{nodeId}'. ");
+        // ValidateConnections(
+        //     baseNodeList,
+        //     connections: Outputs.SelectMany(o =>
+        //         o.ConnectsToNodeId.Select(nodeId => (PortName: o.Name, NodeId: nodeId))),
+        //     idLabel: "Output ConnectsToNodeId",
+        //     missingNodeMessage: (portName, nodeId) =>
+        //         $"Output '{portName}' connects to non-existing node '{nodeId}'. ");
     }
 
     private void ValidateInputConnections(BaseNodeList baseNodeList)
     {
         Debug.WriteLine($"Validating {Inputs.Count} input connections");
 
-        ValidateConnections(
-            baseNodeList,
-            connections: Inputs.SelectMany(i =>
-                i.ConnectsToParentNodeId.Select(nodeId => (PortName: i.Name, NodeId: nodeId))),
-            idLabel: "Input ConnectsToParentNodeId",
-            missingNodeMessage: (portName, nodeId) =>
-                $"Input '{portName}' connects to non-existing parent node '{nodeId}'. ");
+        // ValidateConnections(
+        //     baseNodeList,
+        //     connections: Inputs.SelectMany(i =>
+        //         i.ConnectsToParentNodeId.Select(nodeId => (PortName: i.Name, NodeId: nodeId))),
+        //     idLabel: "Input ConnectsToParentNodeId",
+        //     missingNodeMessage: (portName, nodeId) =>
+        //         $"Input '{portName}' connects to non-existing parent node '{nodeId}'. ");
     }
 
     private void ValidateConnections(

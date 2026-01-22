@@ -48,11 +48,14 @@
             HeightRequest="10"
             Stroke="Blue"
             Fill="Transparent"
-            StrokeThickness="3"
+            StrokeThickness="2"
             InputTransparent="False"
             AnchorY="0.5"
             AnchorX="0.5"
             ZIndex="900">
+            <Ellipse.Shadow>
+                <Shadow Brush="Black" Offset="2,2" Radius="4" Opacity="0.5" />
+            </Ellipse.Shadow>
             <Ellipse.GestureRecognizers>
                 <PointerGestureRecognizer PointerEntered="OnPointerEntered" PointerExited="OnPointerExited"
                                           PointerPressed="OnPointerPressed" PointerReleased="OnPointerReleased" />
