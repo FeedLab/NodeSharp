@@ -357,6 +357,11 @@ public abstract partial class BaseNode : ObservableObject
         throw new InvalidOperationException($"Node not found: {nodeId}");
     }
 
+    public virtual void Reset()
+    {
+        BoxNodeStatus.Reset();
+    }
+
     public void ValidateInputAndOutput()
     {
         Debug.WriteLine($"Validating NodeInject: {Name} (Id: {Id})");
@@ -526,6 +531,12 @@ public partial class BoxNodeStatus : ObservableObject
     public BoxNodeStatus()
     {
         Value = 0;
-        Message = "Ok";
+        Message = "";
+    }
+
+    public void Reset()
+    {
+        Value = 0;
+        Message = "";
     }
 }

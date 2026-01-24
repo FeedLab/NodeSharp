@@ -38,26 +38,30 @@ public class NodeFunction : BaseNode
             yPosition,
             storage
         )
-    {
+    {       
         FunctionData = new FunctionData();
-        
-        const double height = 70;
-        const double width = 280;
-        const double statusBodyHeight = 12;
-        const double anchorWidth = 60;
 
-        BoxDimension = new Rect(0, 0, width, height);
-      //  BoxBodyDimension = new Rect(0, 0, width - anchorWidth - anchorWidth, height - statusBodyHeight);
+        var statusBodyHeight =  InitializeDimensions();
         
         Inputs.Clear();
         Outputs.Clear();
 
-        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, (height - statusBodyHeight) / 2)));
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Output", [], new Point(0, (height - statusBodyHeight) / 2)));
+        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, (BoxDimension.Height - statusBodyHeight) / 2)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Output", [], new Point(0, (BoxDimension.Height - statusBodyHeight) / 2)));
         
     }
 
+    private double InitializeDimensions()
+    {
+        const double height = 70;
+        const double width = 280;
+        const double statusBodyHeight = 12;
 
+        BoxDimension = new Rect(0, 0, width, height);
+
+        return statusBodyHeight;
+    }
+    
     public NodeFunction(
         BaseNodeList nodes,
         string id,
@@ -83,6 +87,8 @@ public class NodeFunction : BaseNode
             inputs
         )
     {
+        InitializeDimensions();
+        
         if (!nodeElement.TryGetProperty("FunctionData", out var functionProp) ||
             functionProp.ValueKind != JsonValueKind.Object)
         {

@@ -48,6 +48,19 @@ public class NodeInject : BaseNode
         Parameters = [new Parameter("Timestamp", "Number", "Timestamp", "")];
 
 
+        var statusBodyHeight = InitializeDimensions();
+
+        Inputs.Clear();
+        Outputs.Clear();
+
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Output", [],
+            new Point(0, (BoxDimension.Height - statusBodyHeight) / 2)));
+
+        OutputMessage = "OK";
+    }
+
+    private double InitializeDimensions()
+    {
         const double height = 70;
         const double width = 240;
         const double statusBodyHeight = 12;
@@ -56,12 +69,7 @@ public class NodeInject : BaseNode
         BoxDimension = new Rect(0, 0, width - anchorWidth, height);
         BoxBodyDimension = new Rect(0, 0, width - anchorWidth - anchorWidth, height - statusBodyHeight);
 
-        Inputs.Clear();
-        Outputs.Clear();
-
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Output", [], new Point(0, (height - statusBodyHeight) / 2)));
-
-        OutputMessage = "OK";
+        return statusBodyHeight;
     }
 
     public NodeInject(
@@ -91,6 +99,9 @@ public class NodeInject : BaseNode
     {
         try
         {
+            InitializeDimensions();
+
+
             Repeat = new Repeat(
                 nodeElement.GetProperty("Repeat").GetProperty("Type").GetString()!,
                 nodeElement.GetProperty("Repeat").GetProperty("Value").GetInt32()
@@ -140,6 +151,11 @@ public class NodeInject : BaseNode
         }
     }
 
+    public override void Reset()
+    {
+        base.Reset();
+    }
+
     public override Task<string> Run()
     {
         var stopwatch = EnterNode(this);
@@ -161,7 +177,7 @@ public class NodeInject : BaseNode
 
                     await PeriodicExecutor.DelayedPeriodicExecution(
                         delay: TimeSpan.FromSeconds(ActivateAfter.Value),
-                        interval: TimeSpan.FromMilliseconds(100),
+                        interval: TimeSpan.FromMilliseconds(250),
                         action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
                         cancellationToken: Cts.Token
                     );
@@ -187,7 +203,7 @@ public class NodeInject : BaseNode
 
                             await PeriodicExecutor.DelayedPeriodicExecution(
                                 delay: TimeSpan.FromSeconds(Repeat.Value),
-                                interval: TimeSpan.FromMilliseconds(500),
+                                interval: TimeSpan.FromMilliseconds(1000),
                                 action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
                                 cancellationToken: Cts.Token);
                         } while (await timer.WaitForNextTickAsync(Cts.Token));

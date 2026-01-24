@@ -38,28 +38,27 @@ public class NodeDelay : BaseNode
         )
     {
         Delay = new DelayPayload();
-        
-        const double height = 70;
-        const double width = 280;
-        const double statusBodyHeight = 12;
-        const double anchorWidth = 60;
 
-        BoxDimension = new Rect(0, 0, width, height);
-        // BoxBodyDimension = new Rect(0, 0, width - anchorWidth - anchorWidth, height - statusBodyHeight);
-        
-        // const double height = 70;
-        // const double width = 240;
-        // const double statusBodyHeight = 12;
-        // const double anchorWidth = 60;
-        //
-        // BoxDimension = new Rect(0, 0, width, height);
-        // BoxBodyDimension = new Rect(0, 0, width - anchorWidth - anchorWidth, height - statusBodyHeight);
+        var statusBodyHeight = InitializeDimensions();
 
         Inputs.Clear();
         Outputs.Clear();
 
-        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, (height - statusBodyHeight) / 2)));
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Output", [], new Point(0, (height - statusBodyHeight) / 2)));
+        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [],
+            new Point(0, (BoxDimension.Height - statusBodyHeight) / 2)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Output", [],
+            new Point(0, (BoxDimension.Height - statusBodyHeight) / 2)));
+    }
+
+    private double InitializeDimensions()
+    {
+        const double height = 70;
+        const double width = 280;
+        const double statusBodyHeight = 12;
+
+        BoxDimension = new Rect(0, 0, width, height);
+
+        return statusBodyHeight;
     }
 
     public NodeDelay(
@@ -87,6 +86,9 @@ public class NodeDelay : BaseNode
             inputs
         )
     {
+        InitializeDimensions();
+        
+        
         if (!nodeElement.TryGetProperty("Delay", out var delayProp) || delayProp.ValueKind != JsonValueKind.Object)
         {
             throw new InvalidOperationException("Delay object not found or invalid");

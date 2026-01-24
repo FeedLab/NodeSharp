@@ -27,6 +27,11 @@ public class BaseNodeList : ObservableCollection<BaseNode>
     {
         foreach (var candidate in this)
         {
+            candidate.Reset();
+        }
+        
+        foreach (var candidate in this)
+        {
             if (!ShouldRunOnStart(candidate))
             {
                 continue;

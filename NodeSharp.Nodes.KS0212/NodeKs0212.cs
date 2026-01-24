@@ -104,6 +104,16 @@ public class NodeKs0212 : BaseNode
         }
     }
 
+    public override void Reset()
+    {
+        base.Reset();
+        
+        if (BoxNodeStatusComponent is MultiBoxComponent statusComponent)
+        {
+            statusComponent.ViewModel.TurnAllOff();
+        }
+    }
+
     protected override async Task<JsonNode?> RunFromInput(BaseNode parentNode, string inputJsonString)
     {
         var stopwatch = EnterNode(this);
