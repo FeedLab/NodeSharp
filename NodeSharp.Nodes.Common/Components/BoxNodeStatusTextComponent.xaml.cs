@@ -4,11 +4,9 @@ namespace NodeSharp.Nodes.Common.Components;
 
 public partial class BoxNodeStatusTextComponent : ContentView
 {
-    private readonly BoxNodeStatusTextViewModel viewModel;
-
     public BoxNodeStatusTextComponent(BaseNode node)
     {
-        viewModel = new BoxNodeStatusTextViewModel(node);
+        var viewModel = new BoxNodeStatusTextViewModel(node);
         
         InitializeComponent();
         

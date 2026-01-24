@@ -5,13 +5,17 @@
              xmlns:viewModels="using:NodeSharp.Nodes.Common.ViewModels"
              x:Class="NodeSharp.Nodes.Common.Components.BoxNodeStatusTextComponent"
              x:DataType="viewModels:BoxNodeStatusTextViewModel"
-             >
+             BackgroundColor="Transparent"
+             Background="Transparent"
+             WidthRequest="{Binding Node.BoxBodyDimension.Width}" >
     
-    <Label 
+    <Label
         Margin="0,2,0,0"
         VerticalOptions="Center"
         HorizontalOptions="Center"
         TextColor="DodgerBlue"
+        BackgroundColor="Transparent"
+        Background="Transparent"
         FontSize="10"
         Text="{Binding Node.BoxNodeStatus.Message}" />
 </ContentView>

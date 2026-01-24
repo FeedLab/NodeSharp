@@ -46,6 +46,22 @@ public class NodeInject : BaseNode
         Repeat = new Repeat("Second", 10);
         ActivateAfter = new ActivateAfter("Second", 1);
         Parameters = [new Parameter("Timestamp", "Number", "Timestamp", "")];
+
+
+        const double height = 70;
+        const double width = 240;
+        const double statusBodyHeight = 12;
+        const double anchorWidth = 60;
+
+        BoxDimension = new Rect(0, 0, width - anchorWidth, height);
+        BoxBodyDimension = new Rect(0, 0, width - anchorWidth - anchorWidth, height - statusBodyHeight);
+
+        Inputs.Clear();
+        Outputs.Clear();
+
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Output", [], new Point(0, (height - statusBodyHeight) / 2)));
+
+        OutputMessage = "OK";
     }
 
     public NodeInject(
@@ -156,7 +172,7 @@ public class NodeInject : BaseNode
                     Debug.WriteLine("Inject: Starting repeating");
 
                     await MainThread.InvokeOnMainThreadAsync(() => { BoxNodeStatus.Value = 0; });
-                    
+
                     var repeatMs = Repeat.Type.ConvertTimeToMilliseconds(Repeat.Value);
                     var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(repeatMs));
 
@@ -174,7 +190,6 @@ public class NodeInject : BaseNode
                                 interval: TimeSpan.FromMilliseconds(500),
                                 action: (percentComplete) => { BoxNodeStatus.Value = (decimal)percentComplete; },
                                 cancellationToken: Cts.Token);
-                                
                         } while (await timer.WaitForNextTickAsync(Cts.Token));
                     }
                     catch (OperationCanceledException)
@@ -195,7 +210,7 @@ public class NodeInject : BaseNode
                     var jsonNode = JsonNode.Parse(parametersJsonString) ?? "";
 
                     await MainThread.InvokeOnMainThreadAsync(() => { BoxNodeStatus.Value = 100; });
-                    
+
                     await SendToConnectedChildrenAsync(jsonNode);
                 }
             });

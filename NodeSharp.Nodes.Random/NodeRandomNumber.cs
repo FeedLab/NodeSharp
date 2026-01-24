@@ -39,6 +39,28 @@ public class NodeRandomNumber : BaseNode
         )
     {
         RandomData = randomData;
+        
+        const double height = 70;
+        const double width = 350;
+        const double statusBodyHeight = 12;
+        const double anchorWidth = 60;
+
+        BoxDimension = new Rect(0, 0, width, height);
+        var bodyDimension = new Rect(0, 0, width - anchorWidth - anchorWidth, height - statusBodyHeight);
+
+        if (NodeBodyComponent is null)
+        {
+            throw new InvalidOperationException("NodeRandomNumber:NodeBodyComponent => component is null");
+        }
+        
+        // NodeBodyComponent.WidthRequest = bodyDimension.Width - 100;
+        // NodeBodyComponent.HeightRequest = bodyDimension.Height;
+        
+        Inputs.Clear();
+        Outputs.Clear();
+
+        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, (height - statusBodyHeight) / 2)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Output", [], new Point(0, (height - statusBodyHeight) / 2)));
     }
 
 
@@ -241,10 +263,10 @@ public class RandomDataPayload
             : maxProp.GetInt32();
     }
 
-    public RandomDataPayload(string source = "Fixed", int min = 0, int max = 100)
+    public RandomDataPayload()
     {
-        Source = source;
-        Min = min;
-        Max = max;
+        Source = "Fixed";
+        Min = 0;
+        Max = 100;
     }
 }

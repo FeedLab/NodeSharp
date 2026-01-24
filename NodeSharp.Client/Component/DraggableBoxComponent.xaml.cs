@@ -1,19 +1,14 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.Nodes.Common;
-using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;
-using NodeSharp.Nodes.Function;
 
 namespace NodeSharp.Client.Component;
 
@@ -42,10 +37,28 @@ public partial class DraggableBoxComponent : ContentView
         BindableProperty.Create(nameof(Text), typeof(string), typeof(DraggableBoxComponent), "");
 
     public static readonly BindableProperty BoxColorProperty =
-        BindableProperty.Create(nameof(BoxColor), typeof(Color), typeof(DraggableBoxComponent), Colors.Gray);
+        BindableProperty.Create(nameof(BoxColor), typeof(Color), typeof(DraggableBoxComponent), Colors.Gray,
+            propertyChanged: OnBoxColorChanged);
+
+    public static readonly BindableProperty BoxColorLightProperty =
+        BindableProperty.Create(nameof(BoxColorLight), typeof(Color), typeof(DraggableBoxComponent), Colors.LightGray);
 
     public static readonly BindableProperty IsHoveredProperty =
         BindableProperty.Create(nameof(IsHovered), typeof(bool), typeof(DraggableBoxComponent), false);
+
+    private static void OnBoxColorChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is DraggableBoxComponent component && newValue is Color color)
+        {
+            // Create a lighter version of the color for gradient
+            component.BoxColorLight = Color.FromRgba(
+                Math.Min(color.Red + 0.15f, 1.0f),
+                Math.Min(color.Green + 0.15f, 1.0f),
+                Math.Min(color.Blue + 0.15f, 1.0f),
+                color.Alpha
+            );
+        }
+    }
 
     public new double X
     {
@@ -83,6 +96,12 @@ public partial class DraggableBoxComponent : ContentView
         set => SetValue(BoxColorProperty, value);
     }
 
+    public Color BoxColorLight
+    {
+        get => (Color)GetValue(BoxColorLightProperty);
+        set => SetValue(BoxColorLightProperty, value);
+    }
+
     public bool IsHovered
     {
         get => (bool)GetValue(IsHoveredProperty);
@@ -98,7 +117,37 @@ public partial class DraggableBoxComponent : ContentView
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
         popupService = AppService.GetRequiredService<IPopupService>();
 
+        BindingContextChanged += (sender, args) =>
+        {
 
+        };
+        
+        Loaded += (sender, args) =>
+        {
+            // var leftAreaWidth = LeftAnchorArea.Width;
+            // var rightAreaWidth = RightAnchorArea.Width;
+            //
+            // // WidthRequest = Width - leftAreaWidth - rightAreaWidth;
+            //
+            // if (leftAreaWidth > 0)
+            // {
+            //     var width = Width - leftAreaWidth - leftAreaWidth;
+            //     MainBorder.WidthRequest = width;
+            //     StatusComponent.WidthRequest = width;
+            // }
+            // else
+            // {
+            //     var width = Width - rightAreaWidth - rightAreaWidth;
+            //     MainBorder.WidthRequest = width;
+            //     StatusComponent.WidthRequest = width;
+            // }
+            //
+            // if (Parent is VisualElement parentView)
+            // {
+            //     parentView.InvalidateMeasure();
+            // }
+        };
+        
         // Update AbsoluteLayout bounds when X, Y, WidthRequest, or HeightRequest properties change
         PropertyChanged += (sender, e) =>
         {
@@ -340,7 +389,7 @@ public partial class DraggableBoxComponent : ContentView
             anchorNode.GestureRecognizers.Add(pointerGesture);
 
             AbsoluteLayout.SetLayoutFlags(anchorNode, AbsoluteLayoutFlags.None);
-            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 25));
+            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y - (25.0 / 2.0), 60, 25));
             absoluteLayout.Children.Add(anchorNode);
         }
     }
@@ -415,7 +464,7 @@ public partial class DraggableBoxComponent : ContentView
             // AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(anchor.X - 5, anchor.Y - 5, 10, 10));
             AbsoluteLayout.SetLayoutFlags(anchorNode, AbsoluteLayoutFlags.None);
 
-            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y, 60, 25));
+            AbsoluteLayout.SetLayoutBounds(anchorNode, new Rect(0, anchor.Y- (25.0 / 2.0), 60, 25));
             // AbsoluteLayout.SetLayoutFlags(boxViewLine, AbsoluteLayoutFlags.None);
             //
             // absoluteLayout.Children.Add(boxViewLine);

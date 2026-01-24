@@ -18,6 +18,11 @@ public partial class DefaultBoxNodeBodyComponent : ContentView
         this.BindingContext = viewModel;
 
         popupService = AppService.GetRequiredService<IPopupService>();
+
+        SizeChanged += (sender, args) =>
+        {
+            InvalidateMeasure();
+        };
     }
 
     private async void PointerGestureRecognizer_OnPointerPressed(object? sender, TappedEventArgs tappedEventArgs)

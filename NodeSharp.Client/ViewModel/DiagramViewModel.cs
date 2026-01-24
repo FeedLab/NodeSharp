@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.Messaging;
-using NodeSharp.Client.Component;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
 

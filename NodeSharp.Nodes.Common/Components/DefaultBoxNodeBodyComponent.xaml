@@ -4,25 +4,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="using:NodeSharp.Nodes.Common.ViewModels"
              x:Class="NodeSharp.Nodes.Common.Components.DefaultBoxNodeBodyComponent"
-             MaximumWidthRequest="200" x:DataType="viewModels:DefaultBoxNodeBodyViewModel">
+             x:DataType="viewModels:DefaultBoxNodeBodyViewModel"
+             HorizontalOptions="Fill">
 
-    <Grid Margin="4">
+    <Grid
+        Margin="0,6,0,6"
+        HorizontalOptions="FillAndExpand">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="40" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <Label
             Grid.Column="0"
             Grid.Row="0"
+            Grid.RowSpan="2"
             Text="{Binding Node.TypeInformation.PresentationInformation.Symbol}"
             HorizontalOptions="Center"
-            VerticalOptions="Center"
+            VerticalOptions="Start"
             FontFamily="{Binding Node.TypeInformation.PresentationInformation.FontFamilyName}"
             FontSize="18"
             TextColor="Black">
@@ -38,41 +42,20 @@
         <Label
             Grid.Column="1"
             Grid.Row="0"
+            HorizontalOptions="Fill"
+            HorizontalTextAlignment="Start"
             Text="{Binding Node.Name}"
             LineBreakMode="NoWrap"
-            HorizontalOptions="Center"
             FontAttributes="None" TextColor="DarkRed" FontSize="12">
-            <Label.Triggers>
-                <DataTrigger TargetType="Label" Binding="{Binding Node.HasFocus}" Value="True">
-                    <Setter Property="Scale" Value="1.05" />
-                    <Setter Property="Shadow">
-                        <Setter.Value>
-                            <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" />
-                        </Setter.Value>
-                    </Setter>
-                </DataTrigger>
-            </Label.Triggers>
-            <!-- <Label.Triggers> -->
-            <!--     <DataTrigger TargetType="Label" Binding="{Binding IsHovered, Source={x:Reference Root}}" Value="True"> -->
-            <!--         <Setter Property="Scale" Value="1.05" /> -->
-            <!--         <Setter Property="Shadow"> -->
-            <!--             <Setter.Value> -->
-            <!--                 <Shadow Brush="Blue" Offset="2,2" Radius="10" Opacity="0.8" /> -->
-            <!--             </Setter.Value> -->
-            <!--         </Setter> -->
-            <!--     </DataTrigger> -->
-            <!-- </Label.Triggers> -->
         </Label>
 
         <Label Grid.Column="1"
                Grid.Row="1"
                Text="{Binding Node.TypeId}"
                LineBreakMode="NoWrap"
-               HorizontalOptions="Center"
+            HorizontalOptions="Fill"
+            HorizontalTextAlignment="Start"
                FontAttributes="None" TextColor="DarkGreen" FontSize="14">
-            <!-- <Label.GestureRecognizers> -->
-            <!--     <PointerGestureRecognizer PointerEntered="OnPointerEntered" PointerExited="OnPointerExited" /> -->
-            <!-- </Label.GestureRecognizers> -->
         </Label>
 
     </Grid>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="using:NodeSharp.Nodes.Common.ViewModels"
+             x:Class="NodeSharp.Nodes.Common.Components.MultiBoxComponent"
+             x:DataType="viewModels:MultiBoxViewModel"
+             HorizontalOptions="Fill"
+             SizeChanged="OnSizeChanged">
+
+    <ContentView.Resources>
+        <Style x:Key="BoxBorderStyle" TargetType="Border">
+            <Setter Property="HeightRequest" Value="12" />
+            <Setter Property="StrokeThickness" Value="1.5" />
+            <Setter Property="Stroke" Value="#40000000" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 3" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Shadow">
+                <Setter.Value>
+                    <Shadow Brush="Black" Opacity="0.15" Offset="0,2" Radius="3" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="BoxViewStyle" TargetType="BoxView">
+            <Setter Property="CornerRadius" Value="3" />
+        </Style>
+    </ContentView.Resources>
+
+    <AbsoluteLayout HorizontalOptions="Fill" Margin="4,0,4,0">
+        <Border x:Name="Box0" Style="{StaticResource BoxBorderStyle}" IsVisible="{Binding ShowBox0}">
+            <BoxView Style="{StaticResource BoxViewStyle}" Color="{Binding Box0Color}" />
+        </Border>
+        <Border x:Name="Box1" Style="{StaticResource BoxBorderStyle}" IsVisible="{Binding ShowBox1}">
+            <BoxView Style="{StaticResource BoxViewStyle}" Color="{Binding Box1Color}" />
+        </Border>
+        <Border x:Name="Box2" Style="{StaticResource BoxBorderStyle}" IsVisible="{Binding ShowBox2}">
+            <BoxView Style="{StaticResource BoxViewStyle}" Color="{Binding Box2Color}" />
+        </Border>
+        <Border x:Name="Box3" Style="{StaticResource BoxBorderStyle}" IsVisible="{Binding ShowBox3}">
+            <BoxView Style="{StaticResource BoxViewStyle}" Color="{Binding Box3Color}" />
+        </Border>
+        <Border x:Name="Box4" Style="{StaticResource BoxBorderStyle}" IsVisible="{Binding ShowBox4}">
+            <BoxView Style="{StaticResource BoxViewStyle}" Color="{Binding Box4Color}" />
+        </Border>
+        <Border x:Name="Box5" Style="{StaticResource BoxBorderStyle}" IsVisible="{Binding ShowBox5}">
+            <BoxView Style="{StaticResource BoxViewStyle}" Color="{Binding Box5Color}" />
+        </Border>
+        <Border x:Name="Box6" Style="{StaticResource BoxBorderStyle}" IsVisible="{Binding ShowBox6}">
+            <BoxView Style="{StaticResource BoxViewStyle}" Color="{Binding Box6Color}" />
+        </Border>
+        <Border x:Name="Box7" Style="{StaticResource BoxBorderStyle}" IsVisible="{Binding ShowBox7}">
+            <BoxView Style="{StaticResource BoxViewStyle}" Color="{Binding Box7Color}" />
+        </Border>
+    </AbsoluteLayout>
+
+</ContentView>

@@ -5,10 +5,8 @@ using NodeSharp.Client.Component;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
-using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;
-using NodeSharp.Nodes.Common.ViewModels;
 using Syncfusion.Maui.Core.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
 
@@ -36,6 +34,7 @@ public static class MauiProgram
                 fonts.AddFont("Roboto-Medium.ttf", "Roboto-Medium");
                 fonts.AddFont("Roboto-Regular.ttf", "Roboto-Regular");
                 fonts.AddFont("TimesNewRoman.ttf", "TimesNewRoman");
+                fonts.AddFont("Verdana.ttf", "Verdana");
                 fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
                 fonts.AddFont("MaterialSymbolsOutlined-Regular.ttf", "MaterialSymbols");
             });

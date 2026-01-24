@@ -51,6 +51,8 @@
                         WidthRequest="{Binding Node.BoxDimension.Width, Mode=TwoWay}"
                         HeightRequest="{Binding Node.BoxDimension.Height, Mode=TwoWay}"
                         BoxColor="{Binding BoxColor}"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill"
                         x:DataType="viewModel:BoxNode" />
                 </DataTemplate>
             </BindableLayout.ItemTemplate>

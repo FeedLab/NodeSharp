@@ -9,11 +9,9 @@ namespace NodeSharp.Nodes.Common.Components;
 
 public partial class BoxNodeStatusGaugeComponent : ContentView
 {
-    private readonly BoxNodeStatusGaugeViewModel viewModel;
-
     public BoxNodeStatusGaugeComponent(BaseNode node)
     {
-        viewModel = new BoxNodeStatusGaugeViewModel(node);
+        var viewModel = new BoxNodeStatusGaugeViewModel(node);
         
         InitializeComponent();
         

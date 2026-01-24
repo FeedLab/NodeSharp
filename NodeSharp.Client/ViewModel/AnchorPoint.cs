@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
-using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Client.ViewModel;

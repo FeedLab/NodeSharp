@@ -7,16 +7,17 @@
              xmlns:viewModels="using:NodeSharp.Nodes.Common.ViewModels"
              x:Class="NodeSharp.Nodes.Common.Components.BoxNodeStatusGaugeComponent"
              x:DataType="viewModels:BoxNodeStatusGaugeViewModel"
+             WidthRequest="{Binding Node.BoxBodyDimension.Width}"
              >
     <gauge:SfLinearGauge x:Name="ProgressBarGauge"
                          Margin="8,2,8,2"
                          Minimum="0"
                          Maximum="100"
                          HeightRequest="12"
-                         WidthRequest="200"
                          EnableAxisAnimation="True"
                          HorizontalOptions="Start"
                          VerticalOptions="Center"
+                         BackgroundColor="Transparent"
                          ShowLabels="False"
                          ShowTicks="False">
         <gauge:SfLinearGauge.LineStyle>

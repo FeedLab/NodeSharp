@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.NodeEngine;
-using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.ViewModels;
 

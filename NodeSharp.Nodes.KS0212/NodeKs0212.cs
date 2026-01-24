@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
@@ -43,19 +44,26 @@ public class NodeKs0212 : BaseNode
         InitialRelaySettings = new RelaySettings();
         CurrentRelaySettings = new RelaySettings();
 
-        BoxDimension = new Rect(0, 0, 250, 235);
+        const double height = 225;
+        const double width = 250;
+        const double statusBodyHeight = 12;
+        const double anchorWidth = 60;
+        const double paddingWidth = 4;
+
+        BoxDimension = new Rect(0, 0, width + paddingWidth + paddingWidth, height);
+      //  BoxBodyDimension = new Rect(0, 0, width - anchorWidth - anchorWidth, height - statusBodyHeight);
 
         Outputs.Clear();
 
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Status", [], new Point(50, 30)));
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 1", [], new Point(50, 70)));
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 2", [], new Point(50, 100)));
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 3", [], new Point(50, 130)));
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 4", [], new Point(50, 160)));
-        Outputs.Add(new Output(Guid.CreateVersion7(), "Error", [], new Point(50, 200)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Status", [], new Point(0, 30)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 1", [], new Point(0, 70)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 2", [], new Point(0, 100)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 3", [], new Point(0, 130)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Relay 4", [], new Point(0, 160)));
+        Outputs.Add(new Output(Guid.CreateVersion7(), "Error", [], new Point(0, 200)));
 
         Inputs.Clear();
-        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, BoxDimension.Height / 2)));
+        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, (height - statusBodyHeight) / 2)));
     }
 
 
@@ -107,7 +115,7 @@ public class NodeKs0212 : BaseNode
 
             var jsonElement = JsonDocument.Parse(inputJsonString).RootElement;
 
-            var newRelaySettings = new RelaySettings(jsonElement, "Payload");
+            // var newRelaySettings = new RelaySettings(jsonElement, "Payload");
 
             if (!jsonElement.TryGetPropertyIgnoreCase("Payload", out var settings) ||
                 settings.ValueKind != JsonValueKind.Object)
@@ -117,34 +125,15 @@ public class NodeKs0212 : BaseNode
                 throw new NodeParseException(errorMessage, "Payload");
             }
 
-            if (newRelaySettings.RelayOne is not null && newRelaySettings.RelayOne != CurrentRelaySettings.RelayOne)
-            {
-                var relayOne = CreateRelayMessage((bool)newRelaySettings.RelayOne);
-                await SendToConnectedChildrenAsync(relayOne, Outputs[1]);
-                CurrentRelaySettings.RelayOne = newRelaySettings.RelayOne;
-            }
+            await ProcessRelayAsync(settings, nameof(RelaySettings.RelayOne),
+                () => CurrentRelaySettings.RelayOne, v => CurrentRelaySettings.RelayOne = v, 1, 0);
+            await ProcessRelayAsync(settings, nameof(RelaySettings.RelayTwo),
+                () => CurrentRelaySettings.RelayTwo, v => CurrentRelaySettings.RelayTwo = v, 2, 1);
+            await ProcessRelayAsync(settings, nameof(RelaySettings.RelayThree),
+                () => CurrentRelaySettings.RelayThree, v => CurrentRelaySettings.RelayThree = v, 3, 2);
+            await ProcessRelayAsync(settings, nameof(RelaySettings.RelayFour),
+                () => CurrentRelaySettings.RelayFour, v => CurrentRelaySettings.RelayFour = v, 4, 3);
 
-            if (newRelaySettings.RelayTwo is not null && newRelaySettings.RelayTwo != CurrentRelaySettings.RelayTwo)
-            {
-                var relayTwo = CreateRelayMessage((bool)newRelaySettings.RelayTwo!);
-                await SendToConnectedChildrenAsync(relayTwo, Outputs[2]);
-                CurrentRelaySettings.RelayTwo = newRelaySettings.RelayTwo;
-            }
-
-            if (newRelaySettings.RelayThree is not null &&
-                newRelaySettings.RelayThree != CurrentRelaySettings.RelayThree)
-            {
-                var relayThree = CreateRelayMessage((bool)newRelaySettings.RelayThree!);
-                await SendToConnectedChildrenAsync(relayThree, Outputs[3]);
-                CurrentRelaySettings.RelayThree = newRelaySettings.RelayThree;
-            }
-
-            if (newRelaySettings.RelayFour is not null && newRelaySettings.RelayFour != CurrentRelaySettings.RelayFour)
-            {
-                var relayFour = CreateRelayMessage((bool)newRelaySettings.RelayFour!);
-                await SendToConnectedChildrenAsync(relayFour, Outputs[4]);
-                CurrentRelaySettings.RelayFour = newRelaySettings.RelayFour;
-            }
 
             var relaySettingsJson = new JsonObject
             {
@@ -170,6 +159,34 @@ public class NodeKs0212 : BaseNode
         finally
         {
             LeaveNode(this, stopwatch);
+        }
+    }
+
+    private async Task ProcessRelayAsync(JsonElement settings, string propertyName,
+        Func<bool> getCurrentValue, Action<bool> setCurrentValue, int outputIndex, int relayIndex)
+    {
+        var relayValue = settings.TryGetPropertyIgnoreCase(propertyName, out var property) &&
+                         property.ValueKind is JsonValueKind.True or JsonValueKind.False
+            ? property.GetBoolean()
+            : (bool?)null;
+
+        if (relayValue.HasValue && relayValue.Value != getCurrentValue())
+        {
+            var relayMessage = CreateRelayMessage(relayValue.Value);
+            await SendToConnectedChildrenAsync(relayMessage, Outputs[outputIndex]);
+            setCurrentValue(relayValue.Value);
+
+            if (BoxNodeStatusComponent is MultiBoxComponent statusComponent)
+            {
+                if (relayValue.Value)
+                {
+                    statusComponent.ViewModel.TurnOn(relayIndex);
+                }
+                else
+                {
+                    statusComponent.ViewModel.TurnOff(relayIndex);
+                }
+            }
         }
     }
 
@@ -241,16 +258,20 @@ public class NodeKs0212 : BaseNode
 
 public partial class RelaySettings : ObservableObject
 {
-    [ObservableProperty] private bool? relayOne;
+    [ObservableProperty] private bool relayOne;
 
-    [ObservableProperty] private bool? relayTwo;
+    [ObservableProperty] private bool relayTwo;
 
-    [ObservableProperty] private bool? relayThree;
+    [ObservableProperty] private bool relayThree;
 
-    [ObservableProperty] private bool? relayFour;
+    [ObservableProperty] private bool relayFour;
 
     public RelaySettings()
     {
+        relayOne = false;
+        relayTwo = false;
+        relayThree = false;
+        relayFour = false;
     }
 
     public RelaySettings(JsonElement element, string nodeName)
@@ -266,21 +287,21 @@ public partial class RelaySettings : ObservableObject
         RelayOne = settings.TryGetPropertyIgnoreCase(nameof(RelayOne), out var oneProperty) &&
                    oneProperty.ValueKind is JsonValueKind.True or JsonValueKind.False
             ? oneProperty.GetBoolean()
-            : null;
+            : throw new InvalidOperationException($"Invalid value for 'RelayOne' in 'msg.{nodeName}'");
 
         RelayTwo = settings.TryGetPropertyIgnoreCase(nameof(RelayTwo), out var twoProperty) &&
                    twoProperty.ValueKind is JsonValueKind.True or JsonValueKind.False
             ? twoProperty.GetBoolean()
-            : null;
+            : throw new InvalidOperationException($"Invalid value for 'RelayTwo' in 'msg.{nodeName}'");
 
         RelayThree = settings.TryGetPropertyIgnoreCase(nameof(RelayThree), out var threeProperty) &&
                      threeProperty.ValueKind is JsonValueKind.True or JsonValueKind.False
             ? threeProperty.GetBoolean()
-            : null;
+            : throw new InvalidOperationException($"Invalid value for 'RelayThree' in 'msg.{nodeName}'");
 
         RelayFour = settings.TryGetPropertyIgnoreCase(nameof(RelayFour), out var fourProperty) &&
                     fourProperty.ValueKind is JsonValueKind.True or JsonValueKind.False
             ? fourProperty.GetBoolean()
-            : null;
+            : throw new InvalidOperationException($"Invalid value for 'RelayFour' in 'msg.{nodeName}'");
     }
 }

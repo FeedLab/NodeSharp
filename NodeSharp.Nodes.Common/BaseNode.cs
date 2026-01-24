@@ -29,7 +29,7 @@ public abstract partial class BaseNode : ObservableObject
     protected readonly IPopupService PopupService;
 
     // [JsonIgnore] [NotifyPropertyChangedFor(nameof(HasOutputMessage))]
-    [ObservableProperty] [JsonIgnore] private string outputMessage;
+    [ObservableProperty][JsonIgnore] private string outputMessage;
 
     partial void OnOutputMessageChanged(string value)
     {
@@ -50,19 +50,28 @@ public abstract partial class BaseNode : ObservableObject
 
     [JsonIgnore] public bool HasOutputMessage => !string.IsNullOrEmpty(OutputMessage);
 
-    [ObservableProperty] [property: JsonIgnore]
+    [ObservableProperty]
+    [property: JsonIgnore]
     private Rect boxDimension;
-
-    [ObservableProperty] [property: JsonIgnore]
+    
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private Rect boxBodyDimension;
+    
+    [ObservableProperty]
+    [property: JsonIgnore]
     private BoxNodeStatus boxNodeStatus;
 
-    [ObservableProperty] [property: JsonIgnore]
+    [ObservableProperty]
+    [property: JsonIgnore]
     private INodeInformation typeInformation;
 
-    [ObservableProperty] [property: JsonIgnore]
+    [ObservableProperty]
+    [property: JsonIgnore]
     private ContentView? nodeBodyComponent;
 
-    [ObservableProperty] [property: JsonIgnore]
+    [ObservableProperty]
+    [property: JsonIgnore]
     private ContentView? boxNodeStatusComponent;
 
     [JsonIgnore] protected CancellationTokenSource Cts;
@@ -94,7 +103,8 @@ public abstract partial class BaseNode : ObservableObject
         BoxNodeStatus = new BoxNodeStatus();
         PopupService = AppService.GetRequiredService<IPopupService>();
         OutputMessage = string.Empty;
-        BoxDimension = new Rect(0, 0, 100, 60);
+        BoxDimension = new Rect(0, 0, 240, 60);
+        BoxBodyDimension = new Rect(0, 0, 140, 48);
 
         if (storage.GetNodeInformation().TryGetValue(typeId, out var nodeSharp))
         {
@@ -161,7 +171,8 @@ public abstract partial class BaseNode : ObservableObject
     {
         BoxNodeStatus = new BoxNodeStatus();
         OutputMessage = string.Empty;
-        BoxDimension = new Rect(0, 0, 100, 60);
+        BoxDimension = new Rect(0, 0, 260, 60);
+        BoxBodyDimension = new Rect(0, 0, 140, 48);
 
         var storage = AppService.GetRequiredService<Storage>();
         PopupService = AppService.GetRequiredService<IPopupService>();
@@ -280,7 +291,7 @@ public abstract partial class BaseNode : ObservableObject
 
             foreach (var nodeId in output.ConnectsToNodeId)
             {
-                var targetNode = Nodes.Find(f => f.Id == nodeId);
+                var targetNode = FindNode(nodeId);
                 if (targetNode is null)
                 {
                     throw new InvalidOperationException($"Node not found: {nodeId}");
@@ -314,7 +325,7 @@ public abstract partial class BaseNode : ObservableObject
             {
                 foreach (var nodeId in output.ConnectsToNodeId)
                 {
-                    var targetNode = Nodes.Find(f => f.Id == nodeId);
+                    var targetNode = FindNode(nodeId);
                     if (targetNode is null)
                     {
                         throw new InvalidOperationException($"Node not found: {nodeId}");
@@ -330,6 +341,21 @@ public abstract partial class BaseNode : ObservableObject
         return Task.FromResult(parametersJsonString);
     }
 
+    private BaseNode FindNode(string nodeId)
+    {
+        foreach (var node in Nodes)
+        {
+            foreach (var input in node.Inputs)
+            {
+                if (input.Id.ToString() == nodeId)
+                {
+                    return node;
+                }
+            }
+        }
+
+        throw new InvalidOperationException($"Node not found: {nodeId}");
+    }
 
     public void ValidateInputAndOutput()
     {
@@ -461,13 +487,13 @@ public partial class Input : ObservableObject
         StartPosition = startPosition;
     }
 
-    [ObservableProperty] [JsonIgnore] private Point startPosition;
+    [ObservableProperty][JsonIgnore] private Point startPosition;
 
-    [ObservableProperty] [JsonIgnore] private Guid id;
+    [ObservableProperty][JsonIgnore] private Guid id;
 
-    [ObservableProperty] [JsonIgnore] private string name;
+    [ObservableProperty][JsonIgnore] private string name;
 
-    [ObservableProperty] [JsonIgnore] private ObservableCollection<string> connectsToParentNodeId;
+    [ObservableProperty][JsonIgnore] private ObservableCollection<string> connectsToParentNodeId;
 }
 
 public partial class Output : ObservableObject
@@ -480,22 +506,22 @@ public partial class Output : ObservableObject
         StartPosition = startPosition;
     }
 
-    [ObservableProperty] [JsonIgnore] private Point startPosition;
+    [ObservableProperty][JsonIgnore] private Point startPosition;
 
-    [ObservableProperty] [JsonIgnore] private Guid id;
+    [ObservableProperty][JsonIgnore] private Guid id;
 
-    [ObservableProperty] [JsonIgnore] private string name;
+    [ObservableProperty][JsonIgnore] private string name;
 
-    [ObservableProperty] [JsonIgnore] private ObservableCollection<string> connectsToNodeId;
+    [ObservableProperty][JsonIgnore] private ObservableCollection<string> connectsToNodeId;
 }
 
 [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
     "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 public partial class BoxNodeStatus : ObservableObject
 {
-    [JsonIgnore] [ObservableProperty] private decimal value;
+    [JsonIgnore][ObservableProperty] private decimal value;
 
-    [JsonIgnore] [ObservableProperty] private string message;
+    [JsonIgnore][ObservableProperty] private string message;
 
     public BoxNodeStatus()
     {

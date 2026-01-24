@@ -25,7 +25,7 @@ public class Startup : INodeSharp
     
     public ContentView? GetNBoxNodeStatusComponent(BaseNode node)
     {
-        return null;
+        return new MultiBoxComponent(4, Colors.Green, Colors.Red);
     }
     
     public string NodeName => "KS0212";

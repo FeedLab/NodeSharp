@@ -20,6 +20,16 @@ public class NodeDebug : BaseNode
         Storage storage)
         : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage)
     {
+        const double height = 70;
+        const double width = 220;
+        const double bodyHeight = 12;
+
+        BoxDimension = new Rect(0, 0, width, height);
+
+        Inputs.Clear();
+        Outputs.Clear();
+
+        Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, (height - bodyHeight) / 2)));
     }
 
     public NodeDebug(
