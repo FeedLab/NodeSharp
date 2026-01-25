@@ -7,17 +7,17 @@
              x:Class="NodeSharp.Client.Component.ToolBarComponent">
     <ContentView.Resources>
         <Style TargetType="buttons:SfButton" x:Key="IconButtonStyle">
-            <Setter Property="Margin" Value="4" />
+            <Setter Property="Margin" Value="2" />
             <Setter Property="FontSize" Value="18" />
-            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="CornerRadius" Value="12" />
             <Setter Property="EnableRippleEffect" Value="True" />
             <Setter Property="ShowIcon" Value="True" />
-            <Setter Property="ImageSize" Value="26" />
+            <Setter Property="ImageSize" Value="22" />
             <Setter Property="ImageAlignment" Value="Default" />
-            <Setter Property="TextColor" Value="Black" />
-            <Setter Property="Stroke" Value="DarkRed" />
+            <Setter Property="TextColor" Value="#0F172A" />
+            <Setter Property="Stroke" Value="#2B3C56" />
             <Setter Property="StrokeThickness" Value="0" />
-            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Background" Value="#EEF2F7" />
             <Setter Property="VerticalOptions" Value="Center" />
             <Setter Property="HorizontalOptions" Value="Center" />
         </Style>
@@ -31,15 +31,17 @@
         </Style>
 
         <!-- Icon resources -->
-        <FontImageSource x:Key="SaveIcon" FontFamily="FontSolid" Glyph="&#xf0c7;" Color="DarkBlue" Size="26" />
-        <FontImageSource x:Key="SaveAsIcon" FontFamily="FontSolid" Glyph="&#xf56f;" Color="DarkBlue" Size="26" />
-        <FontImageSource x:Key="LoadIcon" FontFamily="FontSolid" Glyph="&#xf07c;" Color="DarkBlue" Size="26" />
-        <FontImageSource x:Key="NewIcon" FontFamily="FontSolid" Glyph="&#xf15b;" Color="DarkBlue" Size="26" />
-        <FontImageSource x:Key="QuitIcon" FontFamily="FontSolid" Glyph="&#xf2f5;" Color="DarkBlue" Size="26" />
+        <FontImageSource x:Key="SaveIcon" FontFamily="FontSolid" Glyph="&#xf0c7;" Color="#0F2E6A" Size="22" />
+        <FontImageSource x:Key="SaveAsIcon" FontFamily="FontSolid" Glyph="&#xf56f;" Color="#0F2E6A" Size="22" />
+        <FontImageSource x:Key="LoadIcon" FontFamily="FontSolid" Glyph="&#xf07c;" Color="#0F2E6A" Size="22" />
+        <FontImageSource x:Key="NewIcon" FontFamily="FontSolid" Glyph="&#xf15b;" Color="#0F2E6A" Size="22" />
+        <FontImageSource x:Key="QuitIcon" FontFamily="FontSolid" Glyph="&#xf2f5;" Color="#0F2E6A" Size="22" />
     </ContentView.Resources>
 
-    <Grid ColumnDefinitions="*,*,*,*,*" Padding="4"
-          HorizontalOptions="Fill" VerticalOptions="Center">
+    <Border StrokeThickness="0" BackgroundColor="#E6ECF5" StrokeShape="RoundRectangle 16"
+            Padding="6" Margin="8,6">
+        <Grid ColumnDefinitions="*,*,*,*,*" Padding="4"
+              HorizontalOptions="Fill" VerticalOptions="Center">
 
         <buttons:SfButton
             Grid.Column="0"
@@ -81,6 +83,7 @@
             ImageSource="{StaticResource QuitIcon}"
             ToolTipProperties.Text="Quit" />
 
-    </Grid>
+        </Grid>
+    </Border>
 
 </ContentView>

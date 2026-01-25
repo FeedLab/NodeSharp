@@ -8,7 +8,22 @@
              xmlns:model="using:NodeSharp.Nodes.Common.Model"
              x:Class="NodeSharp.Client.Component.NodeToolListComponent">
 
-    <Border Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray" StrokeShape="RoundRectangle 1">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Color x:Key="ListPanelBg">#E9EDF3</Color>
+            <Color x:Key="ListPanelStroke">#B9C2D0</Color>
+            <Color x:Key="SearchBg">#F1F4F9</Color>
+            <Color x:Key="SearchStroke">#B6C1D3</Color>
+            <Color x:Key="CardBg">#FFFFFF</Color>
+            <Color x:Key="CardStroke">#C9D3E2</Color>
+            <Color x:Key="Accent">#0F2E6A</Color>
+            <Color x:Key="TextPrimary">#101827</Color>
+            <Color x:Key="TextSecondary">#3F4C63</Color>
+            <Color x:Key="TextMuted">#5F6C80</Color>
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <Border Stroke="{StaticResource ListPanelStroke}" StrokeThickness="1" BackgroundColor="{StaticResource ListPanelBg}" StrokeShape="RoundRectangle 0">
         <Grid Padding="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -21,7 +36,8 @@
             </Grid.RowDefinitions>
 
             <!-- Syncfusion themed input -->
-            <Grid Grid.Row="0" Grid.ColumnSpan="0" Padding="10">
+            <Border Grid.Row="0" Grid.ColumnSpan="0" Padding="10" Stroke="{StaticResource SearchStroke}" BackgroundColor="{StaticResource SearchBg}" StrokeShape="RoundRectangle 18" Margin="10,10,10,6">
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <!-- Text input fills -->
@@ -36,9 +52,8 @@
 
                     <core:SfTextInputLayout.HintLabelStyle>
                         <core:LabelStyle
-                            FontSize="16"
-                            FontAttributes="Italic"
-                            TextColor="Blue" />
+                            FontSize="13"
+                            TextColor="{StaticResource TextMuted}" />
                     </core:SfTextInputLayout.HintLabelStyle>
 
                     <Entry x:Name="SearchBox" />
@@ -46,8 +61,8 @@
                         <Label Text="&#xe713;"
                                FontFamily="MaterialAssets"
 
-                               FontSize="24"
-                               TextColor="Black">
+                               FontSize="20"
+                               TextColor="{StaticResource TextPrimary}">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnSearchClicked" />
                             </Label.GestureRecognizers>
@@ -56,34 +71,39 @@
 
 
                 </core:SfTextInputLayout>
-            </Grid>
+                </Grid>
+            </Border>
 
             <syncfusion:SfListView
                 x:Name="ListViewNodesInfo"
                 Grid.Row="1"
+                
                 ItemsSource="{Binding Nodes}"
-                SelectionMode="Single"
+                SelectionMode="None"
                 DragStartMode="OnHold"
-                SelectionBackground="LightBlue"
+                SelectionBackground="Transparent"
                 ItemSize="100"
+                Margin="6,0,6,6"
                 ItemDragging="OnItemDragging">
                 <syncfusion:SfListView.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="6, 3, 6, 3" Stroke="Gray" StrokeThickness="1" BackgroundColor="LightGray"
-                                StrokeShape="RoundRectangle 5">
+                        <Border Margin="10,6" Stroke="{StaticResource CardStroke}" StrokeThickness="1" BackgroundColor="{StaticResource CardBg}"
+                                StrokeShape="RoundRectangle 12">
                             <Border.GestureRecognizers>
                                 <DragGestureRecognizer DragStarting="OnDragStarting" />
+                                <PointerGestureRecognizer PointerEntered="OnItemPointerEntered"
+                                                          PointerExited="OnItemPointerExited" />
                             </Border.GestureRecognizers>
                             <Border.Shadow>
-                                <Shadow Radius="10" Opacity="0.5" Brush="Black" Offset="10,10" />
+                                <Shadow Radius="12" Opacity="0.12" Brush="Black" Offset="0,4" />
                             </Border.Shadow>
 
                             <Grid
-                                Margin="8"
-                                Padding="4">
+                                Margin="10"
+                                Padding="6">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="0.4*" />
-                                    <RowDefinition Height="0.6*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
                                 <Grid Grid.Row="0">
@@ -92,32 +112,35 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
 
-                                    <Label Grid.Column="0" 
-                                           Margin="4"
-                                           Text="{Binding PresentationInformation.Symbol}"
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center"
-                                           FontFamily="{Binding PresentationInformation.FontFamilyName}"
-                                           FontSize="18"
-                                           TextColor="Black">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="OnSearchClicked" />
-                                        </Label.GestureRecognizers>
-                                    </Label>
+                                    <Border Grid.Column="0" BackgroundColor="#DDE6F6" Stroke="#AFC0DF" StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 8" Padding="6" Margin="0,0,8,0"
+                                            HeightRequest="32" WidthRequest="32"
+                                            VerticalOptions="Center" HorizontalOptions="Start">
+                                        <Label Text="{Binding PresentationInformation.Symbol}"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"
+                                               HorizontalTextAlignment="Center"
+                                               VerticalTextAlignment="Center"
+                                               FontFamily="{Binding PresentationInformation.FontFamilyName}"
+                                               FontSize="16"
+                                               TextColor="{StaticResource Accent}" />
+                                    </Border>
 
                                     <Label Grid.Column="1" Text="{Binding TypeId}"
-                                           HorizontalOptions="Center"
-                                           FontAttributes="None" TextColor="Coral" FontSize="21" />
+                                           HorizontalOptions="Start"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="17" />
                                 </Grid>
 
                                 <Label Grid.Row="1"
                                        Grid.Column="0"
                                        Text="{Binding PresentationInformation.OverviewText}"
+                                       ToolTipProperties.Text="{Binding PresentationInformation.OverviewText}"
                                        LineBreakMode="TailTruncation"
                                        MaxLines="4"
                                        HorizontalOptions="Fill"
                                        VerticalOptions="Fill"
-                                       FontAttributes="None" TextColor="Teal" FontSize="11" />
+                                       FontAttributes="None" TextColor="{StaticResource TextSecondary}" FontSize="12" />
 
                             </Grid>
                         </Border>

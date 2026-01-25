@@ -3,6 +3,12 @@ using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
 using Syncfusion.Maui.ListView;
+using MauiApplication = Microsoft.Maui.Controls.Application;
+using MauiDragStartingEventArgs = Microsoft.Maui.Controls.DragStartingEventArgs;
+using MauiPointerEventArgs = Microsoft.Maui.Controls.PointerEventArgs;
+#if WINDOWS
+using Microsoft.UI.Input;
+#endif
 
 namespace NodeSharp.Client.Component;
 
@@ -40,8 +46,7 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
 
     private void OnSearchClicked(object sender, EventArgs e)
     {
-        var app = Application.Current as App;
-        if (app != null)
+        if (MauiApplication.Current is App app)
         {
             app.ToggleTheme();
         }
@@ -154,7 +159,7 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
 
     private void OnQuitTapped(object sender, EventArgs e)
     {
-        Application.Current?.Quit();
+        MauiApplication.Current?.Quit();
     }
 
     private void OnItemDragging(object sender, ItemDraggingEventArgs e)
@@ -168,7 +173,7 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
 
     }
     
-    private void OnDragStarting(object sender, DragStartingEventArgs e)
+    private void OnDragStarting(object sender, MauiDragStartingEventArgs e)
     {
         var border = (Element)sender;
         var nodeInfo = (INodeInformation)border.BindingContext;
@@ -176,4 +181,52 @@ public partial class NodeToolListComponent : Microsoft.Maui.Controls.ContentView
         // Package the data so the DropGestureRecognizer can see it
         e.Data.Properties.Add("Data", nodeInfo);
     }
+
+    private void OnItemPointerEntered(object? sender, MauiPointerEventArgs e)
+    {
+#if WINDOWS
+        if (sender is VisualElement element)
+        {
+            TrySetPointerCursor(element, InputSystemCursorShape.Hand);
+        }
+#endif
+    }
+
+    private void OnItemPointerExited(object? sender, MauiPointerEventArgs e)
+    {
+#if WINDOWS
+        if (sender is VisualElement element)
+        {
+            TrySetPointerCursor(element, InputSystemCursorShape.Arrow);
+        }
+#endif
+    }
+
+#if WINDOWS
+    private static void TrySetPointerCursor(VisualElement element, InputSystemCursorShape shape)
+    {
+        if (element.Handler?.PlatformView is not object platformView)
+        {
+            return;
+        }
+
+        var pointerCursorProperty = platformView.GetType().GetProperty("PointerCursor");
+        if (pointerCursorProperty != null)
+        {
+            var cursor = InputSystemCursor.Create(shape);
+            pointerCursorProperty.SetValue(platformView, cursor);
+            return;
+        }
+
+        var coreWindow = Windows.UI.Core.CoreWindow.GetForCurrentThread();
+        if (coreWindow != null)
+        {
+            coreWindow.PointerCursor = new Windows.UI.Core.CoreCursor(
+                shape == InputSystemCursorShape.Hand
+                    ? Windows.UI.Core.CoreCursorType.Hand
+                    : Windows.UI.Core.CoreCursorType.Arrow,
+                0);
+        }
+    }
+#endif
 }
