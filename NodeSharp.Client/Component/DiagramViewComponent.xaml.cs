@@ -283,6 +283,12 @@ public partial class DiagramViewComponent : ContentView
 
     void OnDeleteAcceleratorInvoked(object sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs e)
     {
+        if (DeleteSelectedNodes())
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (lineConnectionManager.RemoveSelectedConnection())
         {
             lineConnectionManager.RebuildAnchorPointConnections(viewModel.BoxNodes);
@@ -296,6 +302,12 @@ public partial class DiagramViewComponent : ContentView
     {
         if (e.Key != Windows.System.VirtualKey.Delete)
         {
+            return;
+        }
+
+        if (DeleteSelectedNodes())
+        {
+            e.Handled = true;
             return;
         }
 
@@ -560,6 +572,56 @@ public partial class DiagramViewComponent : ContentView
         this.Focus();
     }
 
+    private bool DeleteSelectedNodes()
+    {
+        var selectedNodes = viewModel.BoxNodes.Where(n => n.IsSelected).ToList();
+        if (selectedNodes.Count == 0)
+        {
+            return false;
+        }
+
+        var deletedAnchorIds = new HashSet<string>(
+            selectedNodes.SelectMany(n => n.InputNodes.Select(i => i.Id)
+                .Concat(n.OutputNodes.Select(o => o.Id))));
+
+        var remainingNodes = viewModel.BoxNodes.Except(selectedNodes).ToList();
+        foreach (var node in remainingNodes)
+        {
+            foreach (var input in node.Node.Inputs)
+            {
+                RemoveConnectionIds(input.ConnectsToParentNodeId, deletedAnchorIds);
+            }
+
+            foreach (var output in node.Node.Outputs)
+            {
+                RemoveConnectionIds(output.ConnectsToNodeId, deletedAnchorIds);
+            }
+        }
+
+        foreach (var node in selectedNodes)
+        {
+            node.IsSelected = false;
+            node.DraggableBoxComponent?.IsSelected = false;
+            nodeIo.Nodes.Remove(node.Node);
+        }
+
+        lineConnectionManager.CancelSelection();
+        lineConnectionManager.RebuildAnchorPointConnections(viewModel.BoxNodes);
+        ConnectionCanvas.Invalidate();
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
+        return true;
+    }
+
+    private static void RemoveConnectionIds(IList<string> connections, HashSet<string> deletedAnchorIds)
+    {
+        for (var i = connections.Count - 1; i >= 0; i--)
+        {
+            if (deletedAnchorIds.Contains(connections[i]))
+            {
+                connections.RemoveAt(i);
+            }
+        }
+    }
     private double SnapToGrid(double value)
     {
         var size = gridSettings.Size <= 0 ? 10.0 : gridSettings.Size;

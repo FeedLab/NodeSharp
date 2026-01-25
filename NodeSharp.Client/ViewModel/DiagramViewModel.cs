@@ -26,38 +26,31 @@ public class DiagramViewModel
 
     private void OnNodesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.NewItems is [BaseNode newNode])
+        switch (e.Action)
         {
-            switch (e.Action)
+            case NotifyCollectionChangedAction.Add when e.NewItems is [BaseNode newNode]:
             {
-                case NotifyCollectionChangedAction.Add:
-                    var boxNode = new BoxNode(newNode);
-                    BoxNodes.Add(boxNode);
-                    
-                    WeakReferenceMessenger.Default.Send(new NodeActionEvent
-                        { ActionEventType = NodeActionEventType.Add });
-                    
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    var lookupBoxNode = BoxNodes.First(x => x.Node.Id == newNode.Id);
-                    BoxNodes.Remove(lookupBoxNode);
-                    
-                    WeakReferenceMessenger.Default.Send(new NodeActionEvent
-                        { ActionEventType = NodeActionEventType.Delete });
+                var boxNode = new BoxNode(newNode);
+                BoxNodes.Add(boxNode);
 
-                    break;
+                WeakReferenceMessenger.Default.Send(new NodeActionEvent
+                    { ActionEventType = NodeActionEventType.Add });
+                break;
             }
-        }
-        else
-        {
-            if (e.Action == NotifyCollectionChangedAction.Reset)
+            case NotifyCollectionChangedAction.Remove when e.OldItems is [BaseNode oldNode]:
             {
+                var lookupBoxNode = BoxNodes.First(x => x.Node.Id == oldNode.Id);
+                BoxNodes.Remove(lookupBoxNode);
+
+                WeakReferenceMessenger.Default.Send(new NodeActionEvent
+                    { ActionEventType = NodeActionEventType.Delete });
+                break;
+            }
+            case NotifyCollectionChangedAction.Reset:
                 BoxNodes.Clear();
-            }
-            else
-            {
-                throw new InvalidOperationException("New items must be a single BaseNode.");
-            }
+                break;
+            default:
+                throw new InvalidOperationException("Collection change must contain a single BaseNode.");
         }
     }
     

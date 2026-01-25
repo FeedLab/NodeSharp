@@ -216,7 +216,7 @@ public class LineConnectionManager()
     {
         foreach (var connection in Connections)
         {
-            if (IsPointNearLine(clickPoint, connection.Start, connection.End, tolerance))
+            if (IsPointNearCurve(clickPoint, connection.Start, connection.End, tolerance))
             {
                 System.Diagnostics.Debug.WriteLine(
                     $"🎯 Line found near click point: {connection.Start} -> {connection.End}");
@@ -229,12 +229,13 @@ public class LineConnectionManager()
     }
 
     /// <summary>
-    /// Calculates whether a point is near a line segment within a given tolerance.
-    /// Uses perpendicular distance from point to line segment.
+    /// Calculates whether a point is near the drawn curve within a given tolerance.
+    /// Uses sampled distance to the cubic Bezier segments.
     /// </summary>
-    private static bool IsPointNearLine(Point point, Point lineStart, Point lineEnd, double tolerance)
+    private static bool IsPointNearCurve(Point point, Point start, Point end, double tolerance)
     {
-        var distance = DistanceFromPointToLineSegment(point, lineStart, lineEnd);
+        GetBezierControlPoints(start, end, out var c1, out var c2);
+        var distance = DistanceFromPointToBezier(point, start, c1, c2, end);
         return distance <= tolerance;
     }
 
@@ -267,6 +268,48 @@ public class LineConnectionManager()
 
         // Return the distance from the point to the closest point on the segment
         return Distance(point, closestPoint);
+    }
+
+    private static double DistanceFromPointToBezier(Point point, Point p0, Point p1, Point p2, Point p3)
+    {
+        const int samples = 30;
+        var previous = p0;
+        var min = double.MaxValue;
+
+        for (var i = 1; i <= samples; i++)
+        {
+            var t = i / (double)samples;
+            var current = BezierPoint(p0, p1, p2, p3, t);
+            var distance = DistanceFromPointToLineSegment(point, previous, current);
+            if (distance < min)
+            {
+                min = distance;
+            }
+
+            previous = current;
+        }
+
+        return min;
+    }
+
+    private static Point BezierPoint(Point p0, Point p1, Point p2, Point p3, double t)
+    {
+        var u = 1 - t;
+        var tt = t * t;
+        var uu = u * u;
+        var uuu = uu * u;
+        var ttt = tt * t;
+
+        var x = (uuu * p0.X) + (3 * uu * t * p1.X) + (3 * u * tt * p2.X) + (ttt * p3.X);
+        var y = (uuu * p0.Y) + (3 * uu * t * p1.Y) + (3 * u * tt * p2.Y) + (ttt * p3.Y);
+        return new Point(x, y);
+    }
+
+    private static void GetBezierControlPoints(Point start, Point end, out Point c1, out Point c2)
+    {
+        var dx = Math.Clamp(Math.Abs(end.X - start.X), 40, 200);
+        c1 = new Point(start.X + dx, start.Y);
+        c2 = new Point(end.X - dx, end.Y);
     }
 
     /// <summary>
