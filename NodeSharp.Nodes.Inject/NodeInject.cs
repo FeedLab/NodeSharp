@@ -30,7 +30,8 @@ public class NodeInject : BaseNode
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Storage storage)
+        Storage storage,
+        Color backgroundColor)
         : base(
             nodes,
             id,
@@ -40,7 +41,8 @@ public class NodeInject : BaseNode
             activateOnStart,
             xPosition,
             yPosition,
-            storage
+            storage,
+            backgroundColor
         )
     {
         Repeat = new Repeat("Second", 10);

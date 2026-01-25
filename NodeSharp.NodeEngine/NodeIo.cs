@@ -328,9 +328,10 @@ public class NodeIo(Storage storage)
         var yPosition = (int)dropY;
         var isEnabled = nodeInfo.IsEnabled;
         var activateOnStart = nodeInfo.ActivateOnStart;
+        var backgroundColor = nodeInfo.Background;
 
         var node = nodeFactory.CreateNode(nodes, id, typeId, name, isEnabled, activateOnStart,
-            xPosition, yPosition, storage);
+            xPosition, yPosition, storage, backgroundColor);
 
         nodes.Add(node);
     }
@@ -344,9 +345,10 @@ public class NodeIo(Storage storage)
         // var yPosition = (int)dropY;
         var isEnabled = nodeInfo.IsEnabled;
         var activateOnStart = nodeInfo.ActivateOnStart;
+        var backgroundColor = nodeInfo.Background;
 
         var node = nodeFactory.CreateNode(nodes, id, typeId, name, isEnabled, activateOnStart,
-            0, 0, storage);
+            0, 0, storage, backgroundColor);
 
         node.X = (int)(position.X - (node.BoxDimension.Width / 2));
         node.Y = (int)(position.Y - (node.BoxDimension.Height / 2));

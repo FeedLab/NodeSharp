@@ -25,7 +25,7 @@ public class NodeRandomNumber : BaseNode
         int xPosition,
         int yPosition,
         Storage storage,
-        RandomDataPayload randomData)
+        Color backgroundColor)
         : base(
             nodes,
             id,
@@ -35,10 +35,11 @@ public class NodeRandomNumber : BaseNode
             activateOnStart,
             xPosition,
             yPosition,
-            storage
+            storage,
+            backgroundColor
         )
     {
-        RandomData = randomData;
+        RandomData = new RandomDataPayload();
         
         const double height = 70;
         const double width = 350;

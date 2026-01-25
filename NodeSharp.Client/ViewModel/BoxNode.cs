@@ -24,7 +24,8 @@ public partial class BoxNode : ObservableObject
     {
         Node = baseNode;
         AbsolutePosition = new Point(0, 0);
-        BoxColor = Colors.BlanchedAlmond;
+        // BoxColor = Colors.BlanchedAlmond;
+        BoxColor = baseNode.BackgroundColor;
         SetInitialPosition(baseNode);
         StorePositionFromCenter(new Point(baseNode.X, baseNode.Y));
         

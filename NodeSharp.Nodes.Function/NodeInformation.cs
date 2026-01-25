@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.Maui.Graphics;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Function.Component;
 
@@ -18,6 +19,8 @@ namespace NodeSharp.Nodes.Function;
 
         public string TypeId => DefaultTypeId;
         public string RuntimeType => DefaultRuntimeType;
+        public string Group => "Util";
+        public Color Background => Color.FromArgb("#EAF7EE");
         public bool ActivateOnStart => false;
         public bool IsEnabled => true;
         public int NumberOfInputs => 1;
@@ -26,3 +29,5 @@ namespace NodeSharp.Nodes.Function;
         public bool HasOverviewText => !string.IsNullOrWhiteSpace(PresentationInformation.OverviewText);
         public INodePresentationInformation PresentationInformation { get; init; } = new NodePresentationInformation();
     }
+
+

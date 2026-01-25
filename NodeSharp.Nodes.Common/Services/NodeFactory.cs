@@ -22,7 +22,8 @@ public class NodeFactory
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Storage storageParam)
+        Storage storageParam,
+        Color backgroundColor)
     {
         var nodeType = GetNodeType(typeId);
 
@@ -55,10 +56,11 @@ public class NodeFactory
         parameters[6] = xPosition;
         parameters[7] = yPosition;
         parameters[8] = storageParam;
+        parameters[9] = backgroundColor;
 
         // For any additional parameters (like RandomDataPayload, DelayPayload, etc.),
         // create default instances using Activator
-        for (int i = 9; i < constructorParams.Length; i++)
+        for (int i = 10; i < constructorParams.Length; i++)
         {
             var paramType = constructorParams[i].ParameterType;
             parameters[i] = Activator.CreateInstance(paramType)!;

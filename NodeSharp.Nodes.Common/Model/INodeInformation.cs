@@ -1,9 +1,13 @@
-﻿namespace NodeSharp.Nodes.Common.Model;
+﻿using Microsoft.Maui.Graphics;
+
+namespace NodeSharp.Nodes.Common.Model;
 
 public interface INodeInformation
 {
     string TypeId { get; }
     string RuntimeType { get; }
+    string Group { get; }
+    Color Background { get; }
     bool ActivateOnStart { get; }
     bool IsEnabled { get; }
     int NumberOfInputs { get; }
@@ -18,3 +22,4 @@ public interface INodePresentationInformation
     string FontFamilyName { get; init; }
     string Symbol { get; init; }
 }
+

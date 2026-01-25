@@ -28,7 +28,8 @@ public class NodeKs0212 : BaseNode
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Storage storage)
+        Storage storage,
+        Color backgroundColor)
         : base(
             nodes,
             id,
@@ -38,7 +39,8 @@ public class NodeKs0212 : BaseNode
             activateOnStart,
             xPosition,
             yPosition,
-            storage
+            storage,
+            backgroundColor
         )
     {
         InitialRelaySettings = new RelaySettings();

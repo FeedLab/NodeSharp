@@ -23,9 +23,9 @@ public class NodeToolListModel(ILogger<NodeToolListModel> logger, Storage storag
 
     private void Init()
     {
-        foreach (var nodeInformation in storage.GetNodeInformation())
+        foreach (var nodeSharp in storage.GetNodeInformation().Values.OrderBy(o => o.NodeInformation.Group))
         {
-             nodes?.Add(nodeInformation.Value.NodeInformation);
+             nodes?.Add(nodeSharp.NodeInformation);
         }
     }
 }

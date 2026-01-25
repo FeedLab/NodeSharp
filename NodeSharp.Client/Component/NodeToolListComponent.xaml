@@ -4,8 +4,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:syncfusion="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
              xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:data="clr-namespace:Syncfusion.Maui.DataSource.Extensions;assembly=Syncfusion.Maui.DataSource"
              xmlns:component="using:NodeSharp.Client.Component"
              xmlns:model="using:NodeSharp.Nodes.Common.Model"
+             xmlns:dataSource="http://schemas.syncfusion.com/maui"
              x:Class="NodeSharp.Client.Component.NodeToolListComponent">
 
     <ContentView.Resources>
@@ -20,10 +22,14 @@
             <Color x:Key="TextPrimary">#101827</Color>
             <Color x:Key="TextSecondary">#3F4C63</Color>
             <Color x:Key="TextMuted">#5F6C80</Color>
+            <x:Double x:Key="ItemTitleSize">13</x:Double>
+            <x:Double x:Key="ItemBodySize">10</x:Double>
+            <x:Double x:Key="GroupTitleSize">11</x:Double>
         </ResourceDictionary>
     </ContentView.Resources>
 
-    <Border Stroke="{StaticResource ListPanelStroke}" StrokeThickness="1" BackgroundColor="{StaticResource ListPanelBg}" StrokeShape="RoundRectangle 0">
+    <Border Stroke="{StaticResource ListPanelStroke}" StrokeThickness="1"
+            BackgroundColor="{StaticResource ListPanelBg}" StrokeShape="RoundRectangle 0">
         <Grid Padding="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -36,59 +42,87 @@
             </Grid.RowDefinitions>
 
             <!-- Syncfusion themed input -->
-            <Border Grid.Row="0" Grid.ColumnSpan="0" Padding="10" Stroke="{StaticResource SearchStroke}" BackgroundColor="{StaticResource SearchBg}" StrokeShape="RoundRectangle 18" Margin="10,10,10,6">
+            <Border Grid.Row="0" Grid.ColumnSpan="0" Padding="6" Stroke="{StaticResource SearchStroke}"
+                    BackgroundColor="{StaticResource SearchBg}" StrokeShape="RoundRectangle 16" Margin="8,8,8,4">
                 <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <!-- Text input fills -->
-                    <ColumnDefinition Width="Auto" />
-                    <!-- Button fixed -->
-                </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <!-- Text input fills -->
+                        <ColumnDefinition Width="Auto" />
+                        <!-- Button fixed -->
+                    </Grid.ColumnDefinitions>
 
-                <core:SfTextInputLayout Grid.Column="0"
-                                        Hint="Search by name"
-                                        HorizontalOptions="Fill"
-                                        VerticalOptions="Center">
+                    <core:SfTextInputLayout Grid.Column="0"
+                                            Hint="Search by name"
+                                            HorizontalOptions="Fill"
+                                            VerticalOptions="Center">
 
-                    <core:SfTextInputLayout.HintLabelStyle>
-                        <core:LabelStyle
-                            FontSize="13"
-                            TextColor="{StaticResource TextMuted}" />
-                    </core:SfTextInputLayout.HintLabelStyle>
+                        <core:SfTextInputLayout.HintLabelStyle>
+                            <core:LabelStyle
+                                FontSize="11"
+                                TextColor="{StaticResource TextMuted}" />
+                        </core:SfTextInputLayout.HintLabelStyle>
 
-                    <Entry x:Name="SearchBox" />
-                    <core:SfTextInputLayout.TrailingView>
-                        <Label Text="&#xe713;"
-                               FontFamily="MaterialAssets"
+                        <Entry x:Name="SearchBox" />
+                        <core:SfTextInputLayout.TrailingView>
+                            <Label Text="&#xe713;"
+                                   FontFamily="MaterialAssets"
 
-                               FontSize="20"
-                               TextColor="{StaticResource TextPrimary}">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnSearchClicked" />
-                            </Label.GestureRecognizers>
-                        </Label>
-                    </core:SfTextInputLayout.TrailingView>
+                                   FontSize="16"
+                                   TextColor="{StaticResource TextPrimary}">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnSearchClicked" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </core:SfTextInputLayout.TrailingView>
 
 
-                </core:SfTextInputLayout>
+                    </core:SfTextInputLayout>
                 </Grid>
             </Border>
 
             <syncfusion:SfListView
                 x:Name="ListViewNodesInfo"
                 Grid.Row="1"
-                
+
                 ItemsSource="{Binding Nodes}"
                 SelectionMode="None"
                 DragStartMode="OnHold"
                 SelectionBackground="Transparent"
-                ItemSize="100"
-                Margin="6,0,6,6"
+                ItemSize="76"
+                IsStickyGroupHeader="True"
+                GroupHeaderSize="28"
+                AllowGroupExpandCollapse="True"
+                Margin="4,0,4,4"
                 ItemDragging="OnItemDragging">
+
+                <syncfusion:SfListView.DataSource>
+                    <dataSource:DataSource>
+                        <dataSource:DataSource.GroupDescriptors>
+                            <dataSource:GroupDescriptor PropertyName="Group" />
+                        </dataSource:DataSource.GroupDescriptors>
+                    </dataSource:DataSource>
+                </syncfusion:SfListView.DataSource>
+
+                <syncfusion:SfListView.GroupHeaderTemplate>
+                    <DataTemplate>
+                        <Grid Margin="12,4,8,0"
+                              ColumnDefinitions="4,*">
+                            <Label Grid.Column="1"
+                                   Text="{Binding Key}"
+                                   ToolTipProperties.Text="{Binding Key}"
+                                   FontFamily="Roboto-Medium"
+                                   FontSize="{StaticResource GroupTitleSize}"
+                                   CharacterSpacing="0.8"
+                                   TextColor="{StaticResource TextPrimary}" />
+                        </Grid>
+                    </DataTemplate>
+                </syncfusion:SfListView.GroupHeaderTemplate>
                 <syncfusion:SfListView.ItemTemplate>
                     <DataTemplate>
-                        <Border Margin="10,6" Stroke="{StaticResource CardStroke}" StrokeThickness="1" BackgroundColor="{StaticResource CardBg}"
-                                StrokeShape="RoundRectangle 12">
+                        <Border Margin="8,2" Stroke="{StaticResource CardStroke}" StrokeThickness="1"
+                                BackgroundColor="{Binding Background}"
+                                StrokeShape="RoundRectangle 10">
                             <Border.GestureRecognizers>
                                 <DragGestureRecognizer DragStarting="OnDragStarting" />
                                 <PointerGestureRecognizer PointerEntered="OnItemPointerEntered"
@@ -99,8 +133,8 @@
                             </Border.Shadow>
 
                             <Grid
-                                Margin="10"
-                                Padding="6">
+                                Margin="6"
+                                Padding="4">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
@@ -112,9 +146,10 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
 
-                                    <Border Grid.Column="0" BackgroundColor="#DDE6F6" Stroke="#AFC0DF" StrokeThickness="1"
-                                            StrokeShape="RoundRectangle 8" Padding="6" Margin="0,0,8,0"
-                                            HeightRequest="32" WidthRequest="32"
+                                    <Border Grid.Column="0" BackgroundColor="#DDE6F6" Stroke="#AFC0DF"
+                                            StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 6" Padding="4" Margin="0,0,6,0"
+                                            HeightRequest="26" WidthRequest="26"
                                             VerticalOptions="Center" HorizontalOptions="Start">
                                         <Label Text="{Binding PresentationInformation.Symbol}"
                                                HorizontalOptions="Center"
@@ -122,14 +157,14 @@
                                                HorizontalTextAlignment="Center"
                                                VerticalTextAlignment="Center"
                                                FontFamily="{Binding PresentationInformation.FontFamilyName}"
-                                               FontSize="16"
+                                               FontSize="13"
                                                TextColor="{StaticResource Accent}" />
                                     </Border>
 
                                     <Label Grid.Column="1" Text="{Binding TypeId}"
                                            HorizontalOptions="Start"
                                            FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimary}" FontSize="17" />
+                                           TextColor="{StaticResource TextPrimary}" FontSize="{StaticResource ItemTitleSize}" />
                                 </Grid>
 
                                 <Label Grid.Row="1"
@@ -137,10 +172,10 @@
                                        Text="{Binding PresentationInformation.OverviewText}"
                                        ToolTipProperties.Text="{Binding PresentationInformation.OverviewText}"
                                        LineBreakMode="TailTruncation"
-                                       MaxLines="4"
+                                       MaxLines="3"
                                        HorizontalOptions="Fill"
                                        VerticalOptions="Fill"
-                                       FontAttributes="None" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                       FontAttributes="None" TextColor="{StaticResource TextSecondary}" FontSize="{StaticResource ItemBodySize}" />
 
                             </Grid>
                         </Border>
@@ -148,7 +183,7 @@
                 </syncfusion:SfListView.ItemTemplate>
             </syncfusion:SfListView>
 
-            <component:ToolBarComponent Grid.Row="2" HorizontalOptions="Fill" VerticalOptions="End"/>
+            <component:ToolBarComponent Grid.Row="2" HorizontalOptions="Fill" VerticalOptions="End" />
         </Grid>
     </Border>
 </ContentView>

@@ -17,8 +17,9 @@ public class NodeDebug : BaseNode
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Storage storage)
-        : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage)
+        Storage storage,
+        Color backgroundColor)
+        : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, storage, backgroundColor)
     {
         const double height = 70;
         const double width = 220;

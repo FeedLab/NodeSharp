@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.Maui.Graphics;
 using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.Nodes.KS0212;
@@ -17,6 +18,8 @@ namespace NodeSharp.Nodes.KS0212;
 
         public string TypeId => DefaultTypeId;
         public string RuntimeType => DefaultRuntimeType;
+        public string Group => "Relay";
+        public Color Background => Color.FromArgb("#FCECEC");
         public bool ActivateOnStart => false;
         public bool IsEnabled => true;
         public int NumberOfInputs => 1;
@@ -34,3 +37,5 @@ namespace NodeSharp.Nodes.KS0212;
         return sb.ToString();
     }
 }
+
+

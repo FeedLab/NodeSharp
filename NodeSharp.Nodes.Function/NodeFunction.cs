@@ -26,7 +26,8 @@ public class NodeFunction : BaseNode
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Storage storage)
+        Storage storage,
+        Color backgroundColor)
         : base(
             nodes,
             id,
@@ -36,7 +37,8 @@ public class NodeFunction : BaseNode
             activateOnStart,
             xPosition,
             yPosition,
-            storage
+            storage,
+            backgroundColor
         )
     {       
         FunctionData = new FunctionData();

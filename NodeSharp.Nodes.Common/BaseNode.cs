@@ -81,6 +81,8 @@ public abstract partial class BaseNode : ObservableObject
     public string Id { get; }
     public string TypeId { get; }
     public string Name { get; }
+    
+    public Color BackgroundColor { get; private set; }
     public bool IsEnabled { get; }
     public bool ActivateOnStart { get; }
     public int X { get; set; }
@@ -97,12 +99,14 @@ public abstract partial class BaseNode : ObservableObject
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Storage storage)
+        Storage storage, 
+        Color backgroundColor)
     {
         Cts = new CancellationTokenSource();
         BoxNodeStatus = new BoxNodeStatus();
         PopupService = AppService.GetRequiredService<IPopupService>();
         OutputMessage = string.Empty;
+        BackgroundColor = backgroundColor ?? Colors.White;
         BoxDimension = new Rect(0, 0, 240, 60);
         BoxBodyDimension = new Rect(0, 0, 140, 48);
 
@@ -198,6 +202,7 @@ public abstract partial class BaseNode : ObservableObject
         Y = yPosition;
         Outputs = outputs;
         Inputs = inputs;
+        BackgroundColor = TypeInformation.Background ?? Colors.White;
 
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();

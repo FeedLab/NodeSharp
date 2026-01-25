@@ -23,8 +23,8 @@ public class NodeDelay : BaseNode
         bool activateOnStart,
         int xPosition,
         int yPosition,
-        Storage storage
-    )
+        Storage storage,
+        Color backgroundColor)
         : base(
             nodes,
             id,
@@ -34,7 +34,8 @@ public class NodeDelay : BaseNode
             activateOnStart,
             xPosition,
             yPosition,
-            storage
+            storage,
+            backgroundColor
         )
     {
         Delay = new DelayPayload();

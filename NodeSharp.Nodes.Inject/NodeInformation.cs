@@ -1,4 +1,5 @@
 ﻿using NodeSharp.Nodes.Common.Model;
+using Microsoft.Maui.Graphics;
 
 namespace NodeSharp.Nodes.Inject;
 
@@ -18,6 +19,8 @@ public class NodeInformation : INodeInformation
 
     public string TypeId => DefaultTypeId;
     public string RuntimeType => DefaultRuntimeType;
+    public string Group => "Core";
+    public Color Background => Color.FromUint(0xFFFFEBCD);
     public bool ActivateOnStart => true;
     public bool IsEnabled => true;
     public int NumberOfInputs => 0;
@@ -35,3 +38,5 @@ public class NodeInformation : INodeInformation
          {nameof(HasOverviewText)}: {HasOverviewText}
          """;
 }
+
+

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Microsoft.Maui.Graphics;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Delay.Component;
 
@@ -18,6 +19,8 @@ namespace NodeSharp.Nodes.Delay;
 
         public string TypeId => DefaultTypeId;
         public string RuntimeType => DefaultRuntimeType;
+        public string Group => "Util";
+        public Color Background => Color.FromArgb("#EAF7EE");
         public bool ActivateOnStart => false;
         public bool IsEnabled => true;
         public int NumberOfInputs => 1;
@@ -27,3 +30,5 @@ namespace NodeSharp.Nodes.Delay;
         
         public INodePresentationInformation PresentationInformation { get; init; } = new NodePresentationInformation();
 }
+
+
