@@ -139,6 +139,8 @@ public partial class BoxNode : ObservableObject
 
     [ObservableProperty] private bool hasFocus;
 
+    [ObservableProperty] private bool isSelected;
+
     // private void CalculateInputNodePositions()
     // {
     //     const double fromVerticalMargin = 8.0;

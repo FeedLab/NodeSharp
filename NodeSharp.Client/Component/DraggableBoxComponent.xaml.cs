@@ -9,6 +9,13 @@ using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;
+using Microsoft.Maui;
+using Microsoft.Maui.Devices;
+#if WINDOWS
+using Microsoft.UI.Input;
+using Windows.System;
+using Windows.UI.Core;
+#endif
 
 namespace NodeSharp.Client.Component;
 
@@ -16,6 +23,7 @@ namespace NodeSharp.Client.Component;
 public partial class DraggableBoxComponent : ContentView
 {
     double startX, startY;
+    private readonly List<(BoxNode Node, double StartX, double StartY)> dragTargets = new();
     private readonly DiagramViewModel diagramViewModel;
     private readonly LineConnectionManager lineConnectionManager;
     private readonly CurvedLineDrawable curvedLineDrawable;
@@ -46,6 +54,10 @@ public partial class DraggableBoxComponent : ContentView
     public static readonly BindableProperty IsHoveredProperty =
         BindableProperty.Create(nameof(IsHovered), typeof(bool), typeof(DraggableBoxComponent), false);
 
+    public static readonly BindableProperty IsSelectedProperty =
+        BindableProperty.Create(nameof(IsSelected), typeof(bool), typeof(DraggableBoxComponent), false,
+            propertyChanged: OnIsSelectedChanged);
+
     private static void OnBoxColorChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is DraggableBoxComponent component && newValue is Color color)
@@ -57,6 +69,19 @@ public partial class DraggableBoxComponent : ContentView
                 Math.Min(color.Blue + 0.15f, 1.0f),
                 color.Alpha
             );
+        }
+    }
+
+    private static void OnIsSelectedChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is DraggableBoxComponent component && newValue is bool isSelected)
+        {
+            var border = component.FindByName<Border>("MainBorder");
+            if (border != null)
+            {
+                border.Stroke = isSelected ? Colors.Blue : Color.FromArgb("#30000000");
+                border.StrokeThickness = isSelected ? 3 : 2;
+            }
         }
     }
 
@@ -106,6 +131,12 @@ public partial class DraggableBoxComponent : ContentView
     {
         get => (bool)GetValue(IsHoveredProperty);
         set => SetValue(IsHoveredProperty, value);
+    }
+
+    public bool IsSelected
+    {
+        get => (bool)GetValue(IsSelectedProperty);
+        set => SetValue(IsSelectedProperty, value);
     }
 
     public DraggableBoxComponent()
@@ -228,6 +259,11 @@ public partial class DraggableBoxComponent : ContentView
         pointerGesture.PointerEntered += (s, e) => IsHovered = true;
         pointerGesture.PointerExited += (s, e) => IsHovered = false;
         this.GestureRecognizers.Add(pointerGesture);
+
+        // Add single click for selection
+        var tapGesture = new TapGestureRecognizer { NumberOfTapsRequired = 1 };
+        tapGesture.Tapped += OnSingleTapped;
+        this.GestureRecognizers.Add(tapGesture);
     }
 
     void OnPanUpdated(object sender, PanUpdatedEventArgs e)
@@ -250,6 +286,18 @@ public partial class DraggableBoxComponent : ContentView
                     var currentBounds = AbsoluteLayout.GetLayoutBounds(this);
                     startX = X;
                     startY = Y;
+                    dragTargets.Clear();
+
+                    var selectedNodes = diagramViewModel.BoxNodes.Where(n => n.IsSelected).ToList();
+                    if (selectedNodes.Count == 0 && BindingContext is BoxNode currentNode)
+                    {
+                        selectedNodes.Add(currentNode);
+                    }
+
+                    foreach (var node in selectedNodes)
+                    {
+                        dragTargets.Add((node, node.Node.X, node.Node.Y));
+                    }
 
                     System.Diagnostics.Debug.WriteLine(
                         $"Drag started: X={X}, Y={Y}, LayoutBounds=({currentBounds.X}, {currentBounds.Y})");
@@ -269,13 +317,40 @@ public partial class DraggableBoxComponent : ContentView
                     newX = Math.Max(0, Math.Min(newX, maxX));
                     newY = Math.Max(0, Math.Min(newY, maxY));
 
-                    X = newX;
-                    Y = newY;
-
-                    if (element.BindingContext is BoxNode boxNode)
+                    if (dragTargets.Count > 1)
                     {
-                        boxNode.Node.X = (int)newX;
-                        boxNode.Node.Y = (int)newY;
+                        foreach (var target in dragTargets)
+                        {
+                            var targetComponent = target.Node.DraggableBoxComponent;
+                            if (targetComponent is null)
+                            {
+                                continue;
+                            }
+
+                            var targetMaxX = layout.Width - targetComponent.Width;
+                            var targetMaxY = layout.Height - targetComponent.Height;
+                            var targetX = target.StartX + e.TotalX;
+                            var targetY = target.StartY + e.TotalY;
+
+                            targetX = Math.Max(0, Math.Min(targetX, targetMaxX));
+                            targetY = Math.Max(0, Math.Min(targetY, targetMaxY));
+
+                            targetComponent.X = targetX;
+                            targetComponent.Y = targetY;
+                            target.Node.Node.X = (int)targetX;
+                            target.Node.Node.Y = (int)targetY;
+                        }
+                    }
+                    else
+                    {
+                        X = newX;
+                        Y = newY;
+
+                        if (element.BindingContext is BoxNode boxNode)
+                        {
+                            boxNode.Node.X = (int)newX;
+                            boxNode.Node.Y = (int)newY;
+                        }
                     }
 
                     WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
@@ -286,6 +361,7 @@ public partial class DraggableBoxComponent : ContentView
 
                 case GestureStatus.Completed:
                     lineConnectionManager.RebuildAnchorPointConnections(diagramViewModel.BoxNodes);
+                    dragTargets.Clear();
 
                     WeakReferenceMessenger.Default.Send(new NodeDraggingStatus { IsNodeInDraggingMode = false });
                     WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
@@ -318,6 +394,15 @@ public partial class DraggableBoxComponent : ContentView
 
             BoxNodeBodyContainer.Content = boxNode.Node.NodeBodyComponent;
             BoxNodeStatusContainer.Content = boxNode.Node.BoxNodeStatusComponent;
+
+            // Sync selection state
+            boxNode.PropertyChanged += (s, args) =>
+            {
+                if (args.PropertyName == nameof(BoxNode.IsSelected))
+                {
+                    IsSelected = boxNode.IsSelected;
+                }
+            };
         }
     }
 
@@ -472,7 +557,50 @@ public partial class DraggableBoxComponent : ContentView
         }
     }
 
-    private async void OnDoubleTapped(object sender, TappedEventArgs e)
+    private void OnSingleTapped(object sender, Microsoft.Maui.Controls.TappedEventArgs e)
+    {
+        try
+        {
+            if (BindingContext is not BoxNode boxNode)
+            {
+                return;
+            }
+
+            // Check if Ctrl key is pressed (Windows-only)
+            bool isCtrlPressed = false;
+#if WINDOWS
+            var state = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
+            isCtrlPressed = state.HasFlag(CoreVirtualKeyStates.Down);
+#endif
+
+            if (isCtrlPressed)
+            {
+                // Toggle selection for this box
+                boxNode.IsSelected = !boxNode.IsSelected;
+                IsSelected = boxNode.IsSelected;
+            }
+            else
+            {
+                // Deselect all other boxes, select this one
+                foreach (var node in diagramViewModel.BoxNodes)
+                {
+                    node.IsSelected = false;
+                    node.DraggableBoxComponent?.IsSelected = false;
+                }
+
+                boxNode.IsSelected = true;
+                IsSelected = true;
+            }
+
+            Debug.WriteLine($"Box {boxNode.Node.Name} selected: {boxNode.IsSelected}");
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine($"OnSingleTapped error: {exception.Message}");
+        }
+    }
+
+    private async void OnDoubleTapped(object sender, Microsoft.Maui.Controls.TappedEventArgs e)
     {
         try
         {
@@ -523,7 +651,7 @@ public partial class DraggableBoxComponent : ContentView
     //
     // }
 
-    private async void OnPointerEntered(object? sender, PointerEventArgs e)
+    private async void OnPointerEntered(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
     {
         if (BindingContext is BoxNode boxNode)
         {
@@ -545,7 +673,7 @@ public partial class DraggableBoxComponent : ContentView
         }
     }
 
-    private async void OnPointerExited(object? sender, PointerEventArgs e)
+    private async void OnPointerExited(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
     {
         //   await popupService.ClosePopupAsync(Shell.Current, true);
     }

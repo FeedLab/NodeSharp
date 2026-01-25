@@ -58,6 +58,22 @@
             VerticalOptions="Fill"
             Style="{StaticResource DraggableBoxStyle}"
             AbsoluteLayout.LayoutFlags="PositionProportional">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup Name="SelectionStates">
+                    <VisualState Name="Selected">
+                        <VisualState.Setters>
+                            <Setter Property="Stroke" Value="Blue" />
+                            <Setter Property="StrokeThickness" Value="3" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState Name="NotSelected">
+                        <VisualState.Setters>
+                            <Setter Property="Stroke" Value="#30000000" />
+                            <Setter Property="StrokeThickness" Value="2" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                     <GradientStop Color="{Binding BoxColorLight, Source={x:Reference Root}}" Offset="0.0" />
