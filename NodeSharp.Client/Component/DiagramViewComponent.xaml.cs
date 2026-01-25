@@ -4,6 +4,13 @@ using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
+using MauiPointerEventArgs = Microsoft.Maui.Controls.PointerEventArgs;
+using MauiTappedEventArgs = Microsoft.Maui.Controls.TappedEventArgs;
+#if WINDOWS
+using Microsoft.UI.Input;
+using Windows.System;
+using Windows.UI.Core;
+#endif
 
 namespace NodeSharp.Client.Component;
 
@@ -25,6 +32,12 @@ public partial class DiagramViewComponent : ContentView
     private double viewportWidth, viewportHeight;
     private const double CanvasWidth = 3000; // virtual size
     private const double CanvasHeight = 2000;
+    private const double MarqueeMinDistance = 4;
+
+    private bool isMarqueeSelecting;
+    private Point marqueeStartView;
+    private Point marqueeStartCanvas;
+    private Point marqueeCurrentCanvas;
 
     public DiagramViewComponent()
     {
@@ -50,6 +63,12 @@ public partial class DiagramViewComponent : ContentView
         var pointerGesture = new PointerGestureRecognizer();
         pointerGesture.PointerMoved += OnPointerMoved;
         CanvasSurface.GestureRecognizers.Add(pointerGesture);
+
+        var marqueePointer = new PointerGestureRecognizer();
+        marqueePointer.PointerPressed += OnMarqueePointerPressed;
+        marqueePointer.PointerMoved += OnMarqueePointerMoved;
+        marqueePointer.PointerReleased += OnMarqueePointerReleased;
+        RootGrid.GestureRecognizers.Add(marqueePointer);
 
         // Add mouse wheel zoom support for Windows
 #if WINDOWS
@@ -136,6 +155,11 @@ public partial class DiagramViewComponent : ContentView
 
     void OnCanvasPan(object sender, PanUpdatedEventArgs e)
     {
+        if (isMarqueeSelecting)
+        {
+            return;
+        }
+
         // Check immediately if we're dragging - don't wait for messages
         if (lineConnectionManager.IsDragging)
         {
@@ -246,13 +270,147 @@ public partial class DiagramViewComponent : ContentView
         ConnectionCanvas.TranslationY = panY;
     }
 
+#if WINDOWS
+    private static bool IsMarqueeModifierPressed()
+    {
+        var state = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift);
+        return state.HasFlag(CoreVirtualKeyStates.Down);
+    }
+#endif
+
+    private void OnMarqueePointerPressed(object? sender, MauiPointerEventArgs e)
+    {
+#if WINDOWS
+        if (!IsMarqueeModifierPressed())
+        {
+            return;
+        }
+#endif
+
+        if (lineConnectionManager.IsDragging || DraggingStatus.IsNodeInDraggingMode || AnchorDragging.IsAnchorDragging)
+        {
+            return;
+        }
+
+        var position = e.GetPosition(this);
+        if (position is null)
+        {
+            return;
+        }
+
+        var canvasPoint = new Point((position.Value.X - panX) / scale, (position.Value.Y - panY) / scale);
+        if (IsPointerOverNode(canvasPoint))
+        {
+            return;
+        }
+
+        isMarqueeSelecting = true;
+        marqueeStartView = position.Value;
+        marqueeStartCanvas = canvasPoint;
+        marqueeCurrentCanvas = canvasPoint;
+
+        SelectionRect.IsVisible = true;
+        SelectionRect.TranslationX = marqueeStartView.X;
+        SelectionRect.TranslationY = marqueeStartView.Y;
+        SelectionRect.WidthRequest = 0;
+        SelectionRect.HeightRequest = 0;
+    }
+
+    private void OnMarqueePointerMoved(object? sender, MauiPointerEventArgs e)
+    {
+        if (!isMarqueeSelecting)
+        {
+            return;
+        }
+
+        var position = e.GetPosition(this);
+        if (position is null)
+        {
+            return;
+        }
+
+        var minX = Math.Min(marqueeStartView.X, position.Value.X);
+        var minY = Math.Min(marqueeStartView.Y, position.Value.Y);
+        var maxX = Math.Max(marqueeStartView.X, position.Value.X);
+        var maxY = Math.Max(marqueeStartView.Y, position.Value.Y);
+
+        SelectionRect.TranslationX = minX;
+        SelectionRect.TranslationY = minY;
+        SelectionRect.WidthRequest = maxX - minX;
+        SelectionRect.HeightRequest = maxY - minY;
+
+        marqueeCurrentCanvas = new Point((position.Value.X - panX) / scale, (position.Value.Y - panY) / scale);
+    }
+
+    private void OnMarqueePointerReleased(object? sender, MauiPointerEventArgs e)
+    {
+        if (!isMarqueeSelecting)
+        {
+            return;
+        }
+
+        isMarqueeSelecting = false;
+        SelectionRect.IsVisible = false;
+
+        var selection = NormalizeRect(marqueeStartCanvas, marqueeCurrentCanvas);
+        if (selection.Width < MarqueeMinDistance || selection.Height < MarqueeMinDistance)
+        {
+            return;
+        }
+
+        foreach (var node in viewModel.BoxNodes)
+        {
+            var nodeRect = new Rect(
+                node.XCenter,
+                node.YCenter,
+                node.Node.BoxDimension.Width,
+                node.Node.BoxDimension.Height);
+
+            var isInside = selection.Contains(nodeRect);
+            node.IsSelected = isInside;
+            node.DraggableBoxComponent?.IsSelected = isInside;
+        }
+
+        lineConnectionManager.CancelSelection();
+        WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
+    }
+
+    private bool IsPointerOverNode(Point canvasPoint)
+    {
+        foreach (var node in viewModel.BoxNodes)
+        {
+            var nodeRect = new Rect(
+                node.XCenter,
+                node.YCenter,
+                node.Node.BoxDimension.Width,
+                node.Node.BoxDimension.Height);
+
+            if (nodeRect.Contains(canvasPoint))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Rect NormalizeRect(Point a, Point b)
+    {
+        var minX = Math.Min(a.X, b.X);
+        var minY = Math.Min(a.Y, b.Y);
+        var maxX = Math.Max(a.X, b.X);
+        var maxY = Math.Max(a.Y, b.Y);
+
+        return new Rect(minX, minY, maxX - minX, maxY - minY);
+    }
+
     private void OnDragOver(object sender, DragEventArgs e)
     {
         // Allow drop
         e.AcceptedOperation = DataPackageOperation.Copy;
     }
 
-    private void OnPointerMoved(object? sender, PointerEventArgs e)
+    private void OnPointerMoved(object? sender, MauiPointerEventArgs e)
     {
         if (lineConnectionManager.IsDragging)
         {
@@ -299,7 +457,7 @@ public partial class DiagramViewComponent : ContentView
         }
     }
     
-    private void OnCanvasTapped(object? sender, TappedEventArgs e)
+    private void OnCanvasTapped(object? sender, MauiTappedEventArgs e)
     {
         var hasStartAnchor = lineConnectionManager.CancelSelection();
 
@@ -322,6 +480,12 @@ public partial class DiagramViewComponent : ContentView
             }
             else
             {
+                foreach (var node in viewModel.BoxNodes)
+                {
+                    node.IsSelected = false;
+                    node.DraggableBoxComponent?.IsSelected = false;
+                }
+
                 lineConnectionManager.CancelSelection();
             }
             

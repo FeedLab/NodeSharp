@@ -10,7 +10,7 @@
              IsClippedToBounds="True"
              x:Name="DrawingView">
 
-    <Grid Background="Transparent" IsClippedToBounds="True">
+    <Grid x:Name="RootGrid" Background="Transparent" IsClippedToBounds="True">
         <Grid.GestureRecognizers>
             <PinchGestureRecognizer PinchUpdated="OnCanvasPinch" />
             <PanGestureRecognizer PanUpdated="OnCanvasPan" />
@@ -57,5 +57,14 @@
                 </DataTemplate>
             </BindableLayout.ItemTemplate>
         </AbsoluteLayout>
+
+        <Border x:Name="SelectionRect"
+                IsVisible="False"
+                InputTransparent="True"
+                Stroke="DodgerBlue"
+                StrokeThickness="1"
+                BackgroundColor="#402196F3"
+                HorizontalOptions="Start"
+                VerticalOptions="Start" />
     </Grid> 
 </ContentView>
