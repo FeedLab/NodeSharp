@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.Client.ViewModel;
+using NodeSharp.Client.Configuration;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
@@ -20,6 +21,7 @@ public partial class DiagramViewComponent : ContentView
     private readonly CurvedLineDrawable curvedLineDrawable;
     private readonly LineConnectionManager lineConnectionManager;
     private readonly NodeIo nodeIo;
+    private readonly GridSettings gridSettings;
 
     private NodeDraggingStatus DraggingStatus { get; set; } = new();
     private AnchorDraggingStatus AnchorDragging { get; set; } = new();
@@ -45,6 +47,7 @@ public partial class DiagramViewComponent : ContentView
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
         nodeIo = AppService.GetRequiredService<NodeIo>();
+        gridSettings = AppService.GetRequiredService<NodeSharpSettings>().Grid;
 
         InitializeComponent();
 
@@ -207,6 +210,8 @@ public partial class DiagramViewComponent : ContentView
                 CanvasSurface.TranslationY = panY;
                 ConnectionCanvas.TranslationX = panX;
                 ConnectionCanvas.TranslationY = panY;
+                GridCanvas.TranslationX = panX;
+                GridCanvas.TranslationY = panY;
                 break;
 
             case GestureStatus.Completed:
@@ -268,6 +273,12 @@ public partial class DiagramViewComponent : ContentView
         ConnectionCanvas.Scale = scale;
         ConnectionCanvas.TranslationX = panX;
         ConnectionCanvas.TranslationY = panY;
+
+        GridCanvas.AnchorX = 0;
+        GridCanvas.AnchorY = 0;
+        GridCanvas.Scale = scale;
+        GridCanvas.TranslationX = panX;
+        GridCanvas.TranslationY = panY;
     }
 
 #if WINDOWS
@@ -443,6 +454,9 @@ public partial class DiagramViewComponent : ContentView
                 var dropX = (dropPosition.Value.X  - panX) / scale;
                 var dropY = (dropPosition.Value.Y - panY) / scale;
 
+                dropX = SnapToGrid(dropX);
+                dropY = SnapToGrid(dropY);
+
 
                 nodeIo.Add(nodeInfo, new Point(dropX, dropY));
 
@@ -491,5 +505,11 @@ public partial class DiagramViewComponent : ContentView
             
             WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
         }
+    }
+
+    private double SnapToGrid(double value)
+    {
+        var size = gridSettings.Size <= 0 ? 10.0 : gridSettings.Size;
+        return Math.Round(value / size) * size;
     }
 }

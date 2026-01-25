@@ -17,6 +17,17 @@
             <TapGestureRecognizer Tapped="OnCanvasTapped" />
         </Grid.GestureRecognizers>
 
+        <GraphicsView x:Name="GridCanvas"
+                      WidthRequest="3000"
+                      HeightRequest="2000"
+                      HorizontalOptions="Start"
+                      VerticalOptions="Start"
+                      InputTransparent="True">
+            <GraphicsView.Drawable>
+                <component:GridBackgroundDrawable />
+            </GraphicsView.Drawable>
+        </GraphicsView>
+
         <GraphicsView x:Name="ConnectionCanvas"
                       AutomationId="ConnectionCanvas"
                       WidthRequest="3000"

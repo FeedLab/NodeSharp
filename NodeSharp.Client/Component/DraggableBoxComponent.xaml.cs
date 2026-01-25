@@ -9,6 +9,7 @@ using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;
+using NodeSharp.Client.Configuration;
 using Microsoft.Maui;
 using Microsoft.Maui.Devices;
 #if WINDOWS
@@ -28,6 +29,7 @@ public partial class DraggableBoxComponent : ContentView
     private readonly LineConnectionManager lineConnectionManager;
     private readonly CurvedLineDrawable curvedLineDrawable;
     private readonly IPopupService popupService;
+    private readonly GridSettings gridSettings;
 
     public new static readonly BindableProperty XProperty =
         BindableProperty.Create(nameof(X), typeof(double), typeof(DraggableBoxComponent), 0.0);
@@ -147,6 +149,7 @@ public partial class DraggableBoxComponent : ContentView
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
         popupService = AppService.GetRequiredService<IPopupService>();
+        gridSettings = AppService.GetRequiredService<NodeSharpSettings>().Grid;
 
         BindingContextChanged += (sender, args) =>
         {
@@ -316,6 +319,10 @@ public partial class DraggableBoxComponent : ContentView
                     // Clamp to canvas boundaries
                     newX = Math.Max(0, Math.Min(newX, maxX));
                     newY = Math.Max(0, Math.Min(newY, maxY));
+                    newX = SnapToGrid(newX);
+                    newY = SnapToGrid(newY);
+                    newX = Math.Max(0, Math.Min(newX, maxX));
+                    newY = Math.Max(0, Math.Min(newY, maxY));
 
                     if (dragTargets.Count > 1)
                     {
@@ -332,6 +339,10 @@ public partial class DraggableBoxComponent : ContentView
                             var targetX = target.StartX + e.TotalX;
                             var targetY = target.StartY + e.TotalY;
 
+                            targetX = Math.Max(0, Math.Min(targetX, targetMaxX));
+                            targetY = Math.Max(0, Math.Min(targetY, targetMaxY));
+                            targetX = SnapToGrid(targetX);
+                            targetY = SnapToGrid(targetY);
                             targetX = Math.Max(0, Math.Min(targetX, targetMaxX));
                             targetY = Math.Max(0, Math.Min(targetY, targetMaxY));
 
@@ -676,6 +687,12 @@ public partial class DraggableBoxComponent : ContentView
     private async void OnPointerExited(object? sender, Microsoft.Maui.Controls.PointerEventArgs e)
     {
         //   await popupService.ClosePopupAsync(Shell.Current, true);
+    }
+
+    private double SnapToGrid(double value)
+    {
+        var size = gridSettings.Size <= 0 ? 10.0 : gridSettings.Size;
+        return Math.Round(value / size) * size;
     }
 }
 
