@@ -1,0 +1,9 @@
+{
+  "Grid": {
+    "Size": 10,
+    "MinorLineColor": "#E3E8EF",
+    "MajorLineColor": "#CBD5E1",
+    "BackgroundColor": "#F8FAFC",
+    "MajorLineEvery": 5
+  }
+}

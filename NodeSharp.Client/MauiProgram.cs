@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Logging;
 using NodeSharp.Client.Component;
+using NodeSharp.Client.Configuration;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
@@ -38,6 +39,9 @@ public static class MauiProgram
                 fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
                 fonts.AddFont("MaterialSymbolsOutlined-Regular.ttf", "MaterialSymbols");
             });
+
+        var settings = NodeSharpSettings.Load("NodeSharp.json");
+        builder.Services.AddSingleton(settings);
         
         builder.Services.AddSingleton<NodeToolListModel>();
         builder.Services.AddSingleton<DebugViewModel>();
@@ -46,6 +50,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<NodeIo>();
         builder.Services.AddScoped<ToolBarViewModel>();
         builder.Services.AddSingleton<CurvedLineDrawable>();
+        builder.Services.AddSingleton<GridBackgroundDrawable>();
         builder.Services.AddSingleton<LineConnectionManager>();
         
 
