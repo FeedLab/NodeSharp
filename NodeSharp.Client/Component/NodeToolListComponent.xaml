@@ -121,7 +121,7 @@
                     </DataTemplate>
                 </syncfusion:SfListView.GroupHeaderTemplate>
                 <syncfusion:SfListView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="model:INodeInformation" >
                         <Border Margin="8,2" Stroke="{StaticResource CardStroke}" StrokeThickness="1"
                                 BackgroundColor="{Binding Background}"
                                 StrokeShape="RoundRectangle 10">
@@ -163,7 +163,7 @@
                                                TextColor="{StaticResource Accent}" />
                                     </Border>
 
-                                    <Label Grid.Column="1" Text="{Binding TypeId}"
+                                    <Label Grid.Column="1" Text="{Binding DisplayName}"
                                            HorizontalOptions="Start"
                                            FontAttributes="Bold"
                                            TextColor="{StaticResource TextPrimary}" FontSize="{StaticResource ItemTitleSize}" />

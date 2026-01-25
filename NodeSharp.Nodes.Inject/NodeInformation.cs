@@ -18,6 +18,7 @@ public class NodeInformation : INodeInformation
     private const string DefaultRuntimeType = "NodeInject";
 
     public string TypeId => DefaultTypeId;
+    public string DisplayName => "Inject";
     public string RuntimeType => DefaultRuntimeType;
     public string Group => "Core";
     public Color Background => Color.FromUint(0xFFFFEBCD);

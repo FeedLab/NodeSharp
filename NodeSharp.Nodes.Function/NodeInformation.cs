@@ -18,6 +18,7 @@ namespace NodeSharp.Nodes.Function;
         private const string DefaultRuntimeType = "NodeFunction";
 
         public string TypeId => DefaultTypeId;
+        public string DisplayName => "Function (C#)";
         public string RuntimeType => DefaultRuntimeType;
         public string Group => "Util";
         public Color Background => Color.FromArgb("#EAF7EE");

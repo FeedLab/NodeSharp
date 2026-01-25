@@ -18,6 +18,7 @@ namespace NodeSharp.Nodes.Delay;
         private const string DefaultRuntimeType = "NodeDelay";
 
         public string TypeId => DefaultTypeId;
+        public string DisplayName => "Delay";
         public string RuntimeType => DefaultRuntimeType;
         public string Group => "Util";
         public Color Background => Color.FromArgb("#EAF7EE");

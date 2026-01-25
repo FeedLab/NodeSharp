@@ -17,6 +17,7 @@ namespace NodeSharp.Nodes.KS0212;
         private const string DefaultRuntimeType = "NodeKS0212";
 
         public string TypeId => DefaultTypeId;
+        public string DisplayName => "KS0212 (Raspberry PI)";
         public string RuntimeType => DefaultRuntimeType;
         public string Group => "Relay";
         public Color Background => Color.FromArgb("#FCECEC");

@@ -19,7 +19,7 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>NodeSharp.Client</ApplicationTitle>
+        <ApplicationTitle>NodeSharp</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>com.companyname.nodesharp.client</ApplicationId>

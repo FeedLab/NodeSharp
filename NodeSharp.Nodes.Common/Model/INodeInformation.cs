@@ -5,6 +5,7 @@ namespace NodeSharp.Nodes.Common.Model;
 public interface INodeInformation
 {
     string TypeId { get; }
+    string DisplayName { get; }
     string RuntimeType { get; }
     string Group { get; }
     Color Background { get; }

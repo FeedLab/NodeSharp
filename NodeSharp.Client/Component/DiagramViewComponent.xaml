@@ -18,8 +18,8 @@
         </Grid.GestureRecognizers>
 
         <GraphicsView x:Name="GridCanvas"
-                      WidthRequest="3000"
-                      HeightRequest="2000"
+                      WidthRequest="6000"
+                      HeightRequest="3000"
                       HorizontalOptions="Start"
                       VerticalOptions="Start"
                       InputTransparent="True">
@@ -30,8 +30,8 @@
 
         <GraphicsView x:Name="ConnectionCanvas"
                       AutomationId="ConnectionCanvas"
-                      WidthRequest="3000"
-                      HeightRequest="2000"
+                      WidthRequest="6000"
+                      HeightRequest="3000"
                       HorizontalOptions="Start"
                       VerticalOptions="Start"
                       InputTransparent="True">
@@ -40,8 +40,9 @@
             </GraphicsView.Drawable>
         </GraphicsView>
 
-        <AbsoluteLayout x:Name="CanvasSurface" AutomationId="CanvasSurface" WidthRequest="3000"
-                        HeightRequest="2000"
+        <AbsoluteLayout x:Name="CanvasSurface" AutomationId="CanvasSurface"
+                        WidthRequest="6000"
+                        HeightRequest="3000"
                         HorizontalOptions="Start"
                         VerticalOptions="Start"
                         IsClippedToBounds="True"

@@ -18,6 +18,7 @@ namespace NodeSharp.Nodes.Random;
         private const string DefaultRuntimeType = "NodeRandomNumber";
 
         public string TypeId => DefaultTypeId;
+        public string DisplayName => "RandomNumber";
         public string RuntimeType => DefaultRuntimeType;
         public string Group => "Util";
         public Color Background => Color.FromArgb("#EAF7EE");
