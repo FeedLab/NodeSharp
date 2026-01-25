@@ -22,6 +22,7 @@ public class CurvedLineDrawable : IDrawable
         //         new Point(s.RelativePosition.Value.X, s.RelativePosition.Value.Y)));
 
         var lineConnections = new List<LineConnection>();
+        var selected = lineConnectionManager.Connections.FirstOrDefault(c => c.IsSelected);
         
         foreach (var startAnchorPoint in outputAnchorPoints)
         {
@@ -33,11 +34,21 @@ public class CurvedLineDrawable : IDrawable
                 var toAnchorPt = new Point(endAnchorPoint.RelativePosition!.Value.X,
                     endAnchorPoint.RelativePosition.Value.Y);
                 
-                lineConnections.Add(new LineConnection(fromAnchorPt, toAnchorPt));
+                var connection = new LineConnection(startAnchorPoint, endAnchorPoint, fromAnchorPt, toAnchorPt);
+                if (selected is not null &&
+                    selected.StartAnchor.Id == startAnchorPoint.Id &&
+                    selected.EndAnchor.Id == endAnchorPoint.Id)
+                {
+                    connection.IsSelected = true;
+                }
+
+                lineConnections.Add(connection);
             }
         }
 
-        foreach (var connection in lineConnections)
+        lineConnectionManager.Connections = lineConnections;
+
+        foreach (var connection in lineConnectionManager.Connections)
         {
             DrawCurve(canvas, connection.Start, connection.End, connection.IsSelected);
         }

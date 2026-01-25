@@ -40,6 +40,10 @@ public partial class DiagramViewComponent : ContentView
     private Point marqueeStartView;
     private Point marqueeStartCanvas;
     private Point marqueeCurrentCanvas;
+#if WINDOWS
+    private Microsoft.UI.Xaml.FrameworkElement? nativeElement;
+    private bool deleteAcceleratorAttached;
+#endif
 
     public DiagramViewComponent()
     {
@@ -237,7 +241,22 @@ public partial class DiagramViewComponent : ContentView
     {
         if (this.Handler?.PlatformView is Microsoft.UI.Xaml.FrameworkElement nativeView)
         {
+            nativeElement = nativeView;
+            nativeView.IsTabStop = true;
+            nativeView.PointerPressed += OnNativePointerPressed;
             nativeView.PointerWheelChanged += OnNativePointerWheelChanged;
+            nativeView.KeyDown += OnNativeKeyDown;
+
+            if (!deleteAcceleratorAttached)
+            {
+                var accelerator = new Microsoft.UI.Xaml.Input.KeyboardAccelerator
+                {
+                    Key = Windows.System.VirtualKey.Delete
+                };
+                accelerator.Invoked += OnDeleteAcceleratorInvoked;
+                nativeView.KeyboardAccelerators.Add(accelerator);
+                deleteAcceleratorAttached = true;
+            }
         }
     }
 
@@ -253,6 +272,38 @@ public partial class DiagramViewComponent : ContentView
             scale = Math.Clamp(scale, 0.3, 3.0);
             UpdateTransform();
 
+            e.Handled = true;
+        }
+    }
+
+    void OnNativePointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        nativeElement?.Focus(Microsoft.UI.Xaml.FocusState.Pointer);
+    }
+
+    void OnDeleteAcceleratorInvoked(object sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs e)
+    {
+        if (lineConnectionManager.RemoveSelectedConnection())
+        {
+            lineConnectionManager.RebuildAnchorPointConnections(viewModel.BoxNodes);
+            ConnectionCanvas.Invalidate();
+            WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
+            e.Handled = true;
+        }
+    }
+
+    void OnNativeKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key != Windows.System.VirtualKey.Delete)
+        {
+            return;
+        }
+
+        if (lineConnectionManager.RemoveSelectedConnection())
+        {
+            lineConnectionManager.RebuildAnchorPointConnections(viewModel.BoxNodes);
+            ConnectionCanvas.Invalidate();
+            WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
             e.Handled = true;
         }
     }
@@ -505,6 +556,8 @@ public partial class DiagramViewComponent : ContentView
             
             WeakReferenceMessenger.Default.Send(new ConnectionPointStatus { IsCanvasInvalid = true });
         }
+
+        this.Focus();
     }
 
     private double SnapToGrid(double value)

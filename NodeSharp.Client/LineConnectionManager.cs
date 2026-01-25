@@ -5,14 +5,18 @@ namespace NodeSharp.Client;
 
 public class LineConnection
 {
+    public AnchorPoint StartAnchor { get; }
+    public AnchorPoint EndAnchor { get; }
     public Point Start { get; set; }
     public Point End { get; set; }
 
     public bool IsSelected { get; set; }
 
 
-    public LineConnection(Point from, Point fo)
+    public LineConnection(AnchorPoint startAnchor, AnchorPoint endAnchor, Point from, Point fo)
     {
+        StartAnchor = startAnchor;
+        EndAnchor = endAnchor;
         Start = from;
         End = fo;
     }
@@ -292,6 +296,40 @@ public class LineConnectionManager()
         lineAtPoint.IsSelected = true;
 
         return lineAtPoint;
+    }
+
+    public bool RemoveSelectedConnection()
+    {
+        var selected = Connections.FirstOrDefault(c => c.IsSelected);
+        if (selected is null)
+        {
+            return false;
+        }
+
+        var startOutput = selected.StartAnchor.OriginalOutput;
+        var endInput = selected.EndAnchor.OriginalInput;
+
+        if (startOutput is not null && endInput is not null)
+        {
+            startOutput.ConnectsToNodeId.Remove(endInput.Id.ToString());
+            endInput.ConnectsToParentNodeId.Remove(startOutput.Id.ToString());
+            selected.StartAnchor.ConnectsToNodeId.Remove(selected.EndAnchor);
+        }
+        else
+        {
+            var startInput = selected.StartAnchor.OriginalInput;
+            var endOutput = selected.EndAnchor.OriginalOutput;
+
+            if (startInput is not null && endOutput is not null)
+            {
+                endOutput.ConnectsToNodeId.Remove(startInput.Id.ToString());
+                startInput.ConnectsToParentNodeId.Remove(endOutput.Id.ToString());
+                selected.EndAnchor.ConnectsToNodeId.Remove(selected.StartAnchor);
+            }
+        }
+
+        selected.IsSelected = false;
+        return true;
     }
 
     /// <summary>
