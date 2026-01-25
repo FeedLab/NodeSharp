@@ -89,7 +89,7 @@
                 SelectionMode="None"
                 DragStartMode="OnHold"
                 SelectionBackground="Transparent"
-                ItemSize="76"
+                ItemSize="64"
                 IsStickyGroupHeader="True"
                 GroupHeaderSize="28"
                 AllowGroupExpandCollapse="True"
@@ -106,8 +106,10 @@
 
                 <syncfusion:SfListView.GroupHeaderTemplate>
                     <DataTemplate>
-                        <Grid Margin="12,4,8,0"
-                              ColumnDefinitions="4,*">
+                        <Grid 
+                            Margin="12,4,8,0"
+                            ColumnDefinitions="4,*"
+                            VerticalOptions="End">
                             <Label Grid.Column="1"
                                    Text="{Binding Key}"
                                    ToolTipProperties.Text="{Binding Key}"
