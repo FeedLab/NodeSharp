@@ -10,7 +10,8 @@
             StrokeThickness="1"
             Padding="20"
             MaximumWidthRequest="600"
-            MaximumHeightRequest="500">
+            MinimumHeightRequest="500"
+            MaximumHeightRequest="700">
         <Border.StrokeShape>
             <RoundRectangle CornerRadius="8"/>
         </Border.StrokeShape>

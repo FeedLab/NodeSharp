@@ -34,6 +34,7 @@
         </Grid.ColumnDefinitions>
 
         <Label
+            x:Name="SymbolLabel"
             Margin="0,0,8,0"
             Grid.Column="0"
             Grid.Row="0"
@@ -44,8 +45,12 @@
             FontSize="18"
             TextColor="Black">
             <Label.GestureRecognizers>
-                <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="PointerGestureRecognizer_OnPointerPressed" />
+                <PointerGestureRecognizer PointerEntered="OnSymbolPointerEntered" PointerExited="OnSymbolPointerExited" />
+                <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnSymbolDoubleTapped" />
             </Label.GestureRecognizers>
+            <!-- <Label.GestureRecognizers> -->
+            <!--     <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="PointerGestureRecognizer_OnPointerPressed" /> -->
+            <!-- </Label.GestureRecognizers> -->
         </Label>
 
         <Label

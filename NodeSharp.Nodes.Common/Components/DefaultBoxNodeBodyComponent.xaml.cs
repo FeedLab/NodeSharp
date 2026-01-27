@@ -1,6 +1,9 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Collections.Generic;
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Services;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;

@@ -253,10 +253,15 @@ public partial class DiagramViewComponent : ContentView
             {
                 var accelerator = new Microsoft.UI.Xaml.Input.KeyboardAccelerator
                 {
-                    Key = Windows.System.VirtualKey.Delete
+                    Key = Windows.System.VirtualKey.Delete,
+                    IsEnabled = true
                 };
                 accelerator.Invoked += OnDeleteAcceleratorInvoked;
                 nativeView.KeyboardAccelerators.Add(accelerator);
+
+                // Disable automatic tooltip
+                Microsoft.UI.Xaml.Controls.ToolTipService.SetToolTip(nativeView, null);
+
                 deleteAcceleratorAttached = true;
             }
         }

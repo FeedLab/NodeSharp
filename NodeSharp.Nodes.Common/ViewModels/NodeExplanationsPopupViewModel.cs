@@ -1,13 +1,17 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Controls;
+using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Common.ViewModels;
 
 public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAttributable
 {
     [ObservableProperty]
-    private ObservableCollection<ExplanationItem> explanations = new();
+    private ObservableCollection<ExplanationItem> explanations = [];
 
     [ObservableProperty]
     private int currentIndex;
@@ -27,12 +31,16 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
     [ObservableProperty]
     private bool canGoPrevious;
 
+    private readonly IPopupService popupService;
+
     public NodeExplanationsPopupViewModel()
     {
+        popupService = AppService.GetRequiredService<IPopupService>();
+        
         UpdateCurrentItem();
     }
 
-    public void Initialize(ObservableCollection<ExplanationItem> items)
+    private void Initialize(ObservableCollection<ExplanationItem> items)
     {
         Explanations = items;
         CurrentIndex = 0;
@@ -62,7 +70,7 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
     [RelayCommand]
     private void Close()
     {
-        // Close popup - will be handled by the popup service
+        popupService.ClosePopupAsync(Shell.Current);
     }
 
     private void UpdateCurrentItem()
