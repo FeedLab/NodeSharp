@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.ApplicationModel.DataTransfer;
 using Microsoft.Maui.Controls;
 using NodeSharp.Nodes.Common.Services;
 
@@ -71,6 +73,12 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
     private void Close()
     {
         popupService.ClosePopupAsync(Shell.Current);
+    }
+
+    [RelayCommand]
+    private async Task CopyCode()
+    {
+        await Clipboard.SetTextAsync(CurrentCode);
     }
 
     private void UpdateCurrentItem()

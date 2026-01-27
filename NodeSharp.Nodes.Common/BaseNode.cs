@@ -258,6 +258,7 @@ public abstract partial class BaseNode : ObservableObject
                 Explanations.Clear();
                 foreach (var item in items)
                 {
+                    item.FileName = fileName;
                     Explanations.Add(item);
                 }
             }
@@ -611,4 +612,5 @@ public class ExplanationItem
     public string Label { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Code { get; set; } = string.Empty;
+    public string FileName { get; set; } = string.Empty;
 }

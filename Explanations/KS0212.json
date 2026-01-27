@@ -1,27 +1,27 @@
 [
   {
-    "Label": "Basic String Injection",
-    "Description": "Injects a simple string value into the flow",
-    "Code": "msg.payload = new ExpandoObject();     msg.payload.RelayOne = false;     msg.payload.RelayTwo = false;     msg.payload.RelayThree = false;     msg.payload.RelayFour = false;"
+    "Label": "From Function Node",
+    "Description": "Turn all relays OFF",
+    "Code": "msg.payload = new ExpandoObject();\n\rmsg.payload.RelayOne = false;\n\rmsg.payload.RelayTwo = false;\n\rmsg.payload.RelayThree = false;\n\rmsg.payload.RelayFour = false;\n\r"
   },
   {
-    "Label": "Current DateTime",
-    "Description": "Returns the current date and time as a formatted string",
-    "Code": "return DateTime.Now.ToString(\"yyyy-MM-dd HH:mm:ss\");"
+    "Label": "From Function Node",
+    "Description": "Turn all relays ON",
+    "Code": "msg.payload = new ExpandoObject();\n\rmsg.payload.RelayOne = true;\n\rmsg.payload.RelayTwo = true;\n\rmsg.payload.RelayThree = true;\n\rmsg.payload.RelayFour = true;\n\r"
   },
   {
-    "Label": "Random Number Generator",
-    "Description": "Generates a random number between 1 and 100",
-    "Code": "var random = new Random();\nreturn random.Next(1, 101);"
+    "Label": "From Function Node",
+    "Description": "Turn relay 2 ON",
+    "Code": "msg.payload = new ExpandoObject();\n\rmsg.payload.RelayTwo = true;\n\r"
   },
   {
-    "Label": "JSON Object",
-    "Description": "Creates and returns a JSON object with sample data",
-    "Code": "return new { Name = \"John Doe\", Age = 30, Active = true };"
+    "Label": "From Function Node",
+    "Description": "Turn relay 2 ON and 4 OFF",
+    "Code": "msg.payload = new ExpandoObject();\n\rmsg.payload.RelayTwo = true;\n\rmsg.payload.RelayFour = false;\n\r"
   },
   {
-    "Label": "Array of Values",
-    "Description": "Returns an array of sequential numbers",
-    "Code": "return Enumerable.Range(1, 10).ToArray();"
+    "Label": "From Function Node",
+    "Description": "Turn relays ON and OFF in random order",
+    "Code": "var rnd = new Random();\n\rmsg.payload = new ExpandoObject();\n\rmsg.payload.RelayOne = rnd.Next(0, 2) == 1;\n\rmsg.payload.RelayTwo = rnd.Next(0, 2) == 1;\n\rmsg.payload.RelayThree = rnd.Next(0, 2) == 1;\n\rmsg.payload.RelayFour = rnd.Next(0, 2) == 1;\n\r"
   }
 ]

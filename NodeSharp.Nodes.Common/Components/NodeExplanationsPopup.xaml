@@ -2,93 +2,130 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:NodeSharp.Nodes.Common.ViewModels"
+             xmlns:smartComponents="clr-namespace:Syncfusion.Maui.SmartComponents;assembly=Syncfusion.Maui.SmartComponents"
              x:Class="NodeSharp.Nodes.Common.Components.NodeExplanationsPopup"
-             x:DataType="viewModels:NodeExplanationsPopupViewModel">
+             x:DataType="viewModels:NodeExplanationsPopupViewModel"
+             BackgroundColor="#F8F9FA"
+             Padding="1"
+             MaximumWidthRequest="950"
+             MinimumWidthRequest="650"
+             MinimumHeightRequest="550"
+             MaximumHeightRequest="750">
 
-    <Border BackgroundColor="White"
-            Stroke="Gray"
-            StrokeThickness="1"
-            Padding="20"
-            MaximumWidthRequest="600"
-            MinimumHeightRequest="500"
-            MaximumHeightRequest="700">
-        <Border.StrokeShape>
-            <RoundRectangle CornerRadius="8"/>
-        </Border.StrokeShape>
+    <Grid RowDefinitions="Auto, Auto, *, Auto" RowSpacing="15">
+        <!-- Label -->
+        <Label Grid.Row="0"
+               Text="{Binding CurrentLabel}"
+               FontSize="24"
+               FontAttributes="Bold"
+               TextColor="#2C3E50"/>
 
-        <Grid RowDefinitions="*, Auto" RowSpacing="20">
-            <!-- Top: Content Area -->
-            <Grid Grid.Row="0" RowDefinitions="Auto, Auto, *" RowSpacing="10">
-                <!-- Label -->
-                <Label Grid.Row="0"
-                       Text="{Binding CurrentLabel}"
-                       FontSize="20"
-                       FontAttributes="Bold"
-                       TextColor="Black"/>
+        <!-- Description -->
+        <Label Grid.Row="1"
+               Text="{Binding CurrentDescription}"
+               FontSize="15"
+               TextColor="#546E7A"
+               LineBreakMode="WordWrap"/>
 
-                <!-- Description -->
-                <Label Grid.Row="1"
-                       Text="{Binding CurrentDescription}"
-                       FontSize="14"
-                       TextColor="DarkGray"
-                       LineBreakMode="WordWrap"/>
+        <!-- Code -->
+        <Grid Grid.Row="2" VerticalOptions="FillAndExpand">
+            <Border BackgroundColor="#FFFFFF"
+                    Stroke="#E0E0E0"
+                    StrokeThickness="1"
+                    Padding="8">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,6" Radius="20" Opacity="0.15"/>
+                </Border.Shadow>
 
-                <!-- Code -->
-                <Border Grid.Row="2"
-                        BackgroundColor="#F5F5F5"
-                        Stroke="#DDDDDD"
-                        StrokeThickness="1"
-                        Padding="10">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="4"/>
-                    </Border.StrokeShape>
+                <smartComponents:SfSmartTextEditor x:Name="CodeEditor"
+                                                   HorizontalOptions="Fill"
+                                                   VerticalOptions="Fill"
+                                                   Text="{Binding CurrentCode, Mode=TwoWay}"
+                                                   BackgroundColor="Transparent"
+                                                   Margin="0">
+                    <smartComponents:SfSmartTextEditor.TextStyle>
+                        <smartComponents:SmartTextEditorStyle
+                            FontSize="13"
+                            FontFamily="Courier New"
+                            TextColor="#37474F" />
+                    </smartComponents:SfSmartTextEditor.TextStyle>
+                </smartComponents:SfSmartTextEditor>
+            </Border>
 
-                    <ScrollView>
-                        <Label Text="{Binding CurrentCode}"
-                               FontFamily="Courier New"
-                               FontSize="12"
-                               TextColor="Black"
-                               LineBreakMode="WordWrap"/>
-                    </ScrollView>
-                </Border>
-            </Grid>
-
-            <!-- Bottom: Navigation Controls -->
-            <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto, Auto">
-                <!-- Previous Button -->
-                <Button Grid.Column="0"
-                        Text="◀"
-                        Command="{Binding PreviousCommand}"
-                        IsEnabled="{Binding CanGoPrevious}"
-                        WidthRequest="50"
-                        HeightRequest="40"
-                        BackgroundColor="LightGray"
-                        TextColor="Black"
-                        Margin="0,0,10,0"/>
-
-                <!-- Spacer -->
-                <BoxView Grid.Column="1" Color="Transparent"/>
-
-                <!-- Next Button -->
-                <Button Grid.Column="2"
-                        Text="▶"
-                        Command="{Binding NextCommand}"
-                        IsEnabled="{Binding CanGoNext}"
-                        WidthRequest="50"
-                        HeightRequest="40"
-                        BackgroundColor="LightGray"
-                        TextColor="Black"
-                        Margin="0,0,10,0"/>
-
-                <!-- Close Button -->
-                <Button Grid.Column="3"
-                        Text="✕"
-                        Command="{Binding CloseCommand}"
-                        WidthRequest="50"
-                        HeightRequest="40"
-                        BackgroundColor="#E74C3C"
-                        TextColor="White"/>
-            </Grid>
+            <!-- Copy Button (Frozen at top-right) -->
+            <Button x:Name="CopyButton"
+                    Text="📋"
+                    Command="{Binding CopyCodeCommand}"
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    BackgroundColor="#42A5F5"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    Margin="12">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="12" Opacity="0.25"/>
+                </Button.Shadow>
+            </Button>
         </Grid>
-    </Border>
+
+        <!-- Bottom: Navigation Controls -->
+        <Grid Grid.Row="3" ColumnDefinitions="Auto, *, Auto, Auto">
+            <!-- Previous Button -->
+            <Button Grid.Column="0"
+                    Text="◀"
+                    Command="{Binding PreviousCommand}"
+                    IsEnabled="{Binding CanGoPrevious}"
+                    WidthRequest="52"
+                    HeightRequest="44"
+                    BackgroundColor="#42A5F5"
+                    TextColor="White"
+                    FontSize="16"
+                    CornerRadius="10"
+                    Margin="0,0,10,0">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.25"/>
+                </Button.Shadow>
+            </Button>
+
+            <!-- Spacer -->
+            <BoxView Grid.Column="1" Color="Transparent"/>
+
+            <!-- Next Button -->
+            <Button Grid.Column="2"
+                    Text="▶"
+                    Command="{Binding NextCommand}"
+                    IsEnabled="{Binding CanGoNext}"
+                    WidthRequest="52"
+                    HeightRequest="44"
+                    BackgroundColor="#42A5F5"
+                    TextColor="White"
+                    FontSize="16"
+                    CornerRadius="10"
+                    Margin="0,0,10,0">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.25"/>
+                </Button.Shadow>
+            </Button>
+
+            <!-- Close Button -->
+            <Button Grid.Column="3"
+                    Text="✕"
+                    Command="{Binding CloseCommand}"
+                    WidthRequest="52"
+                    HeightRequest="44"
+                    BackgroundColor="#E53935"
+                    TextColor="White"
+                    FontSize="18"
+                    CornerRadius="10">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.25"/>
+                </Button.Shadow>
+            </Button>
+        </Grid>
+    </Grid>
 </ContentView>
