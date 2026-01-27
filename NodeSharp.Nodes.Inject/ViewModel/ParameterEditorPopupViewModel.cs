@@ -39,27 +39,37 @@ public partial class ParameterEditorPopupViewModel : ObservableObject, IQueryAtt
     [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task OnOk()
     {
-        if (IsNameValid && ParameterItem is not null)
-        {
-            ParameterItem.Name = Name;
-            ParameterItem.Type = PrimitiveType;
-            ParameterItem.Value = PrimitiveValue;
-            ParameterItem.Source = SelectedTabIndex switch
-            {
-                0 => "Primitive",
-                1 => "Environment",
-                2 => "Timestamp",
-                _ => throw new InvalidOperationException("Invalid tab index")
-            };
-
-            // Copy values back to original parameter
-            OriginalParameter.Name = ParameterItem.Name;
-            OriginalParameter.Source = ParameterItem.Source;
-            OriginalParameter.Type = ParameterItem.Type;
-            OriginalParameter.Value = ParameterItem.Value;
-            
-            await popupService.ClosePopupAsync(Shell.Current, true);
-        }
+                await popupService.ClosePopupAsync(Shell.Current, true);
+        
+        // if (IsNameValid && ParameterItem is not null)
+        // {
+        //     ParameterItem.Name = Name;
+        //     ParameterItem.Type = PrimitiveType;
+        //     ParameterItem.Value = PrimitiveValue;
+        //     ParameterItem.Source = SelectedTabIndex switch
+        //     {
+        //         0 => "Primitive",
+        //         1 => "Environment",
+        //         2 => "Timestamp",
+        //         _ => throw new InvalidOperationException("Invalid tab index")
+        //     };
+        //     
+        //     // Copy values back to original parameter
+        //     OriginalParameter.Name = ParameterItem.Name;
+        //     OriginalParameter.Source = ParameterItem.Source;
+        //     OriginalParameter.Type = ParameterItem.Type;
+        //     OriginalParameter.Value = ParameterItem.Value;
+        //
+        //     try
+        //     {
+        //         await popupService.ClosePopupAsync(Shell.Current, true);
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine(e);
+        //         throw;
+        //     }
+        // }
     }
 
     bool CanSave()

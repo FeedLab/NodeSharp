@@ -10,7 +10,7 @@
              xmlns:components="clr-namespace:NodeSharp.Nodes.Common.Components;assembly=NodeSharp.Nodes.Common"
              xmlns:component="clr-namespace:NodeSharp.Nodes.Inject.Component"
              x:Class="NodeSharp.Nodes.Inject.Component.InjectConfigurePopupComponent"
-             WidthRequest="900">
+             WidthRequest="800" HeightRequest="700">
 
     <ContentView.Resources>
         <ResourceDictionary>
@@ -26,7 +26,7 @@
         HorizontalOptions="Fill"
         VerticalOptions="Fill"
         Padding="0"
-        RowSpacing="16"
+        RowSpacing="2"
         Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

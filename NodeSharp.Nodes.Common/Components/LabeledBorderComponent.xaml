@@ -1,14 +1,14 @@
 ﻿<Grid xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
       x:Class="NodeSharp.Nodes.Common.Components.LabeledBorder"
-      Margin="0,12,0,0"
+      Margin="0,0,0,0"
       x:Name="Root">
 
     <!-- Border behind everything -->
     <Border Stroke="{Binding Stroke, Source={x:Reference Root}}"
             StrokeThickness="{Binding StrokeThickness, Source={x:Reference Root}}"
             BackgroundColor="{Binding BackgroundColor, Source={x:Reference Root}}"
-            Padding="8,8,8,8"
+            Padding="8,2,8,2"
             Shadow="{x:Null}"
             x:Name="InnerBorder">
 

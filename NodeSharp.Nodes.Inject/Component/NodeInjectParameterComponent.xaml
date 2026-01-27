@@ -37,18 +37,19 @@
         <FontImageSource x:Key="RemoveIcon" FontFamily="MaterialAssets" Glyph="&#xe70e;" Color="White" />
     </ContentView.Resources>
     
-    <Grid RowDefinitions="*, Auto">
+    <Grid 
+        RowDefinitions="*, Auto">
         <syncfusion:SfDataGrid Grid.Row="0"
                                x:Name="DataGrid"
                                ItemsSource="{Binding Items}"
                                AutoGenerateColumnsMode="None"
                                ColumnWidthMode="LastColumnFill"
-                               AllowEditing="True"
+                               AllowEditing="False"
                                EditTapAction="OnTap"
                                SelectionMode="Single"
                                NavigationMode="Row"
                                HeaderRowHeight="42"
-                               RowHeight="32"
+                               RowHeight="24"
                                GridLinesVisibility="Horizontal"
                                CellDoubleTapped="DataGrid_OnCellDoubleTapped"
                                LiveDataUpdateMode="AllowDataShaping"
@@ -126,39 +127,39 @@
         <HorizontalStackLayout Grid.Row="1" Spacing="4" HeightRequest="50" Margin="0,24,0,0">
 
             <buttons:SfButton
-                FontSize="14"
+                FontSize="12"
+                HeightRequest="32"
                 Text="Primitive"
                 Background="DarkGreen"                         
             Style="{StaticResource IconButtonWithOpacityStyle}"
             Command="{Binding AddCommand}"
-            ImageSource="{StaticResource AddIcon}"
             ToolTipProperties.Text="Add Primitive" />
 
         <buttons:SfButton
-                FontSize="14"
+                FontSize="12"
+                HeightRequest="32"
                 Text="Timestamp"
                 Background="DarkGreen"                         
             Style="{StaticResource IconButtonWithOpacityStyle}"
             Command="{Binding AddCommand}"
-            ImageSource="{StaticResource AddIcon}"
             ToolTipProperties.Text="Add Timestamp" />
 
             <buttons:SfButton
-                FontSize="14"
+                FontSize="12"
+                HeightRequest="32"
                 Text="Environment"
                 Background="DarkGreen"                         
             Style="{StaticResource IconButtonWithOpacityStyle}"
             Command="{Binding AddCommand}"
-            ImageSource="{StaticResource AddIcon}"
             ToolTipProperties.Text="Add from environment variable" />
 
             <buttons:SfButton
-                FontSize="14"
+                FontSize="12"
+                HeightRequest="32"
                 Text="Remove"
                 Background="DarkRed"
             Style="{StaticResource IconButtonWithOpacityStyle}"
             Command="{Binding RemoveCommand}"
-            ImageSource="{StaticResource RemoveIcon}"
             ToolTipProperties.Text="Remove selected parameter" />
 
         </HorizontalStackLayout>
