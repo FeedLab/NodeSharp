@@ -86,7 +86,7 @@ public abstract partial class BaseNode : ObservableObject
 
     [ObservableProperty]
     [property: JsonIgnore]
-    private ObservableCollection<ExplanationItem> explanations = [];
+    private ExplanationCollection explanations = new(string.Empty);
 
     [JsonIgnore] protected CancellationTokenSource Cts;
 
@@ -173,7 +173,8 @@ public abstract partial class BaseNode : ObservableObject
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
 
-        LoadExplanations();
+        Explanations = new ExplanationCollection(TypeId);
+        Explanations.LoadFromFile();
     }
 
 
@@ -223,50 +224,8 @@ public abstract partial class BaseNode : ObservableObject
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
 
-        LoadExplanations();
-    }
-
-    private void LoadExplanations()
-    {
-        try
-        {
-            var directoriesSettings = AppService.GetService<Microsoft.Extensions.Options.IOptions<Configuration.DirectoriesSettings>>()?.Value;
-            if (directoriesSettings == null)
-            {
-                return;
-            }
-
-            var explanationsPath = directoriesSettings.GetExpandedExplanationFilesDirectory();
-            if (string.IsNullOrEmpty(explanationsPath) || !Directory.Exists(explanationsPath))
-            {
-                return;
-            }
-
-            var fileName = $"{TypeId}.json";
-            var filePath = Path.Combine(explanationsPath, fileName);
-
-            if (!File.Exists(filePath))
-            {
-                return;
-            }
-
-            var json = File.ReadAllText(filePath);
-            var items = JsonSerializer.Deserialize<List<ExplanationItem>>(json);
-
-            if (items != null)
-            {
-                Explanations.Clear();
-                foreach (var item in items)
-                {
-                    item.FileName = fileName;
-                    Explanations.Add(item);
-                }
-            }
-        }
-        catch (System.Exception ex)
-        {
-            Debug.WriteLine($"Failed to load explanations for {TypeId}: {ex.Message}");
-        }
+        Explanations = new ExplanationCollection(TypeId);
+        Explanations.LoadFromFile();
     }
 
     public void Abort()
@@ -607,10 +566,18 @@ public partial class BoxNodeStatus : ObservableObject
     }
 }
 
-public class ExplanationItem
+public partial class ExplanationItem : ObservableObject
 {
-    public string Label { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string Code { get; set; } = string.Empty;
-    public string FileName { get; set; } = string.Empty;
+    [ObservableProperty]
+    private string label = string.Empty;
+
+    [ObservableProperty]
+    private string description = string.Empty;
+
+    [ObservableProperty]
+    private string code = string.Empty;
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private string fileName = string.Empty;
 }

@@ -102,6 +102,16 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
         CanGoPrevious = CurrentIndex > 0;
     }
 
+    partial void OnCurrentCodeChanged(string value)
+    {
+        if (CurrentIndex < 0 || CurrentIndex >= Explanations.Count)
+        {
+            return;
+        }
+
+        Explanations[CurrentIndex].Code = value;
+    }
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         var baseNode = (BaseNode)query[nameof(BaseNode)];
