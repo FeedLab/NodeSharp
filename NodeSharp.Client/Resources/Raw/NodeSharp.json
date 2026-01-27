@@ -7,6 +7,9 @@
     "MajorLineEvery": 5
   },
   "Directories": {
+  },
+  "ExplanationsPopup": {
+    "UseEditableFields": true,
     "ExplanationFilesDirectory": "..\\..\\..\\..\\..\\Explanations"
   }
 }

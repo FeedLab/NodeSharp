@@ -2,6 +2,7 @@
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Collection;
 using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.Nodes.Debug;

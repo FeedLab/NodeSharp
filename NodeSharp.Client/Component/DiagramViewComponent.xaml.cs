@@ -29,7 +29,7 @@ public partial class DiagramViewComponent : ContentView
     private double startX = 0;
     private double startY = 0;
     private double panX, panY;
-    private double scale = 0.75;
+    private double scale = 1.0;
 
     private double viewportWidth, viewportHeight;
     private const double CanvasWidth = 3000; // virtual size

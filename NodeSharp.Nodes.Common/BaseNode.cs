@@ -15,6 +15,7 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
+using NodeSharp.Nodes.Common.Collection;
 using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;

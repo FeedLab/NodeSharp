@@ -1,3 +1,5 @@
+using Microsoft.Maui.Controls;
+
 namespace NodeSharp.Nodes.Common.Extension;
 
 public static class VisualElementExtensions

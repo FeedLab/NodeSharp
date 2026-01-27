@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Configuration;
@@ -14,6 +15,7 @@ public static class Startup
         services.AddSingleton(settings);
         services.AddSingleton(Options.Create(settings.Grid));
         services.AddSingleton(Options.Create(settings.Directories));
+        services.AddSingleton(Options.Create(settings.ExplanationsPopup));
 
         services.AddSingletonPopup<LastOutputMessageTooltipComponent, LastOutputMessageTooltipViewModel>();
         services.AddTransientPopup<ErrorPopup, ErrorPopupViewModel>();

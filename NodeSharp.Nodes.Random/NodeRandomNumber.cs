@@ -4,6 +4,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Collection;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;

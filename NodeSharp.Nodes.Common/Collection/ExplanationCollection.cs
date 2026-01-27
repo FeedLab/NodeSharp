@@ -6,7 +6,7 @@ using System.IO;
 using System.Text.Json;
 using NodeSharp.Nodes.Common.Services;
 
-namespace NodeSharp.Nodes.Common;
+namespace NodeSharp.Nodes.Common.Collection;
 
 public sealed class ExplanationCollection(string typeId) : ObservableCollection<ExplanationItem>
 {
@@ -150,7 +150,7 @@ public sealed class ExplanationCollection(string typeId) : ObservableCollection<
 
     private static string? GetExplanationsPath()
     {
-        var directoriesSettings = AppService.GetService<Microsoft.Extensions.Options.IOptions<Configuration.DirectoriesSettings>>()?.Value;
-        return directoriesSettings?.GetExpandedExplanationFilesDirectory();
+        var popupSettings = AppService.GetService<Microsoft.Extensions.Options.IOptions<Configuration.ExplanationsPopupSettings>>()?.Value;
+        return popupSettings?.GetExpandedExplanationFilesDirectory();
     }
 }

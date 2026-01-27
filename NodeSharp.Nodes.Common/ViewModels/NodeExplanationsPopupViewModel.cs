@@ -33,6 +33,8 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
     [ObservableProperty]
     private bool canGoPrevious;
 
+    public bool HasExplanations => Explanations.Count > 0;
+
     private readonly IPopupService popupService;
 
     public NodeExplanationsPopupViewModel()
@@ -47,6 +49,7 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
         Explanations = items;
         CurrentIndex = 0;
         UpdateCurrentItem();
+        OnPropertyChanged(nameof(HasExplanations));
     }
 
     [RelayCommand]
@@ -76,6 +79,38 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
     }
 
     [RelayCommand]
+    private void AddExplanation()
+    {
+        var newItem = new ExplanationItem
+        {
+            Label = "New explanation",
+            Description = "Describe this explanation...",
+            Code = "// Add code here"
+        };
+
+        Explanations.Add(newItem);
+        CurrentIndex = Explanations.Count - 1;
+        UpdateCurrentItem();
+    }
+
+    [RelayCommand]
+    private void DeleteExplanation()
+    {
+        if (Explanations.Count == 0 || CurrentIndex < 0 || CurrentIndex >= Explanations.Count)
+        {
+            return;
+        }
+
+        Explanations.RemoveAt(CurrentIndex);
+        if (CurrentIndex >= Explanations.Count)
+        {
+            CurrentIndex = Explanations.Count - 1;
+        }
+
+        UpdateCurrentItem();
+    }
+
+    [RelayCommand]
     private async Task CopyCode()
     {
         await Clipboard.SetTextAsync(CurrentCode);
@@ -83,6 +118,7 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
 
     private void UpdateCurrentItem()
     {
+        OnPropertyChanged(nameof(HasExplanations));
         if (Explanations.Count == 0)
         {
             CurrentLabel = string.Empty;
@@ -100,6 +136,26 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
 
         CanGoNext = CurrentIndex < Explanations.Count - 1;
         CanGoPrevious = CurrentIndex > 0;
+    }
+
+    partial void OnCurrentLabelChanged(string value)
+    {
+        if (CurrentIndex < 0 || CurrentIndex >= Explanations.Count)
+        {
+            return;
+        }
+
+        Explanations[CurrentIndex].Label = value;
+    }
+
+    partial void OnCurrentDescriptionChanged(string value)
+    {
+        if (CurrentIndex < 0 || CurrentIndex >= Explanations.Count)
+        {
+            return;
+        }
+
+        Explanations[CurrentIndex].Description = value;
     }
 
     partial void OnCurrentCodeChanged(string value)

@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Text.Json;
 using Microsoft.Maui.Storage;
 
@@ -7,6 +9,7 @@ public sealed class NodeSharpSettings
 {
     public GridSettings Grid { get; init; } = new();
     public DirectoriesSettings Directories { get; init; } = new();
+    public ExplanationsPopupSettings ExplanationsPopup { get; init; } = new();
 
     public static NodeSharpSettings Load(string fileName)
     {
@@ -36,6 +39,11 @@ public sealed class GridSettings
 
 public sealed class DirectoriesSettings
 {
+}
+
+public sealed class ExplanationsPopupSettings
+{
+    public bool UseEditableFields { get; init; } = false;
     public string ExplanationFilesDirectory { get; init; } = string.Empty;
 
     public string GetExpandedExplanationFilesDirectory() =>

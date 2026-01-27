@@ -6,6 +6,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Collection;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Helper;
@@ -151,6 +152,8 @@ public class NodeInject : BaseNode
         {
             throw new NodeParseException(this, nameof(Parameters), e);
         }
+        
+        Parameters.Add(new Parameter("Timestamp", "Number", "Timestamp", ""));
     }
 
     public override void Reset()
@@ -400,8 +403,8 @@ public class NodeInject : BaseNode
 
 public class ActivateAfter
 {
-    public string Type { get; }
-    public int Value { get; }
+    public string Type { get; set; }
+    public int Value { get; set; }
 
     [JsonIgnore] public int ActivateAfterMilliseconds { get; }
 
@@ -416,9 +419,9 @@ public class ActivateAfter
 
 public class Repeat
 {
-    public string Type { get; }
+    public string Type { get; set; }
 
-    public int Value { get; }
+    public int Value { get; set; }
 
     public bool IsEnabled => Value > 0;
 

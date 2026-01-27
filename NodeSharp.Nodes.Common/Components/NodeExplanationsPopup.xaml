@@ -5,6 +5,7 @@
              xmlns:smartComponents="clr-namespace:Syncfusion.Maui.SmartComponents;assembly=Syncfusion.Maui.SmartComponents"
              x:Class="NodeSharp.Nodes.Common.Components.NodeExplanationsPopup"
              x:DataType="viewModels:NodeExplanationsPopupViewModel"
+             x:Name="Root"
              BackgroundColor="#F8F9FA"
              Padding="1"
              MaximumWidthRequest="950"
@@ -13,19 +14,38 @@
              MaximumHeightRequest="750">
 
     <Grid RowDefinitions="Auto, Auto, *, Auto" RowSpacing="15">
-        <!-- Label -->
-        <Label Grid.Row="0"
-               Text="{Binding CurrentLabel}"
-               FontSize="24"
-               FontAttributes="Bold"
-               TextColor="#2C3E50"/>
+    <!-- Label -->
+    <Entry Grid.Row="0"
+           Text="{Binding CurrentLabel, Mode=TwoWay}"
+           FontSize="24"
+           FontAttributes="Bold"
+           TextColor="#2C3E50"
+           BackgroundColor="Transparent"
+           ClearButtonVisibility="WhileEditing"
+           IsVisible="{Binding Source={x:Reference Root}, Path=UseEditableFields}"/>
 
-        <!-- Description -->
-        <Label Grid.Row="1"
-               Text="{Binding CurrentDescription}"
-               FontSize="15"
-               TextColor="#546E7A"
-               LineBreakMode="WordWrap"/>
+    <Label Grid.Row="0"
+           Text="{Binding CurrentLabel}"
+           FontSize="24"
+           FontAttributes="Bold"
+           TextColor="#2C3E50"
+           IsVisible="{Binding Source={x:Reference Root}, Path=UseReadOnlyFields}"/>
+
+    <!-- Description -->
+    <Editor Grid.Row="1"
+            Text="{Binding CurrentDescription, Mode=TwoWay}"
+            FontSize="15"
+            TextColor="#546E7A"
+            AutoSize="TextChanges"
+            BackgroundColor="Transparent"
+            IsVisible="{Binding Source={x:Reference Root}, Path=UseEditableFields}"/>
+
+    <Label Grid.Row="1"
+           Text="{Binding CurrentDescription}"
+           FontSize="15"
+           TextColor="#546E7A"
+           LineBreakMode="WordWrap"
+           IsVisible="{Binding Source={x:Reference Root}, Path=UseReadOnlyFields}"/>
 
         <!-- Code -->
         <Grid Grid.Row="2" VerticalOptions="FillAndExpand">
@@ -72,11 +92,46 @@
                 </Button.Shadow>
             </Button>
         </Grid>
-
         <!-- Bottom: Navigation Controls -->
-        <Grid Grid.Row="3" ColumnDefinitions="Auto, *, Auto, Auto">
-            <!-- Previous Button -->
+        <Grid Grid.Row="3" ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto" ColumnSpacing="10">
+            <!-- Add Button -->
             <Button Grid.Column="0"
+                    Text="+"
+                    Command="{Binding AddExplanationCommand}"
+                    WidthRequest="52"
+                    HeightRequest="44"
+                    BackgroundColor="#42A5F5"
+                    TextColor="White"
+                    FontSize="18"
+                    CornerRadius="10"
+                    IsVisible="{Binding Source={x:Reference Root}, Path=UseEditableFields}">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.25"/>
+                </Button.Shadow>
+            </Button>
+
+            <!-- Delete Button -->
+            <Button Grid.Column="1"
+                    Text="-"
+                    Command="{Binding DeleteExplanationCommand}"
+                    IsEnabled="{Binding HasExplanations}"
+                    WidthRequest="52"
+                    HeightRequest="44"
+                    BackgroundColor="#EF5350"
+                    TextColor="White"
+                    FontSize="18"
+                    CornerRadius="10"
+                    IsVisible="{Binding Source={x:Reference Root}, Path=UseEditableFields}">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.25"/>
+                </Button.Shadow>
+            </Button>
+
+            <!-- Spacer -->
+            <BoxView Grid.Column="2" Color="Transparent"/>
+
+            <!-- Previous Button -->
+            <Button Grid.Column="3"
                     Text="◀"
                     Command="{Binding PreviousCommand}"
                     IsEnabled="{Binding CanGoPrevious}"
@@ -92,11 +147,8 @@
                 </Button.Shadow>
             </Button>
 
-            <!-- Spacer -->
-            <BoxView Grid.Column="1" Color="Transparent"/>
-
             <!-- Next Button -->
-            <Button Grid.Column="2"
+            <Button Grid.Column="4"
                     Text="▶"
                     Command="{Binding NextCommand}"
                     IsEnabled="{Binding CanGoNext}"
@@ -113,7 +165,7 @@
             </Button>
 
             <!-- Close Button -->
-            <Button Grid.Column="3"
+            <Button Grid.Column="5"
                     Text="✕"
                     Command="{Binding CloseCommand}"
                     WidthRequest="52"
@@ -129,3 +181,4 @@
         </Grid>
     </Grid>
 </ContentView>
+
