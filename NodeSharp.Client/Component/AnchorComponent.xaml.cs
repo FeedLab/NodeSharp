@@ -26,7 +26,7 @@ public partial class AnchorComponent : ContentView
         {
             Grid.SetColumn(ConnectionLine, 0);
             Grid.SetColumn(AnchorConnectionControl, 1);
-            
+
             Grid.SetColumn(ConnectionName, 0);
             ConnectionName.Text = anchorPoint.OriginalOutput?.Name ?? string.Empty;
         }
@@ -34,11 +34,11 @@ public partial class AnchorComponent : ContentView
         {
             Grid.SetColumn(ConnectionLine, 1);
             Grid.SetColumn(AnchorConnectionControl, 0);
-          
+
             Grid.SetColumn(ConnectionName, 1);
             ConnectionName.Text = anchorPoint.OriginalInput?.Name ?? string.Empty;
         }
-        
+
 
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
 

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:NodeSharp.Nodes.Common.ViewModels"
+             x:Class="NodeSharp.Nodes.Common.Components.NodeExplanationsPopup"
+             x:DataType="viewModels:NodeExplanationsPopupViewModel">
+
+    <Border BackgroundColor="White"
+            Stroke="Gray"
+            StrokeThickness="1"
+            Padding="20"
+            MaximumWidthRequest="600"
+            MaximumHeightRequest="500">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="8"/>
+        </Border.StrokeShape>
+
+        <Grid RowDefinitions="*, Auto" RowSpacing="20">
+            <!-- Top: Content Area -->
+            <Grid Grid.Row="0" RowDefinitions="Auto, Auto, *" RowSpacing="10">
+                <!-- Label -->
+                <Label Grid.Row="0"
+                       Text="{Binding CurrentLabel}"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="Black"/>
+
+                <!-- Description -->
+                <Label Grid.Row="1"
+                       Text="{Binding CurrentDescription}"
+                       FontSize="14"
+                       TextColor="DarkGray"
+                       LineBreakMode="WordWrap"/>
+
+                <!-- Code -->
+                <Border Grid.Row="2"
+                        BackgroundColor="#F5F5F5"
+                        Stroke="#DDDDDD"
+                        StrokeThickness="1"
+                        Padding="10">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="4"/>
+                    </Border.StrokeShape>
+
+                    <ScrollView>
+                        <Label Text="{Binding CurrentCode}"
+                               FontFamily="Courier New"
+                               FontSize="12"
+                               TextColor="Black"
+                               LineBreakMode="WordWrap"/>
+                    </ScrollView>
+                </Border>
+            </Grid>
+
+            <!-- Bottom: Navigation Controls -->
+            <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto, Auto">
+                <!-- Previous Button -->
+                <Button Grid.Column="0"
+                        Text="◀"
+                        Command="{Binding PreviousCommand}"
+                        IsEnabled="{Binding CanGoPrevious}"
+                        WidthRequest="50"
+                        HeightRequest="40"
+                        BackgroundColor="LightGray"
+                        TextColor="Black"
+                        Margin="0,0,10,0"/>
+
+                <!-- Spacer -->
+                <BoxView Grid.Column="1" Color="Transparent"/>
+
+                <!-- Next Button -->
+                <Button Grid.Column="2"
+                        Text="▶"
+                        Command="{Binding NextCommand}"
+                        IsEnabled="{Binding CanGoNext}"
+                        WidthRequest="50"
+                        HeightRequest="40"
+                        BackgroundColor="LightGray"
+                        TextColor="Black"
+                        Margin="0,0,10,0"/>
+
+                <!-- Close Button -->
+                <Button Grid.Column="3"
+                        Text="✕"
+                        Command="{Binding CloseCommand}"
+                        WidthRequest="50"
+                        HeightRequest="40"
+                        BackgroundColor="#E74C3C"
+                        TextColor="White"/>
+            </Grid>
+        </Grid>
+    </Border>
+</ContentView>

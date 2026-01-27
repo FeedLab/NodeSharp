@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.Client.ViewModel;
-using NodeSharp.Client.Configuration;
+using NodeSharp.Nodes.Common.Configuration;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
@@ -51,7 +51,7 @@ public partial class DiagramViewComponent : ContentView
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
         nodeIo = AppService.GetRequiredService<NodeIo>();
-        gridSettings = AppService.GetRequiredService<NodeSharpSettings>().Grid;
+        gridSettings = AppService.GetRequiredService<Microsoft.Extensions.Options.IOptions<GridSettings>>().Value;
 
         InitializeComponent();
 

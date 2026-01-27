@@ -5,5 +5,8 @@
     "MajorLineColor": "#CBD5E1",
     "BackgroundColor": "#F8FAFC",
     "MajorLineEvery": 5
+  },
+  "Directories": {
+    "ExplanationFilesDirectory": "..\\..\\..\\..\\..\\Explanations"
   }
 }

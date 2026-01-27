@@ -9,7 +9,7 @@ using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;
-using NodeSharp.Client.Configuration;
+using NodeSharp.Nodes.Common.Configuration;
 using Microsoft.Maui;
 using Microsoft.Maui.Devices;
 #if WINDOWS
@@ -149,7 +149,7 @@ public partial class DraggableBoxComponent : ContentView
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
         popupService = AppService.GetRequiredService<IPopupService>();
-        gridSettings = AppService.GetRequiredService<NodeSharpSettings>().Grid;
+        gridSettings = AppService.GetRequiredService<Microsoft.Extensions.Options.IOptions<GridSettings>>().Value;
 
         BindingContextChanged += (sender, args) =>
         {

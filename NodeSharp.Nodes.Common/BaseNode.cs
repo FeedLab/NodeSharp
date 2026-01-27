@@ -15,6 +15,8 @@ using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Common;
 
+using Options = Microsoft.Extensions.Options.Options;
+
 [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
     "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
 [SuppressMessage("Usage", "CsWinRT1030:Project does not enable unsafe blocks")]
@@ -73,6 +75,10 @@ public abstract partial class BaseNode : ObservableObject
     [ObservableProperty]
     [property: JsonIgnore]
     private ContentView? boxNodeStatusComponent;
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private ObservableCollection<ExplanationItem> explanations = [];
 
     [JsonIgnore] protected CancellationTokenSource Cts;
 
@@ -158,6 +164,8 @@ public abstract partial class BaseNode : ObservableObject
 
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
+
+        LoadExplanations();
     }
 
 
@@ -206,6 +214,50 @@ public abstract partial class BaseNode : ObservableObject
 
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
+
+        LoadExplanations();
+    }
+
+    private void LoadExplanations()
+    {
+        try
+        {
+            var directoriesSettings = AppService.GetService<Microsoft.Extensions.Options.IOptions<Configuration.DirectoriesSettings>>()?.Value;
+            if (directoriesSettings == null)
+            {
+                return;
+            }
+
+            var explanationsPath = directoriesSettings.GetExpandedExplanationFilesDirectory();
+            if (string.IsNullOrEmpty(explanationsPath) || !Directory.Exists(explanationsPath))
+            {
+                return;
+            }
+
+            var fileName = $"{TypeId}.json";
+            var filePath = Path.Combine(explanationsPath, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            var json = File.ReadAllText(filePath);
+            var items = JsonSerializer.Deserialize<List<ExplanationItem>>(json);
+
+            if (items != null)
+            {
+                Explanations.Clear();
+                foreach (var item in items)
+                {
+                    Explanations.Add(item);
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.WriteLine($"Failed to load explanations for {TypeId}: {ex.Message}");
+        }
     }
 
     public void Abort()
@@ -544,4 +596,11 @@ public partial class BoxNodeStatus : ObservableObject
         Value = 0;
         Message = "";
     }
+}
+
+public class ExplanationItem
+{
+    public string Label { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Code { get; set; } = string.Empty;
 }

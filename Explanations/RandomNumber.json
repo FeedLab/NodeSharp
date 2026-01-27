@@ -1,0 +1,27 @@
+[
+  {
+    "Label": "Basic String Injection",
+    "Description": "Injects a simple string value into the flow",
+    "Code": "return \"Hello, World!\";"
+  },
+  {
+    "Label": "Current DateTime",
+    "Description": "Returns the current date and time as a formatted string",
+    "Code": "return DateTime.Now.ToString(\"yyyy-MM-dd HH:mm:ss\");"
+  },
+  {
+    "Label": "Random Number Generator",
+    "Description": "Generates a random number between 1 and 100",
+    "Code": "var random = new Random();\nreturn random.Next(1, 101);"
+  },
+  {
+    "Label": "JSON Object",
+    "Description": "Creates and returns a JSON object with sample data",
+    "Code": "return new { Name = \"John Doe\", Age = 30, Active = true };"
+  },
+  {
+    "Label": "Array of Values",
+    "Description": "Returns an array of sequential numbers",
+    "Code": "return Enumerable.Range(1, 10).ToArray();"
+  }
+]
