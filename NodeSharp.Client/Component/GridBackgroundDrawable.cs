@@ -1,5 +1,6 @@
+using Microsoft.Extensions.Options;
 using Microsoft.Maui.Graphics;
-using NodeSharp.Client.Configuration;
+using NodeSharp.Nodes.Common.Configuration;
 using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Client.Component;
@@ -10,7 +11,7 @@ public class GridBackgroundDrawable : IDrawable
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
-        gridSettings ??= AppService.GetService<NodeSharpSettings>()?.Grid ?? new GridSettings();
+        gridSettings ??= AppService.GetService<IOptions<GridSettings>>()?.Value ?? new GridSettings();
         var grid = gridSettings;
 
         canvas.SaveState();

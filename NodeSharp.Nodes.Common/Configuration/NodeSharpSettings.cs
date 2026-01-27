@@ -1,7 +1,9 @@
+using System;
+using System.IO;
 using System.Text.Json;
 using Microsoft.Maui.Storage;
 
-namespace NodeSharp.Client.Configuration;
+namespace NodeSharp.Nodes.Common.Configuration;
 
 public sealed class NodeSharpSettings
 {

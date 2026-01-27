@@ -2,7 +2,7 @@
 using CommunityToolkit.Maui.Markup;
 using Microsoft.Extensions.Logging;
 using NodeSharp.Client.Component;
-using NodeSharp.Client.Configuration;
+using NodeSharp.Nodes.Common.Configuration;
 using NodeSharp.Client.ViewModel;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common;
@@ -12,6 +12,8 @@ using Syncfusion.Maui.Core.Hosting;
 using Syncfusion.Maui.Toolkit.Hosting;
 
 namespace NodeSharp.Client;
+
+using Options = Microsoft.Extensions.Options.Options;
 
 public static class MauiProgram
 {
@@ -40,9 +42,7 @@ public static class MauiProgram
                 fonts.AddFont("MaterialSymbolsOutlined-Regular.ttf", "MaterialSymbols");
             });
 
-        var settings = NodeSharpSettings.Load("NodeSharp.json");
-        builder.Services.AddSingleton(settings);
-        
+
         builder.Services.AddSingleton<NodeToolListModel>();
         builder.Services.AddSingleton<DebugViewModel>();
         builder.Services.AddSingleton<DiagramViewModel>();
@@ -52,14 +52,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<CurvedLineDrawable>();
         builder.Services.AddSingleton<GridBackgroundDrawable>();
         builder.Services.AddSingleton<LineConnectionManager>();
-        
 
         var storage = new Storage();
         RegisterDynamicNodes(builder.Services, storage);
 
         builder.Services.AddSingleton(storage);
 
-        Startup.Register(builder.Services);
+        var settings = NodeSharpSettings.Load("NodeSharp.json");
+        Startup.Register(builder.Services, settings);
 
 #if DEBUG
         builder.Logging.AddDebug();

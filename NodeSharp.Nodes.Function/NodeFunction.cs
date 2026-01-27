@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Collection;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Helper;
 using NodeSharp.Nodes.Common.Model;

@@ -1,4 +1,8 @@
-﻿namespace NodeSharp.Nodes.Common.Extension;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Maui;
+
+namespace NodeSharp.Nodes.Common.Extension;
 
 public static class VisualTreeExtensions
 {

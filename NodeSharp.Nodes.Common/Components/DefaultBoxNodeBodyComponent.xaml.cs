@@ -1,4 +1,10 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Collections.Generic;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Services;
+using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
+using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;
 
@@ -25,27 +31,42 @@ public partial class DefaultBoxNodeBodyComponent : ContentView
         };
     }
 
-    private async void PointerGestureRecognizer_OnPointerPressed(object? sender, TappedEventArgs tappedEventArgs)
+    private void OnSymbolPointerEntered(object? sender, PointerEventArgs e)
     {
-        if (viewModel?.Node is null)
+        if (viewModel?.Node?.Explanations.Count > 0)
         {
-            throw new InvalidOperationException("ViewModel or Node is null");
+            SymbolLabel.BackgroundColor = Colors.LightBlue;
+            SymbolLabel.Opacity = 0.8;
         }
+    }
 
-        var queryAttributes = new Dictionary<string, object>
+    private void OnSymbolPointerExited(object? sender, PointerEventArgs e)
+    {
+        SymbolLabel.BackgroundColor = Colors.Transparent;
+        SymbolLabel.Opacity = 1.0;
+    }
+
+    private async void OnSymbolDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (viewModel?.Node?.Explanations.Count > 0)
         {
-            [nameof(BaseNode)] = viewModel.Node
-        };
+            var baseNode = viewModel.Node;
+            var queryAttributes = new Dictionary<string, object>
+            {
+                [nameof(BaseNode)] = baseNode
+            };
 
-        var popupOptions = new PopupOptions
-        {
-            CanBeDismissedByTappingOutsideOfPopup = true,
-            PageOverlayColor = Colors.Transparent
-        };
-
-        await popupService.ShowPopupAsync<LastOutputMessageTooltipViewModel>(
-            Shell.Current,
-            options: popupOptions,
-            queryAttributes);
+            var popupOptions = new PopupOptions
+            {
+                CanBeDismissedByTappingOutsideOfPopup = false
+            };
+            
+            await popupService.ShowPopupAsync<NodeExplanationsPopupViewModel>(
+                Shell.Current,
+                options: popupOptions,
+                shellParameters: queryAttributes);
+            
+            WeakReferenceMessenger.Default.Send(new ShowExplanationsMessage(viewModel.Node));
+        }
     }
 }

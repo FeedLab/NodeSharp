@@ -21,6 +21,7 @@
         </Grid.ColumnDefinitions>
 
         <Label
+            x:Name="SymbolLabel"
             Grid.Column="0"
             Grid.Row="0"
             Grid.RowSpan="2"
@@ -30,13 +31,10 @@
             FontFamily="{Binding Node.TypeInformation.PresentationInformation.FontFamilyName}"
             FontSize="18"
             TextColor="Black">
-            <!-- <Label.GestureRecognizers> -->
-            <!--     <TapGestureRecognizer Tapped="OnSearchClicked" /> -->
-            <!-- </Label.GestureRecognizers> -->
             <Label.GestureRecognizers>
-                <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="PointerGestureRecognizer_OnPointerPressed" />
+                <PointerGestureRecognizer PointerEntered="OnSymbolPointerEntered" PointerExited="OnSymbolPointerExited" />
+                <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnSymbolDoubleTapped" />
             </Label.GestureRecognizers>
-
         </Label>
 
         <Label

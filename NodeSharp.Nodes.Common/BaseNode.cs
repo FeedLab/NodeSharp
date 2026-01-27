@@ -1,12 +1,21 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
+using NodeSharp.Nodes.Common.Collection;
 using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;
@@ -14,6 +23,8 @@ using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Common;
+
+using Options = Microsoft.Extensions.Options.Options;
 
 [SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.ObservablePropertyGenerator",
     "MVVMTK0045:Using [ObservableProperty] on fields is not AOT compatible for WinRT")]
@@ -73,6 +84,10 @@ public abstract partial class BaseNode : ObservableObject
     [ObservableProperty]
     [property: JsonIgnore]
     private ContentView? boxNodeStatusComponent;
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private ExplanationCollection explanations = new(string.Empty);
 
     [JsonIgnore] protected CancellationTokenSource Cts;
 
@@ -158,6 +173,9 @@ public abstract partial class BaseNode : ObservableObject
 
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
+
+        Explanations = new ExplanationCollection(TypeId);
+        Explanations.LoadFromFile();
     }
 
 
@@ -206,6 +224,9 @@ public abstract partial class BaseNode : ObservableObject
 
         NodeBodyComponent = nodeSharp.GetNodeBody(this);
         BoxNodeStatusComponent = nodeSharp.GetNBoxNodeStatusComponent(this) ?? new BoxNodeStatusDefaultComponent();
+
+        Explanations = new ExplanationCollection(TypeId);
+        Explanations.LoadFromFile();
     }
 
     public void Abort()
@@ -544,4 +565,20 @@ public partial class BoxNodeStatus : ObservableObject
         Value = 0;
         Message = "";
     }
+}
+
+public partial class ExplanationItem : ObservableObject
+{
+    [ObservableProperty]
+    private string label = string.Empty;
+
+    [ObservableProperty]
+    private string description = string.Empty;
+
+    [ObservableProperty]
+    private string code = string.Empty;
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private string fileName = string.Empty;
 }

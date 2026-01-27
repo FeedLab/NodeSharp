@@ -1,4 +1,5 @@
-﻿using NodeSharp.Nodes.Common.ViewModels;
+﻿using Microsoft.Maui.Controls;
+using NodeSharp.Nodes.Common.ViewModels;
 
 namespace NodeSharp.Nodes.Common.Components;
 

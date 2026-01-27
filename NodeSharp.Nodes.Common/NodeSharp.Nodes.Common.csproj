@@ -47,4 +47,11 @@
       </Compile>
     </ItemGroup>
 
+
+    <ItemGroup>
+      <Reference Include="Syncfusion.Maui.SmartComponents">
+        <HintPath>C:\Users\jompa\.nuget\packages\syncfusion.maui.smartcomponents\32.1.24\lib\net10.0-ios26.0\Syncfusion.Maui.SmartComponents.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

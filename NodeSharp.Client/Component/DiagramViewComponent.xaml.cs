@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using CommunityToolkit.Mvvm.Messaging;
 using NodeSharp.Client.ViewModel;
-using NodeSharp.Client.Configuration;
+using NodeSharp.Nodes.Common.Configuration;
 using NodeSharp.NodeEngine;
 using NodeSharp.Nodes.Common.Model;
 using NodeSharp.Nodes.Common.Services;
@@ -29,7 +29,7 @@ public partial class DiagramViewComponent : ContentView
     private double startX = 0;
     private double startY = 0;
     private double panX, panY;
-    private double scale = 0.75;
+    private double scale = 1.0;
 
     private double viewportWidth, viewportHeight;
     private const double CanvasWidth = 3000; // virtual size
@@ -51,7 +51,7 @@ public partial class DiagramViewComponent : ContentView
         curvedLineDrawable = AppService.GetRequiredService<CurvedLineDrawable>();
         lineConnectionManager = AppService.GetRequiredService<LineConnectionManager>();
         nodeIo = AppService.GetRequiredService<NodeIo>();
-        gridSettings = AppService.GetRequiredService<NodeSharpSettings>().Grid;
+        gridSettings = AppService.GetRequiredService<Microsoft.Extensions.Options.IOptions<GridSettings>>().Value;
 
         InitializeComponent();
 
@@ -253,10 +253,15 @@ public partial class DiagramViewComponent : ContentView
             {
                 var accelerator = new Microsoft.UI.Xaml.Input.KeyboardAccelerator
                 {
-                    Key = Windows.System.VirtualKey.Delete
+                    Key = Windows.System.VirtualKey.Delete,
+                    IsEnabled = true
                 };
                 accelerator.Invoked += OnDeleteAcceleratorInvoked;
                 nativeView.KeyboardAccelerators.Add(accelerator);
+
+                // Disable automatic tooltip
+                Microsoft.UI.Xaml.Controls.ToolTipService.SetToolTip(nativeView, null);
+
                 deleteAcceleratorAttached = true;
             }
         }

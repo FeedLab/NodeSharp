@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using NodeSharp.Nodes.Common.Helper;
@@ -20,16 +22,17 @@ public class NodeInformationDictionary : Dictionary<string, INodeSharp>
         Add(nodeSharpInstance.NodeName, nodeSharpInstance);
     }
 
-    public bool TryGetInformation(string key, out INodeInformation? nodeInformation)
+    public bool TryGetInformation(string key, out INodeInformation nodeInformation)
     {
         if(TryGetValue(key, out var nodeSharpInstance))
         {
             nodeInformation = nodeSharpInstance.NodeInformation;
             return true;
         }
-
-        nodeInformation = null;
-        return false;
+        else
+        {
+            throw new InvalidOperationException($"Node type not found: {key}");
+        }
     }
     
     public bool TryGetNodeType(string typeId, out Type nodeType)

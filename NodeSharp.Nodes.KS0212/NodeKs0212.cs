@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using NodeSharp.Nodes.Common;
+using NodeSharp.Nodes.Common.Collection;
 using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Exception;
 using NodeSharp.Nodes.Common.Extension;

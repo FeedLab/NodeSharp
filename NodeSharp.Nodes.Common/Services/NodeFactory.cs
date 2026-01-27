@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using NodeSharp.Nodes.Common.Collection;
 using NodeSharp.Nodes.Common.Model;
 
 namespace NodeSharp.Nodes.Common.Services;

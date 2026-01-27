@@ -1,5 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Controls;
 
 namespace NodeSharp.Nodes.Common.ViewModels;
 

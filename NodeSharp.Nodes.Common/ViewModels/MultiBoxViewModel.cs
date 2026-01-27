@@ -1,6 +1,8 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Maui.Graphics;
 
 namespace NodeSharp.Nodes.Common.ViewModels;
 

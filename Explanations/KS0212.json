@@ -1,0 +1,37 @@
+[
+  {
+    "Label": "From Function Node",
+    "Description": "Turn all relays OFF",
+    "Code": "msg.payload = new ExpandoObject();\r\rmsg.payload.RelayOne = false;\rmsg.payload.RelayTwo = false;\rmsg.payload.RelayThree = false;\rmsg.payload.RelayFour = false;\r\r"
+  },
+  {
+    "Label": "From Function Node",
+    "Description": "Turn all relays ON",
+    "Code": "msg.payload = new ExpandoObject();\r\rmsg.payload.RelayOne = true;\rmsg.payload.RelayTwo = true;\rmsg.payload.RelayThree = true;\rmsg.payload.RelayFour = true;\r\r"
+  },
+  {
+    "Label": "From Function Node",
+    "Description": "Turn relay 2 ON",
+    "Code": "msg.payload = new ExpandoObject();\r\rmsg.payload.RelayTwo = true;\r\r"
+  },
+  {
+    "Label": "From Function Node",
+    "Description": "Turn relay 2 ON and 4 OFF",
+    "Code": "msg.payload = new ExpandoObject();\r\rmsg.payload.RelayTwo = true;\rmsg.payload.RelayFour = false;\r\r"
+  },
+  {
+    "Label": "From Function Node",
+    "Description": "Turn relays ON and OFF in random order",
+    "Code": "var rnd = new Random();\rmsg.payload = new ExpandoObject();\r\rmsg.payload.RelayOne = rnd.Next(0, 2) == 1;\rmsg.payload.RelayTwo = rnd.Next(0, 2) == 1;\rmsg.payload.RelayThree = rnd.Next(0, 2) == 1;\rmsg.payload.RelayFour = rnd.Next(0, 2) == 1;\r\r"
+  },
+  {
+    "Label": "New explanation 1",
+    "Description": "Describe this explanation...",
+    "Code": "// Add code here"
+  },
+  {
+    "Label": "New explanation 2",
+    "Description": "Describe this explanation...",
+    "Code": "// Add code here"
+  }
+]
