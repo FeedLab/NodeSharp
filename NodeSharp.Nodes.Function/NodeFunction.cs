@@ -16,6 +16,7 @@ namespace NodeSharp.Nodes.Function;
 
 public class NodeFunction : BaseNode
 {
+    private readonly KeyValueStore keyValueStore;
     [JsonInclude] public FunctionData FunctionData { get; set; }
 
     public NodeFunction(
@@ -41,7 +42,9 @@ public class NodeFunction : BaseNode
             storage,
             backgroundColor
         )
-    {       
+    {
+        keyValueStore = AppService.GetRequiredService<KeyValueStore>();
+
         FunctionData = new FunctionData();
 
         var statusBodyHeight =  InitializeDimensions();
@@ -90,6 +93,8 @@ public class NodeFunction : BaseNode
             inputs
         )
     {
+        keyValueStore = AppService.GetRequiredService<KeyValueStore>();
+     
         InitializeDimensions();
         
         if (!nodeElement.TryGetProperty("FunctionData", out var functionProp) ||
@@ -162,7 +167,9 @@ public partial class FunctionData : ObservableObject
 
         try
         {
-            var output = method.Invoke(null, [json]);
+            var keyValueStore = AppService.GetRequiredService<KeyValueStore>();
+            
+            var output = method.Invoke(null, [json, keyValueStore]);
             return (true, output?.ToString(), null);
         }
         catch (TargetInvocationException tie)
@@ -177,7 +184,7 @@ public partial class FunctionData : ObservableObject
     }
 
     public const string MessageTemplate =
-        "using System;\n\rusing System.Dynamic;\n\rusing Newtonsoft.Json;\n\n\rpublic class Runner \n\r{\n\r    public static string Execute(string json) \n\r    {\n\r        dynamic msg = JsonConvert.DeserializeObject<ExpandoObject>(json);\n\n        // Serialize back to JSON\n\r\n\r        ##@@##\n\n        string updatedJson = JsonConvert.SerializeObject(msg, Formatting.Indented);\n\r\n\r        return updatedJson;\n\r    }\n\r}";
+        "using NodeSharp.Nodes.Common.Services;\n\rusing System;\n\rusing System.Dynamic;\n\rusing Newtonsoft.Json;\n\n\rpublic class Runner \n\r{\n\r    public static string Execute(string json, KeyValueStore kvs) \n\r    {\n\r        dynamic msg = JsonConvert.DeserializeObject<ExpandoObject>(json);\n\n        // Serialize back to JSON\n\r\n\r        ##@@##\n\n        string updatedJson = JsonConvert.SerializeObject(msg, Formatting.Indented);\n\r\n\r        return updatedJson;\n\r    }\n\r}";
 
 
     public void CompileScript()
