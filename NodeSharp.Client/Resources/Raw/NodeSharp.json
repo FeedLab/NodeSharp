@@ -11,5 +11,12 @@
   "ExplanationsPopup": {
     "UseEditableFields": true,
     "ExplanationFilesDirectory": "..\\..\\..\\..\\..\\Explanations"
+  },
+  "KeyValueStore": {
+    "StoreName": "NodeSharp.KeyValueStore",
+    "PersistToDisk": {
+      "FileName": "KeyValueStore.json",
+      "FlushInterval": "00:00:05"
+    }
   }
 }

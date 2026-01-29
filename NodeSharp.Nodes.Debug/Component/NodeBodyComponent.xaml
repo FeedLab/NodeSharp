@@ -1,0 +1,368 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:buttons="http://schemas.syncfusion.com/maui"
+             x:Class="NodeSharp.Nodes.Debug.Component.NodeBodyComponent"
+             HorizontalOptions="Fill">
+
+    <ContentView.Resources>
+        
+        <Style x:Key="AndroidStyle" TargetType="buttons:SfSwitch">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <Setter.Value>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="On">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="#005FB8"
+                                                ThumbCornerRadius="15"
+                                                ThumbHeightRequest="30"
+                                                ThumbStroke="#005FB8"
+                                                ThumbStrokeThickness="1"
+                                                ThumbWidthRequest="30"
+                                                TrackBackground="#91caff"
+                                                TrackHeightRequest="22"
+                                                TrackStroke="#91caff"
+                                                TrackStrokeThickness="0"
+                                                TrackWidthRequest="52" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Off">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="White"
+                                                ThumbCornerRadius="15"
+                                                ThumbHeightRequest="30"
+                                                ThumbStroke="Gray"
+                                                ThumbStrokeThickness="1"
+                                                ThumbWidthRequest="30"
+                                                TrackBackground="DimGray"
+                                                TrackHeightRequest="22"
+                                                TrackStroke="Black"
+                                                TrackStrokeThickness="0"
+                                                TrackWidthRequest="52" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WindowsStyle" TargetType="buttons:SfSwitch">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <Setter.Value>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Off">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="#A19F9D"
+                                                ThumbCornerRadius="6"
+                                                ThumbHeightRequest="11"
+                                                ThumbStroke="#A19F9D"
+                                                ThumbWidthRequest="11"
+                                                TrackBackground="Transparent"
+                                                TrackHeightRequest="19"
+                                                TrackStroke="#A19F9D"
+                                                ThumbStrokeThickness="1"
+                                                TrackStrokeThickness="1"
+                                                TrackWidthRequest="39" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="OffPressed">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="#A19F9D"
+                                                ThumbCornerRadius="7"
+                                                ThumbHeightRequest="13"
+                                                ThumbStroke="#A19F9D"
+                                                ThumbWidthRequest="13"
+                                                TrackBackground="Transparent"
+                                                TrackHeightRequest="19"
+                                                TrackStroke="#A19F9D"
+                                                ThumbStrokeThickness="1"
+                                                TrackStrokeThickness="1"
+                                                TrackWidthRequest="39" />   
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="OffHovered">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="#A19F9D"
+                                                ThumbCornerRadius="7"
+                                                ThumbHeightRequest="13"
+                                                ThumbStroke="#A19F9D"
+                                                ThumbWidthRequest="13"
+                                                TrackBackground="Transparent"
+                                                TrackHeightRequest="19"
+                                                TrackStroke="#A19F9D"
+                                                ThumbStrokeThickness="1"
+                                                TrackStrokeThickness="1"
+                                                TrackWidthRequest="39" />   
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="On">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="#1B1A19"
+                                                ThumbCornerRadius="6"
+                                                ThumbHeightRequest="11"
+                                                ThumbStroke="#1B1A19"
+                                                ThumbWidthRequest="11"
+                                                TrackBackground="#0078D4"
+                                                TrackHeightRequest="19"
+                                                TrackStroke="#0078D4"
+                                                ThumbStrokeThickness="1"
+                                                TrackStrokeThickness="1"
+                                                TrackWidthRequest="39" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="OnPressed">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="#1B1A19"
+                                                ThumbCornerRadius="7"
+                                                ThumbHeightRequest="13"
+                                                ThumbStroke="#1B1A19"
+                                                ThumbWidthRequest="13"
+                                                TrackBackground="#0078D4"
+                                                TrackHeightRequest="19"
+                                                TrackStroke="#0078D4"
+                                                ThumbStrokeThickness="1"
+                                                TrackStrokeThickness="1"
+                                                TrackWidthRequest="39" />   
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="OnHovered">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                 ThumbBackground="#1B1A19"
+                                                 ThumbCornerRadius="7"
+                                                 ThumbHeightRequest="13"
+                                                 ThumbStroke="#1B1A19"
+                                                 ThumbWidthRequest="13"
+                                                 TrackBackground="#0078D4"
+                                                 TrackHeightRequest="19"
+                                                 TrackStroke="#0078D4"
+                                                 ThumbStrokeThickness="1"
+                                                 TrackStrokeThickness="1"
+                                                 TrackWidthRequest="39" />  
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="iOSStyle" TargetType="buttons:SfSwitch">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <Setter.Value>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="On">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="White"
+                                                ThumbCornerRadius="15"
+                                                ThumbHeightRequest="26"
+                                                ThumbStroke="White"
+                                                ThumbStrokeThickness="1"
+                                                ThumbWidthRequest="26"
+                                                TrackBackground="#0078D4"
+                                                TrackHeightRequest="28"
+                                                TrackStroke="#0078D4"
+                                                TrackStrokeThickness="1.5"
+                                                TrackWidthRequest="48" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Off">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="White"
+                                                ThumbCornerRadius="15"
+                                                ThumbHeightRequest="26"
+                                                ThumbStroke="White"
+                                                ThumbStrokeThickness="1"
+                                                ThumbWidthRequest="26"
+                                                TrackBackground="#39393D"
+                                                TrackHeightRequest="28"
+                                                TrackStroke="#39393D"
+                                                TrackStrokeThickness="1.5"
+                                                TrackWidthRequest="48" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SolidStyle" TargetType="buttons:SfSwitch">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <Setter.Value>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="On">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="#FF029BFF"
+                                                ThumbHeightRequest="24"
+                                                ThumbStroke="#FF029BFF"
+                                                ThumbStrokeThickness="0.5"
+                                                ThumbWidthRequest="24"
+                                                TrackBackground="#22029BFF"
+                                                TrackStroke="#22029BFF"
+                                                TrackStrokeThickness="0.5" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Off">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbBackground="#FFFF0199"
+                                                ThumbStroke="#FFFF0199"
+                                                ThumbStrokeThickness="0.5"
+                                                TrackBackground="#22FF0199"
+                                                TrackStroke="#22FF0199"
+                                                TrackStrokeThickness="0.5" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Indeterminate">
+                                <VisualState.Setters>
+                                    <Setter Property="SwitchSettings">
+                                        <Setter.Value>
+                                            <buttons:SwitchSettings
+                                                ThumbHeightRequest="20"
+                                                ThumbWidthRequest="20"
+                                                ThumbBackground="#9ACB0D"
+                                                ThumbStroke="#9ACB0D"
+                                                ThumbStrokeThickness="0.5"
+                                                TrackBackground="#D2F768"
+                                                TrackStroke="#D2F768"
+                                                TrackStrokeThickness="0.5" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </VisualState.Setters>
+                            </VisualState>
+                            
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ContentView.Resources>
+
+
+    <Grid
+        Margin="0,6,0,6"
+        HorizontalOptions="Fill">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="60" />
+        </Grid.ColumnDefinitions>
+
+        <Label
+            x:Name="SymbolLabel"
+            Grid.Column="0"
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Text="{Binding Node.TypeInformation.PresentationInformation.Symbol}"
+            HorizontalOptions="Center"
+            VerticalOptions="Start"
+            FontFamily="{Binding Node.TypeInformation.PresentationInformation.FontFamilyName}"
+            FontSize="18"
+            TextColor="Black">
+            <Label.GestureRecognizers>
+                <PointerGestureRecognizer PointerEntered="OnSymbolPointerEntered" PointerExited="OnSymbolPointerExited" />
+                <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnSymbolDoubleTapped" />
+            </Label.GestureRecognizers>
+        </Label>
+
+        <Label
+            Grid.Column="1"
+            Grid.Row="0"
+            HorizontalOptions="Fill"
+            HorizontalTextAlignment="Start"
+            Text="{Binding Node.Name}"
+            LineBreakMode="NoWrap"
+            FontAttributes="None" TextColor="DarkRed" FontSize="12">
+        </Label>
+
+        <Label Grid.Column="1"
+               Grid.Row="1"
+               Text="{Binding Node.TypeId}"
+               LineBreakMode="NoWrap"
+            HorizontalOptions="Fill"
+            HorizontalTextAlignment="Start"
+               FontAttributes="None" TextColor="DarkGreen" FontSize="14">
+        </Label>
+
+        <buttons:SfSwitch
+            x:Name="ShowOutputMessage"
+            Grid.Row="0"
+            Grid.Column="2"
+            Grid.RowSpan="2"
+            VerticalOptions="Center"
+            AllowIndeterminateState="False"
+            IsOn="True"
+            Style="{StaticResource WindowsStyle}" />
+    </Grid>
+
+</ContentView>

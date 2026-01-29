@@ -35,10 +35,20 @@
         <DependentUpon>RandomConfigurePopupComponent.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Component\NodeBodyComponent.xaml.cs">
+        <DependentUpon>DefaultBoxNodeBodyComponent.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="ViewModel\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="Component\NodeBodyComponent.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
     </ItemGroup>
 
 </Project>

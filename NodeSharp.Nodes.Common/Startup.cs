@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NodeSharp.Nodes.Common.Components;
 using NodeSharp.Nodes.Common.Configuration;
+using NodeSharp.Nodes.Common.Services;
 using NodeSharp.Nodes.Common.ViewModels;
 
 namespace NodeSharp.Nodes.Common;
@@ -16,6 +17,9 @@ public static class Startup
         services.AddSingleton(Options.Create(settings.Grid));
         services.AddSingleton(Options.Create(settings.Directories));
         services.AddSingleton(Options.Create(settings.ExplanationsPopup));
+        services.AddSingleton(Options.Create(settings.KeyValueStore));
+        services.AddSingleton(Options.Create(settings.PersistToDisk));
+        services.AddSingleton<KeyValueStore>();
 
         services.AddSingletonPopup<LastOutputMessageTooltipComponent, LastOutputMessageTooltipViewModel>();
         services.AddTransientPopup<ErrorPopup, ErrorPopupViewModel>();

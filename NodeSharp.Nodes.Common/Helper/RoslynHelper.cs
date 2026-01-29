@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
+using NodeSharp.Nodes.Common.Services;
 
 namespace NodeSharp.Nodes.Common.Helper;
 
@@ -31,8 +32,10 @@ public class RoslynHelper(string codeTemplate, string sourceCode)
             MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(System.Dynamic.ExpandoObject).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(JsonConvert).Assembly.Location),
-            MetadataReference.CreateFromFile(
-                typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly.Location)
+            MetadataReference.CreateFromFile(typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(KeyValueStore).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(System.Text.Json.JsonSerializer).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Microsoft.Extensions.Options.IOptions<>).Assembly.Location)
         };
 
         compilation = CSharpCompilation.Create(

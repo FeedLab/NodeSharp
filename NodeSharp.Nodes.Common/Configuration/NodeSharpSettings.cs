@@ -10,6 +10,8 @@ public sealed class NodeSharpSettings
     public GridSettings Grid { get; init; } = new();
     public DirectoriesSettings Directories { get; init; } = new();
     public ExplanationsPopupSettings ExplanationsPopup { get; init; } = new();
+    public KeyValueStoreSettings KeyValueStore { get; init; } = new();
+    public PersistToDiskSettings PersistToDisk { get; init; } = new();
 
     public static NodeSharpSettings Load(string fileName)
     {
@@ -77,4 +79,15 @@ public sealed class ExplanationsPopupSettings
 
         return expanded;
     }
+}
+
+public sealed class KeyValueStoreSettings
+{
+    public string StoreName { get; init; } = "NodeSharp.KeyValueStore";
+}
+
+public sealed class PersistToDiskSettings
+{
+    public string FileName { get; init; } = "KeyValueStore.json";
+    public TimeSpan FlushInterval { get; init; } = TimeSpan.FromSeconds(0); // 0 means memory store only
 }

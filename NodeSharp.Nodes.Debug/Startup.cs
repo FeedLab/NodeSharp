@@ -18,7 +18,7 @@ public class Startup : INodeSharp
 
     public ContentView? GetNodeBody(BaseNode node)
     {
-        return new DefaultBoxNodeBodyComponent(node);
+        return new NodeBodyComponent(node);
     }
     
     public ContentView? GetNBoxNodeStatusComponent(BaseNode node)

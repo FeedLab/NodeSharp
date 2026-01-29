@@ -25,9 +25,9 @@
     "Code": "var rnd = new Random();\rmsg.payload = new ExpandoObject();\r\rmsg.payload.RelayOne = rnd.Next(0, 2) == 1;\rmsg.payload.RelayTwo = rnd.Next(0, 2) == 1;\rmsg.payload.RelayThree = rnd.Next(0, 2) == 1;\rmsg.payload.RelayFour = rnd.Next(0, 2) == 1;\r\r"
   },
   {
-    "Label": "New explanation 1",
-    "Description": "Describe this explanation...",
-    "Code": "// Add code here"
+    "Label": "KeyValueStore (kvs)",
+    "Description": "Toggle relay two ON and next time toggle it OFF and repeat. I will have the effect of a blinking lamp.",
+    "Code": "msg.payload = new ExpandoObject();\r\rvar relayTwo = kvs.Get\u003Cbool?\u003E(\u0022RelayTwo\u0022) ?? true;\r\rmsg.payload.RelayTwo = relayTwo;\rkvs.Set(\u0022RelayTwo\u0022, !relayTwo );"
   },
   {
     "Label": "New explanation 2",

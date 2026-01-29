@@ -3,12 +3,16 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using NodeSharp.Nodes.Common;
 using NodeSharp.Nodes.Common.Collection;
+using NodeSharp.Nodes.Common.Extension;
 using NodeSharp.Nodes.Common.Model;
+using NodeSharp.Nodes.Debug.Component;
 
 namespace NodeSharp.Nodes.Debug;
 
 public class NodeDebug : BaseNode
 {
+    public bool ShowOutputMessage { get; set; }
+
     public NodeDebug(
         BaseNodeList nodes,
         string id,
@@ -32,6 +36,8 @@ public class NodeDebug : BaseNode
         Outputs.Clear();
 
         Inputs.Add(new Input(Guid.CreateVersion7(), "Input", [], new Point(0, (height - bodyHeight) / 2)));
+        
+        InitializeOutputMessageSwitch(true);
     }
 
     public NodeDebug(
@@ -48,7 +54,30 @@ public class NodeDebug : BaseNode
         JsonElement nodeElement)
         : base(nodes, id, typeId, name, isEnabled, activateOnStart, xPosition, yPosition, outputs, inputs)
     {
+        const double height = 70;
+        const double width = 220;
+
+        BoxDimension = new Rect(0, 0, width, height);
+        
+        ShowOutputMessage = !nodeElement.TryGetPropertyIgnoreCase(nameof(ShowOutputMessage), out var oneProperty) ||
+                            oneProperty.ValueKind is not (JsonValueKind.True or JsonValueKind.False) || oneProperty.GetBoolean();
+
+        InitializeOutputMessageSwitch(ShowOutputMessage);
     }
+
+    private void InitializeOutputMessageSwitch(bool showOutputMessage)
+    {
+        if (NodeBodyComponent is NodeBodyComponent nodeBodyComponent)
+        {
+            nodeBodyComponent.ShowOutputMessageSwitch.IsOn = showOutputMessage;
+            nodeBodyComponent.ShowOutputMessageSwitch.StateChanged += (sender, args) =>
+            {
+                var showOutputMessageValue = args.NewValue;
+                ShowOutputMessage = showOutputMessageValue ?? true;
+            };
+        }
+    }
+
 
     protected override async Task<JsonNode?> RunFromInput(BaseNode parentNode, string inputJsonString)
     {
@@ -67,11 +96,14 @@ public class NodeDebug : BaseNode
 
             System.Diagnostics.Debug.WriteLine($"{Name}: {inputJsonString}");
 
-            ExitNodeMessage(
-                this,
-                "Output",
-                fromInput.ToJsonString(new JsonSerializerOptions { WriteIndented = true }),
-                Name);
+            if (ShowOutputMessage)
+            {
+                ExitNodeMessage(
+                    this,
+                    "Output",
+                    fromInput.ToJsonString(new JsonSerializerOptions { WriteIndented = true }),
+                    Name);
+            }
 
             return fromInput;
         }
