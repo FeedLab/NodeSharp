@@ -94,6 +94,27 @@ public partial class NodeExplanationsPopupViewModel : ObservableObject, IQueryAt
     }
 
     [RelayCommand]
+    private void InsertExplanation()
+    {
+        var newItem = new ExplanationItem
+        {
+            Label = "New explanation",
+            Description = "Describe this explanation...",
+            Code = "// Add code here"
+        };
+
+        var insertIndex = CurrentIndex;
+        if (insertIndex < 0 || insertIndex > Explanations.Count)
+        {
+            insertIndex = Explanations.Count;
+        }
+
+        Explanations.Insert(insertIndex, newItem);
+        CurrentIndex = insertIndex;
+        UpdateCurrentItem();
+    }
+
+    [RelayCommand]
     private void DeleteExplanation()
     {
         if (Explanations.Count == 0 || CurrentIndex < 0 || CurrentIndex >= Explanations.Count)

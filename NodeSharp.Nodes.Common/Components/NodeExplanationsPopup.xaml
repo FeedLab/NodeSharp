@@ -13,6 +13,42 @@
              MinimumHeightRequest="550"
              MaximumHeightRequest="750">
 
+    <ContentView.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Scale" Value="1"/>
+            <Setter Property="TranslationY" Value="0"/>
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="Scale" Value="1"/>
+                                <Setter Property="TranslationY" Value="0"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="PointerOver">
+                            <VisualState.Setters>
+                                <Setter Property="Scale" Value="1.06"/>
+                                <Setter Property="TranslationY" Value="-2"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Pressed">
+                            <VisualState.Setters>
+                                <Setter Property="Scale" Value="0.98"/>
+                                <Setter Property="TranslationY" Value="0"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Disabled">
+                            <VisualState.Setters>
+                                <Setter Property="Opacity" Value="0.6"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </ContentView.Resources>
+
     <Grid RowDefinitions="Auto, Auto, *, Auto" RowSpacing="15">
     <!-- Label -->
     <Entry Grid.Row="0"
@@ -93,7 +129,7 @@
             </Button>
         </Grid>
         <!-- Bottom: Navigation Controls -->
-        <Grid Grid.Row="3" ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto" ColumnSpacing="10">
+        <Grid Grid.Row="3" ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto, Auto" ColumnSpacing="10">
             <!-- Add Button -->
             <Button Grid.Column="0"
                     Text="+"
@@ -110,8 +146,24 @@
                 </Button.Shadow>
             </Button>
 
-            <!-- Delete Button -->
+            <!-- Insert Button -->
             <Button Grid.Column="1"
+                    Text="Insert"
+                    Command="{Binding InsertExplanationCommand}"
+                    WidthRequest="76"
+                    HeightRequest="44"
+                    BackgroundColor="#42A5F5"
+                    TextColor="White"
+                    FontSize="14"
+                    CornerRadius="10"
+                    IsVisible="{Binding Source={x:Reference Root}, Path=UseEditableFields}">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Offset="0,4" Radius="10" Opacity="0.25"/>
+                </Button.Shadow>
+            </Button>
+
+            <!-- Delete Button -->
+            <Button Grid.Column="2"
                     Text="-"
                     Command="{Binding DeleteExplanationCommand}"
                     IsEnabled="{Binding HasExplanations}"
@@ -128,11 +180,11 @@
             </Button>
 
             <!-- Spacer -->
-            <BoxView Grid.Column="2" Color="Transparent"/>
+            <BoxView Grid.Column="3" Color="Transparent"/>
 
             <!-- Previous Button -->
-            <Button Grid.Column="3"
-                    Text="◀"
+            <Button Grid.Column="4"
+                    Text="Previous"
                     Command="{Binding PreviousCommand}"
                     IsEnabled="{Binding CanGoPrevious}"
                     WidthRequest="52"
@@ -148,8 +200,8 @@
             </Button>
 
             <!-- Next Button -->
-            <Button Grid.Column="4"
-                    Text="▶"
+            <Button Grid.Column="5"
+                    Text="Next"
                     Command="{Binding NextCommand}"
                     IsEnabled="{Binding CanGoNext}"
                     WidthRequest="52"
@@ -165,8 +217,8 @@
             </Button>
 
             <!-- Close Button -->
-            <Button Grid.Column="5"
-                    Text="✕"
+            <Button Grid.Column="6"
+                    Text="Close"
                     Command="{Binding CloseCommand}"
                     WidthRequest="52"
                     HeightRequest="44"
@@ -179,6 +231,7 @@
                 </Button.Shadow>
             </Button>
         </Grid>
+
     </Grid>
 </ContentView>
 
